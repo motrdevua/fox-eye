@@ -484,6 +484,8 @@ select.speed-select {
     -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Стан приховання (ліва панель їде вліво, права вправо) */
