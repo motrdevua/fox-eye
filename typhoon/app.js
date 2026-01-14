@@ -117,14 +117,6 @@ function syncStorage() {
   localStorage.setItem('typhoon_v1.4_data', JSON.stringify(markersData));
 }
 
-function calculateTravelTime(km) {
-  const speed = parseFloat(document.getElementById('transport-speed').value);
-  const totalMinutes = (km / speed) * 60;
-  const h = Math.floor(totalMinutes / 60);
-  const m = Math.round(totalMinutes % 60);
-  return h > 0 ? `${h} год ${m} хв` : `${m} хв`;
-}
-
 // --- ПРОВЕРКА WEBGL ---
 function checkWebGL() {
   try {
@@ -459,8 +451,7 @@ function updateCompassVisual(currentLngLat) {
           radiusKm < 1
             ? Math.round(radiusKm * 1000) + ' м'
             : radiusKm.toFixed(2) + ' км'
-        }<br>
-        ЧАС: ${calculateTravelTime(radiusKm)}`;
+        }`;
 }
 
 function addRulerPoint(lngLat) {
@@ -520,8 +511,7 @@ function updateMeasurements() {
     map.getSource('ruler-source').setData(circle);
     document.getElementById('distance-info').innerHTML = `
             <span style='color:#00ff00'>РАДІУС ЗАФІКСОВАНО:</span><br>
-            ВІДСТАНЬ: ${radiusKm.toFixed(2)} км<br>
-            ЧАС: ${calculateTravelTime(radiusKm)}`;
+            ВІДСТАНЬ: ${radiusKm.toFixed(2)} км`;
   } else {
     const line = turf.lineString(coords);
     const km = turf.length(line, { units: 'kilometers' });
@@ -531,9 +521,7 @@ function updateMeasurements() {
     map.getSource('ruler-source').setData(line);
     document.getElementById(
       'distance-info'
-    ).innerHTML = `ВІДСТАНЬ: ${km.toFixed(2)} км<br>АЗИМУТ: ${Math.round(
-      az
-    )}°<br>ЧАС: ${calculateTravelTime(km)}`;
+    ).innerHTML = `ВІДСТАНЬ: ${km.toFixed(2)} км<br>АЗИМУТ: ${Math.round(az)}°`;
   }
 }
 
@@ -634,7 +622,7 @@ function handleShiftMeasure(id, lngLat) {
       'distance-info'
     ).innerHTML = `<span style='color:#00ff00'>ЗАМІР:</span> ${km.toFixed(
       2
-    )} км<br>ЧАС: ${calculateTravelTime(km)}`;
+    )} км`;
     map.getSource('ruler-source').setData(line);
     shiftSelectedMarkers = [];
   }
