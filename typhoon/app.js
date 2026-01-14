@@ -165,6 +165,7 @@ function initMap(lon, lat) {
   }
 
   try {
+    // Внутри функции initMap(lon, lat)
     map = new maplibregl.Map({
       container: 'map',
       center: [lon, lat],
@@ -179,8 +180,10 @@ function initMap(lon, lat) {
           },
           'terrain-data': {
             type: 'raster-dem',
+            // Используем v2 тайлы, они точнее
             url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${apiKey}`,
             tileSize: 512,
+            encoding: 'mapbox',
           },
         },
         layers: [{ id: 'sat', type: 'raster', source: 'google-satellite' }],
@@ -204,10 +207,18 @@ function initMap(lon, lat) {
     document.getElementById('map').appendChild(selectionBoxEl);
 
     map.on('load', () => {
+      if (!map.getSource('terrain-data')) return;
       loadSavedMarkers();
       map.addSource('ruler-source', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
+      });
+      // Добавляем невидимый слой для принудительной подгрузки DEM-тайлов
+      map.addLayer({
+        id: 'terrain-helper',
+        type: 'hillshade',
+        source: 'terrain-data',
+        paint: { 'hillshade-exaggeration': 0 },
       });
       map.addLayer({
         id: 'ruler-layer-fill',
@@ -215,21 +226,65 @@ function initMap(lon, lat) {
         source: 'ruler-source',
         paint: { 'fill-color': '#00ff00', 'fill-opacity': 0.1 },
       });
+      loadSavedMarkers();
       map.addLayer({
         id: 'ruler-layer-line',
         type: 'line',
         source: 'ruler-source',
         paint: { 'line-color': '#00ff00', 'line-width': 2 },
       });
+      // 1. Добавляем источник векторных данных контуров
+      map.addSource('contours', {
+        type: 'vector',
+        url: `https://api.maptiler.com/tiles/contours/tiles.json?key=${apiKey}`,
+      });
+      // 2. Линии рельефа (Изогипсы)
+      map.addLayer({
+        id: 'contour-lines',
+        type: 'line',
+        source: 'contours',
+        'source-layer': 'contour',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round',
+        },
+        paint: {
+          // Светло-оранжевый или коричневый цвет, характерный для топокарт
+          'line-color': '#ffcc00',
+          'line-opacity': 0.6,
+          'line-width': [
+            'match',
+            ['get', 'nth_line'],
+            5,
+            1.5, // Каждая 5-я линия (жирная)
+            0.6, // Остальные (тонкие)
+          ],
+        },
+      });
+      // 3. Подписи высот на линиях
+      map.addLayer({
+        id: 'contour-labels',
+        type: 'symbol',
+        source: 'contours',
+        'source-layer': 'contour',
+        filter: ['==', ['get', 'nth_line'], 5], // Подписываем только жирные линии
+        layout: {
+          'symbol-placement': 'line',
+          'text-field': ['concat', ['get', 'ele'], 'м'],
+          'text-font': ['Roboto Bold'],
+          'text-size': 10,
+          'text-allow-overlap': false,
+        },
+        paint: {
+          'text-color': '#ffcc00',
+          'text-halo-color': '#000',
+          'text-halo-width': 1,
+        },
+      });
     });
 
     // ... весь інший код (mousemove, click, dblclick) залишається без змін ...
     map.on('mousemove', (e) => {
-      const h = map.queryTerrainElevation(e.lngLat);
-      if (h !== null)
-        document.getElementById('elevation-info').innerText = `${Math.round(
-          h
-        )} м`;
       try {
         const m = mgrs.forward([e.lngLat.lng, e.lngLat.lat]);
         document.getElementById('mgrs-info').innerText = m.replace(
@@ -492,7 +547,6 @@ function clearRuler() {
       .setData({ type: 'FeatureCollection', features: [] });
 }
 
-// --- МАРКЕРИ ---
 function createMarker(lngLat, savedData = null) {
   const id = savedData ? savedData.id : Date.now();
   const name = savedData ? savedData.name : `POINT ${++markerCount}`;
@@ -588,38 +642,47 @@ function handleShiftMeasure(id, lngLat) {
 
 // Вспомогательная функция для очистки результатов
 function clearScanResults() {
-  // 1. Перевірка наявності карти
-  if (!map) return;
+  // 1. Проверка: если карта еще не создана или не загружена, просто выходим
+  if (!map || !map.getStyle()) return;
 
-  // 2. Очищення лінійок та циркуля
+  // 2. Очистка линеек и циркуля
   clearRuler();
 
-  // 3. Закриття сайдбару та списку точок
-  document.getElementById('results-sidebar').style.display = 'none';
-  document.getElementById('points-list').innerHTML = '';
+  // 3. Скрытие панелей
+  const resultsSidebar = document.getElementById('results-sidebar');
+  if (resultsSidebar) resultsSidebar.style.display = 'none';
 
-  // 4. Видалення маски видимості
+  const pointsList = document.getElementById('points-list');
+  if (pointsList) pointsList.innerHTML = '';
+
+  // 4. Безопасное удаление слоев видимости
   if (map.getLayer('visibility-canvas')) map.removeLayer('visibility-canvas');
   if (map.getSource('visibility-canvas')) map.removeSource('visibility-canvas');
 
-  // 5. Видалення маркерів сканування (PT-1, PT-2...)
+  // 5. Удаление маркеров сканирования
   if (window.scanMarkersList && window.scanMarkersList.length > 0) {
     window.scanMarkersList.forEach((m) => m.remove());
     window.scanMarkersList = [];
   }
 
-  // 6. Скидання лічильника маркерів (опціонально)
-  // markerCount = 0;
-
   showCopyToast('КАРТУ ОЧИЩЕНО');
+}
+
+// Вспомогательная функция для удаления слоев (вызывайте её вместо прямого map.removeLayer)
+function safeRemoveLayer(id) {
+  if (map && map.getStyle()) {
+    if (map.getLayer(id)) map.removeLayer(id);
+    if (map.getSource(id)) map.removeSource(id);
+  }
 }
 
 // Функция центрирования карты на точке из списка
 function focusPoint(lng, lat) {
   map.flyTo({
     center: [lng, lat],
-    zoom: 15,
+    zoom: 16, // Рівень наближення
     essential: true,
+    speed: 1.2,
   });
 }
 
@@ -631,11 +694,7 @@ async function findHighestPoints(p1, p2) {
   }
   const pointsCount = parseInt(pointsCountInput) || 5;
 
-  if (window.scanMarkersList) {
-    window.scanMarkersList.forEach((m) => m.remove());
-  }
-  window.scanMarkersList = [];
-
+  // Визначаємо межі
   const bbox = [
     Math.min(p1.lng, p2.lng),
     Math.min(p1.lat, p2.lat),
@@ -643,26 +702,32 @@ async function findHighestPoints(p1, p2) {
     Math.max(p1.lat, p2.lat),
   ];
 
-  const grid = turf.pointGrid(bbox, 0.07, { units: 'kilometers' });
-  let allPoints = [];
+  // Створюємо дуже щільну сітку (крок 10 метрів для максимальної точності)
+  // Використовуємо 0.01 км, щоб точно влучити в центр найменшої ізогіпси
+  const grid = turf.pointGrid(bbox, 0.01, { units: 'kilometers' });
 
+  const results = [];
+
+  // Пряме опитування карти (MapLibre Terrain)
+  // ... всередині findHighestPoints ...
   grid.features.forEach((f) => {
     const coords = f.geometry.coordinates;
     const elev = map.queryTerrainElevation(coords) || 0;
-    allPoints.push({ lng: coords[0], lat: coords[1], elevation: elev });
+    results.push({
+      lng: coords[0],
+      lat: coords[1],
+      elevation: Math.round(elev), // Округлюємо до цілих метрів
+    });
   });
 
-  if (allPoints.length === 0) {
-    setActiveTool(null);
-    return;
-  }
+  // Сортуємо: від найвищої
+  results.sort((a, b) => b.elevation - a.elevation);
 
-  allPoints.sort((a, b) => b.elevation - a.elevation);
-
+  // Фільтруємо, щоб точки не злипалися (мінімум 300м між PT-1, PT-2...)
   let filtered = [];
-  for (let p of allPoints) {
+  for (let p of results) {
     if (filtered.length >= pointsCount) break;
-    let isTooClose = filtered.some(
+    const isTooClose = filtered.some(
       (f) =>
         turf.distance([p.lng, p.lat], [f.lng, f.lat], { units: 'kilometers' }) <
         0.3
@@ -670,6 +735,55 @@ async function findHighestPoints(p1, p2) {
     if (!isTooClose) filtered.push(p);
   }
 
+  // 1. Берем ТОП-50 точек по предварительным данным карты.
+  // (GET-запрос имеет лимит длины URL, поэтому 50 точек — безопасный максимум за раз, и этого более чем достаточно)
+  filtered.sort((a, b) => b.elevation - a.elevation);
+  const fastCandidates = filtered.slice(0, 50);
+
+  showCopyToast(`ЗАПИТ ДО OPEN-METEO (High Speed)...`);
+
+  try {
+    // Формируем URL для пакетного запроса (координаты через запятую)
+    const lats = fastCandidates.map((p) => p.lat).join(',');
+    const lngs = fastCandidates.map((p) => p.lng).join(',');
+
+    // Open-Meteo Elevation API: мгновенный ответ, данные Copernicus DEM 30m
+    const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lngs}`;
+
+    const response = await fetch(url);
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Open-Meteo возвращает массив { elevation: [261, 245, ...] }
+      if (data.elevation && data.elevation.length === fastCandidates.length) {
+        fastCandidates.forEach((p, index) => {
+          // Обновляем высоту
+          p.elevation = Math.round(data.elevation[index]);
+        });
+      }
+    } else {
+      throw new Error('API Response Error');
+    }
+  } catch (e) {
+    console.error('Ошибка API, використовуємо дані мапи:', e);
+    // showCopyToast(`ПОМИЛКА МЕРЕЖІ`); // Можно раскомментировать для отладки
+  }
+
+  // 2. Финальная сортировка уже по точным данным
+  fastCandidates.sort((a, b) => b.elevation - a.elevation);
+
+  // 3. Рендер результата
+  // Берем именно fastCandidates, так как мы обновили высоту только в них
+  const finalResult = fastCandidates.slice(0, pointsCount);
+  console.log(finalResult);
+
+  renderScanResults(finalResult);
+  setActiveTool(null);
+}
+
+// Допоміжна функція для виводу результатів
+function renderScanResults(filtered) {
   const listEl = document.getElementById('points-list');
   listEl.innerHTML = '';
   document.getElementById('results-sidebar').style.display = 'flex';
@@ -678,7 +792,7 @@ async function findHighestPoints(p1, p2) {
     const color = `hsl(${(i / filtered.length) * 240}, 100%, 50%)`;
     const pointName = `PT-${i + 1}`;
 
-    // 1. ЕЛЕМЕНТ НА КАРТІ (залишається без змін)
+    // 1. Створення маркера на карті
     const el = document.createElement('div');
     el.className = 'scan-result-marker';
     el.style.backgroundColor = color;
@@ -693,85 +807,49 @@ async function findHighestPoints(p1, p2) {
 
     window.scanMarkersList.push(marker);
 
-    // 2. ЕЛЕМЕНТ У САЙДБАРІ (ОНОВЛЕНА СТРУКТУРА)
+    // 2. Створення елемента списку
     const rawMgrs = mgrs.forward([p.lng, p.lat]);
     const formattedMgrs = rawMgrs.replace(
       /(.{3})(.{2})(.{5})(.{5})/,
       '$1 $2 $3 $4'
     );
 
-    // ... у циклі filtered.forEach ...
-
     const item = document.createElement('div');
     item.className = 'point-item';
     item.style.borderLeft = `5px solid ${color}`;
 
-    // 1. Клік по самій картці (назва/висота) — ТІЛЬКИ політ до точки
+    // --- ДОДАЄМО ОБРОБНИК КЛІКУ ДЛЯ ЗУМУ ---
     item.onclick = (e) => {
-      map.flyTo({ center: [p.lng, p.lat], zoom: 15 });
-    };
-
-    item.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items: baseline;">
-        <b style="color: ${color}; font-size: 14px;">${pointName}</b>
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="btn-copy-small btn-eye" title="Аналіз видимості" style="padding: 2px 5px;">${
-              icons.eye
-            }</button>
-            <b style="padding: 2px 4px; border-radius: 2px; color: black; background-color: ${color}; font-size: 14px;">${Math.round(
-      p.elevation
-    )} м</b>
-        </div>
-    </div>
-    <div class="mgrs-copy-zone" style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-        <span class="coord-text" style="color: #00ff00; opacity: 0.8; font-size: 11px;">${formattedMgrs}</span>
-        <button class="btn-copy-small btn-copy-mgrs">COPY</button>
-    </div>
-`;
-
-    // 2. Кнопка ОКА — ТІЛЬКИ видимість
-    // 2. Кнопка ОКА — запит радіусу та розрахунок
-    const eyeBtn = item.querySelector('.btn-eye');
-    eyeBtn.onclick = (e) => {
-      e.stopPropagation();
-
-      // 1. Запит радіусу
-      const userRadius = prompt('РАДІУС АНАЛІЗУ (КМ):', '4');
-      if (userRadius === null) return;
-
-      // 2. Запит висоти спостерігача
-      const userHeight = prompt("ВИСОТА ОБ'ЄКТА / ОЧЕЙ (МЕТРИ):", '2.5');
-      if (userHeight === null) return;
-
-      const r = parseFloat(userRadius.replace(',', '.'));
-      const h = parseFloat(userHeight.replace(',', '.'));
-
-      if (!isNaN(r) && !isNaN(h) && r > 0) {
-        calculateVisibility(p.lng, p.lat, p.elevation, r, h);
-      } else {
-        showCopyToast('ПОМИЛКА ВВОДУ ПАРАМЕТРІВ');
+      // Перевіряємо, щоб клік не був по кнопці копіювання
+      if (e.target.tagName !== 'BUTTON') {
+        focusPoint(p.lng, p.lat);
       }
     };
 
-    // 3. Кнопка COPY — ТІЛЬКИ копіювання
+    item.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items: baseline; pointer-events: none;">
+          <b style="color: ${color}; font-size: 14px;">${pointName}</b>
+          <b style="background:${color}; color:black; padding:2px 6px; border-radius:2px; font-size: 14px;">${Math.round(
+      p.elevation
+    )} м</b>
+      </div>
+      <div class="mgrs-copy-zone">
+          <span class="coord-text" style="color: #00ff00; opacity: 0.8;">${formattedMgrs}</span>
+          <button class="btn-copy-small btn-copy-mgrs">COPY</button>
+      </div>
+    `;
+
+    // Кнопка копіювання (stopPropagation щоб не спрацював зум при копіюванні)
     const copyBtn = item.querySelector('.btn-copy-mgrs');
     copyBtn.onclick = (e) => {
-      e.stopPropagation(); // Зупиняємо політ карти
+      e.stopPropagation();
       navigator.clipboard.writeText(rawMgrs).then(() => {
-        showCopyToast(`${pointName} MGRS СКОПІЙОВАНО`);
+        showCopyToast(`${pointName} СКОПІЙОВАНО`);
       });
     };
+
     listEl.appendChild(item);
   });
-
-  setActiveTool(null);
-  document.getElementById('distance-info').innerText = 'ГОТОВО';
-}
-
-// Функція-заглушка для зон видимості (додамо логіку в наступному кроці)
-function showVisibility(lngLat, height) {
-  console.log(`Аналіз видимості для точки ${height}м...`);
-  // Тут ми додамо малювання променів або затінення
 }
 
 function showCopyToast(text) {
@@ -794,7 +872,7 @@ async function calculateVisibility(obsLng, obsLat, obsElev, radius, obsHeight) {
 
   showCopyToast(`АНАЛІЗ: ${radius}км | h=${obsHeight}м...`);
 
-  const steps = radius > 5 ? 80 : 50;
+  const steps = radius > 5 ? 50 : 25;
   const rays = 120;
   // Сумуємо висоту рельєфу та висоту об'єкта
   const totalObsHeight = obsElev + obsHeight;
@@ -821,6 +899,7 @@ async function calculateVisibility(obsLng, obsLat, obsElev, radius, obsHeight) {
       // Отримуємо висоту рельєфу в точці цілі
       const targetElev = map.queryTerrainElevation(coords) || 0;
 
+      // Расчет уклона (slope) для определения, видна ли точка
       // Математична модель Line of Sight
       // slope = (висота_цілі - висота_спостерігача) / відстань
       const slope = (targetElev - totalObsHeight) / (dist * 1000);
@@ -854,12 +933,16 @@ async function calculateVisibility(obsLng, obsLat, obsElev, radius, obsHeight) {
   });
 }
 
-if (map.getLayer('visibility-canvas')) map.removeLayer('visibility-canvas');
-if (map.getSource('visibility-canvas')) map.removeSource('visibility-canvas');
-
-// Очищення при завантаженні
+// Вместо открытых вызовов map.getLayer в конце файла,
+// используем только обработчик загрузки окна.
 window.onload = () => {
   const input = document.getElementById('city-input');
-  input.value = '';
-  updatePlaceholder();
+  if (input) {
+    input.value = '';
+    updatePlaceholder();
+  }
+
+  // Очищення та малювання
+  if (window.scanMarkersList) window.scanMarkersList.forEach((m) => m.remove());
+  window.scanMarkersList = [];
 };

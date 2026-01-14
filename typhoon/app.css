@@ -27,6 +27,7 @@ body {
   z-index: 100;
   color: #00ff00;
 }
+
 .search-box {
   background: #111;
   padding: 40px;
@@ -36,6 +37,7 @@ body {
   justify-content: center;
   flex-direction: column;
 }
+
 input[type='text'],
 select {
   padding: 12px;
@@ -59,6 +61,7 @@ select {
   border: 1px solid #00ff00;
   min-width: 220px;
 }
+
 .label-desc {
   color: #888;
   font-size: 10px;
@@ -72,6 +75,7 @@ select {
   gap: 8px;
   margin-bottom: 10px;
 }
+
 .icon-btn {
   background: #003300;
   border: 1px solid #00ff00;
@@ -82,15 +86,18 @@ select {
   justify-content: center;
   transition: 0.2s;
 }
+
 .icon-btn svg {
   width: 22px;
   height: 22px;
   fill: #00ff00;
 }
+
 .icon-btn.active {
   background: #ff0000;
   border-color: #fff;
 }
+
 .icon-btn.active svg {
   fill: #fff;
 }
@@ -100,6 +107,7 @@ select {
   width: 0;
   height: 0;
 }
+
 .custom-marker {
   position: absolute;
   width: 14px;
@@ -112,18 +120,22 @@ select {
   cursor: -webkit-grab;
   cursor: grab;
 }
+
 .m-green {
   background: #00ff00;
   box-shadow: 0 0 10px #00ff00;
 }
+
 .m-red {
   background: #ff0000;
   box-shadow: 0 0 10px #ff0000;
 }
+
 .m-blue {
   background: #008cff;
   box-shadow: 0 0 10px #008cff;
 }
+
 .m-yellow {
   background: #ffff00;
   box-shadow: 0 0 10px #ffff00;
@@ -145,22 +157,26 @@ select {
   -ms-user-select: none;
   user-select: none;
 }
+
 .label-top {
   bottom: 15px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
+
 .label-right {
   left: 15px;
   top: -7px;
 }
+
 .label-bottom {
   top: 15px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
+
 .label-left {
   right: 15px;
   top: -7px;
@@ -172,6 +188,7 @@ select {
   transition: transform 0.2s;
   transition: transform 0.2s, -webkit-transform 0.2s;
 }
+
 .ruler-point-el:hover {
   -webkit-transform: scale(1.4);
   transform: scale(1.4);
@@ -207,6 +224,7 @@ button.main-btn {
   justify-content: center;
   align-items: center;
 }
+
 button.main-btn:hover {
   background: #00ff00;
   color: #000;
@@ -234,6 +252,7 @@ select.speed-select {
   margin-bottom: 10px;
   cursor: pointer;
 }
+
 /* Рамка выделения области */
 .selection-box {
   position: absolute;
@@ -243,6 +262,7 @@ select.speed-select {
   pointer-events: none; /* Щоб мишка не "застрягла" на самому діві */
   display: none;
 }
+
 .results-panel {
   position: absolute;
   top: 50%;
@@ -300,6 +320,7 @@ select.speed-select {
   display: block;
   margin-top: 3px;
 }
+
 /* Оновлюємо моноширинні елементи для координат (опційно) */
 .coord-text,
 #mgrs-info,
@@ -308,11 +329,13 @@ select.speed-select {
   font-family: 'Roboto', sans-serif;
   letter-spacing: 0.5px;
 }
+
 /* Стилі для знайдених сканером точок */
 /* Контейнер, який MapLibre вішає на координату */
 .maplibregl-marker {
   z-index: 9999 !important;
 }
+
 /* ПРИМУСОВИЙ ВИВОД ТОЧОК СКАНУВАННЯ */
 .scan-marker-svg {
   display: block !important;
@@ -332,14 +355,15 @@ select.speed-select {
   stroke-width: 0.5px;
   paint-order: stroke;
 }
+
 /* Новий клас, який ігнорує всі нульові розміри */
 /* ПРАВИЛЬНЕ ВІДОБРАЖЕННЯ ТОЧОК */
 /* КЛАС ДЛЯ ТОЧОК СКАНЕРА */
 .scan-result-marker {
   width: 16px !important;
   height: 16px !important;
-  border: 2px solid #ffffff !important;
-  border-radius: 2px !important; /* Квадратні за ТЗ */
+  border: 2px solid rgba(0, 0, 0, 0.45) !important;
+  border-radius: 50% !important; /* Квадратні за ТЗ */
   box-sizing: border-box !important;
   /* Z-index нижче ніж у .data-panel та .results-panel (які мають 10 та 100) */
   z-index: 1 !important;
@@ -350,20 +374,22 @@ select.speed-select {
 /* ПІДПИС НАЗВИ ТОЧКИ (БЕЗ ВИСОТИ) */
 .scan-marker-label {
   position: absolute;
-  bottom: 22px;
+  bottom: 20px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
-  background: rgba(0, 10, 0, 0.9);
+  background: rgba(0, 10, 0, 0.85);
   color: #00ff00;
-  padding: 1px 6px;
+  padding: 0px 5px;
   font-size: 11px;
   font-weight: bold;
   border: 1px solid #00ff00;
   pointer-events: none;
   white-space: nowrap;
   z-index: 5;
+  border-radius: 5px;
 }
+
 .copy-hint {
   font-size: 9px;
   color: #555;
@@ -380,16 +406,19 @@ select.speed-select {
   position: fixed;
   bottom: 20px;
   left: 50%;
+  z-index: 10;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
-  background: #00ff00;
-  color: #000;
-  padding: 5px 15px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #00ff00;
+  padding: 12px;
   font-weight: bold;
   border-radius: 2px;
-  z-index: 1000;
   display: none;
+  font-size: 14px;
+  line-height: 1.5;
 }
+
 /* Кнопка копіювання всередині елемента списку */
 .btn-copy-small {
   padding: 2px 8px;
@@ -473,17 +502,11 @@ select.speed-select {
 #search-overlay {
   transition: opacity 0.3s ease-in-out;
 }
+
 /* Базові переходи для панелей */
 #map-controls,
 #results-sidebar {
   transition: -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
