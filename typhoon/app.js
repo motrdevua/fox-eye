@@ -57,8 +57,9 @@ async function performSearch() {
   if (type === 'mgrs') {
     // Перевірка формату (мінімум зона, квадрат і по 1 цифрі координат)
     const cleanMgrs = query.replace(/\s/g, '');
+    // Знайти рядок з alert('ПОМИЛКА: Недостатньо символів...') і замінити на:
     if (cleanMgrs.length < 7) {
-      alert('ПОМИЛКА: Недостатньо символів для MGRS (мін. 7)');
+      customAlert('ПОМИЛКА: Недостатньо символів для MGRS (мін. 7)');
       return;
     }
     // ЛОГІКА ДЛЯ MGRS
@@ -84,7 +85,7 @@ async function performSearch() {
         });
       }, 500);
     } catch (e) {
-      alert('ПОМИЛКА: Невірний формат MGRS');
+      customAlert('ПОМИЛКА: Невірний формат MGRS');
       console.error(e);
     }
   } else {
@@ -275,7 +276,6 @@ function initMap(lon, lat) {
       });
     });
 
-    // ... весь інший код (mousemove, click, dblclick) залишається без змін ...
     map.on('mousemove', (e) => {
       try {
         const m = mgrs.forward([e.lngLat.lng, e.lngLat.lat]);
@@ -304,6 +304,8 @@ function initMap(lon, lat) {
       if (activeTool !== 'scan') return;
       if (e.button !== 0) return; // Тільки ліва кнопка
 
+      clearScanResults();
+
       isSelecting = true;
       map.dragPan.disable(); // Вимикаємо рух карти поки малюємо
 
@@ -319,6 +321,10 @@ function initMap(lon, lat) {
       selectionBoxEl.style.width = '0px';
       selectionBoxEl.style.height = '0px';
       selectionBoxEl.style.display = 'block';
+
+      uiElements.forEach((el) => {
+        if (el) el.classList.add('interface-hidden');
+      });
     });
 
     map.getCanvas().addEventListener('mousemove', (e) => {
@@ -352,6 +358,9 @@ function initMap(lon, lat) {
         e.clientY - rect.top,
       ]);
 
+      uiElements.forEach((el) => {
+        if (el) el.classList.remove('interface-hidden');
+      });
       // Запускаємо пошук висот
       findHighestPoints(selectionStart.lngLat, endLngLat);
     });
@@ -675,7 +684,11 @@ function focusPoint(lng, lat) {
 }
 
 async function findHighestPoints(p1, p2) {
-  const pointsCountInput = prompt('Скільки найвищих точок знайти?', '5');
+  const pointsCountInput = await customPrompt(
+    'Скільки найвищих точок знайти?',
+    '5'
+  );
+
   if (pointsCountInput === null) {
     setActiveTool(null);
     return;
@@ -918,6 +931,39 @@ async function calculateVisibility(obsLng, obsLat, obsElev, radius, obsHeight) {
       'fill-color': '#ff0000',
       'fill-opacity': 0.35, // Напівпрозорий червоний "туман"
     },
+  });
+}
+
+// --- КАСТОМНІ МОДАЛКИ ЗАМІСТЬ alert ТА prompt ---
+function customAlert(text) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('modal-alert');
+    document.getElementById('modal-alert-text').innerText = text;
+    modal.style.display = 'flex';
+    document.getElementById('modal-alert-ok').onclick = () => {
+      modal.style.display = 'none';
+      resolve();
+    };
+  });
+}
+
+function customPrompt(text, defaultValue) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('modal-prompt');
+    const input = document.getElementById('modal-prompt-input');
+    document.getElementById('modal-prompt-text').innerText = text;
+    input.value = defaultValue;
+    modal.style.display = 'flex';
+    input.focus();
+
+    document.getElementById('modal-prompt-ok').onclick = () => {
+      modal.style.display = 'none';
+      resolve(input.value);
+    };
+    document.getElementById('modal-prompt-cancel').onclick = () => {
+      modal.style.display = 'none';
+      resolve(null);
+    };
   });
 }
 

@@ -1,8 +1,44 @@
+:root {
+  /* Кольори інтерфейсу (основні) */
+  --color-main: #00ff00; /* Яскраво-зелений (текст, рамки) */
+  --color-main-dark: #003300; /* Темно-зелений (кнопки) */
+  --color-main-deep: #001500; /* Глибокий зелений (фон панелей) */
+  --color-main-muted: #004400; /* Мутний зелений (радіо-кнопки) */
+  --color-accent: #ff0000; /* Акцентний колір (активна лінійка/видалення) */
+  --color-accent-blue: #008cff; /* Синій маркер */
+  --color-accent-yellow: #ffff00; /* Жовтий маркер */
+
+  /* Фон та текст */
+  --bg-black: #000000;
+  --bg-dark-grey: #0a0a0a;
+  --bg-panel: rgba(0, 15, 0, 0.9);
+  --bg-overlay: rgba(0, 0, 0, 0.85);
+  --text-grey: #888888;
+  --text-dark-grey: #666666;
+  --text-dim: #555555;
+
+  /* Параметри елементів */
+  --border-width: 1px;
+  --border-radius: 2px;
+  --gap-small: 5px;
+  --gap-medium: 10px;
+  --panel-padding: 15px;
+
+  /* Шрифти */
+  --font-main: 'Roboto', sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+  /* Анімації */
+  --transition-fast: 0.2s;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slide: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', sans-serif;
-  background: #000;
+  font-family: var(--font-main);
+  background: var(--bg-black);
   overflow: hidden;
 }
 
@@ -19,19 +55,19 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #0a0a0a;
+  background: var(--bg-dark-grey);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 100;
-  color: #00ff00;
+  color: var(--color-main);
 }
 
 .search-box {
   background: #111;
   padding: 40px;
-  border: 1px solid #00ff00;
+  border: var(--border-width) solid var(--color-main);
   text-align: center;
   display: flex;
   justify-content: center;
@@ -42,11 +78,11 @@ input[type='text'],
 select {
   padding: 12px;
   width: 280px;
-  background: #000;
-  color: #00ff00;
-  border: 1px solid #00ff00;
+  background: var(--bg-black);
+  color: var(--color-main);
+  border: var(--border-width) solid var(--color-main);
   outline: none;
-  margin-bottom: 10px;
+  margin-bottom: var(--gap-medium);
   font-family: inherit;
 }
 
@@ -55,46 +91,46 @@ select {
   top: 10px;
   left: 10px;
   z-index: 10;
-  background: rgba(0, 15, 0, 0.9);
-  color: #00ff00;
-  padding: 15px;
-  border: 1px solid #00ff00;
+  background: var(--bg-panel);
+  color: var(--color-main);
+  padding: var(--panel-padding);
+  border: var(--border-width) solid var(--color-main);
   min-width: 220px;
 }
 
 .label-desc {
-  color: #888;
+  color: var(--text-grey);
   font-size: 10px;
   display: block;
   text-transform: uppercase;
-  margin-bottom: 5px;
+  margin-bottom: var(--gap-small);
 }
 
 .ruler-selector {
   display: flex;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: var(--gap-medium);
 }
 
 .icon-btn {
-  background: #003300;
-  border: 1px solid #00ff00;
+  background: var(--color-main-dark);
+  border: var(--border-width) solid var(--color-main);
   cursor: pointer;
   padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.2s;
+  transition: var(--transition-fast);
 }
 
 .icon-btn svg {
   width: 22px;
   height: 22px;
-  fill: #00ff00;
+  fill: var(--color-main);
 }
 
 .icon-btn.active {
-  background: #ff0000;
+  background: var(--color-accent);
   border-color: #fff;
 }
 
@@ -114,39 +150,39 @@ select {
   height: 14px;
   left: -7px;
   top: -7px;
-  border: 1px solid #000;
-  border-radius: 2px;
+  border: 1px solid var(--bg-black);
+  border-radius: var(--border-radius);
   z-index: 2;
   cursor: -webkit-grab;
   cursor: grab;
 }
 
 .m-green {
-  background: #00ff00;
-  box-shadow: 0 0 10px #00ff00;
+  background: var(--color-main);
+  box-shadow: 0 0 10px var(--color-main);
 }
 
 .m-red {
-  background: #ff0000;
-  box-shadow: 0 0 10px #ff0000;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent);
 }
 
 .m-blue {
-  background: #008cff;
-  box-shadow: 0 0 10px #008cff;
+  background: var(--color-accent-blue);
+  box-shadow: 0 0 10px var(--color-accent-blue);
 }
 
 .m-yellow {
-  background: #ffff00;
-  box-shadow: 0 0 10px #ffff00;
+  background: var(--color-accent-yellow);
+  box-shadow: 0 0 10px var(--color-accent-yellow);
 }
 
 .marker-label {
   position: absolute;
   background: rgba(0, 0, 0, 0.9);
-  color: #00ff00;
+  color: var(--color-main);
   padding: 2px 6px;
-  border: 1px solid #00ff00;
+  border: var(--border-width) solid var(--color-main);
   font-size: 11px;
   font-weight: bold;
   white-space: nowrap;
@@ -164,19 +200,16 @@ select {
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
-
 .label-right {
   left: 15px;
   top: -7px;
 }
-
 .label-bottom {
   top: 15px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
-
 .label-left {
   right: 15px;
   top: -7px;
@@ -184,15 +217,14 @@ select {
 
 .ruler-point-el {
   cursor: pointer;
-  transition: -webkit-transform 0.2s;
-  transition: transform 0.2s;
-  transition: transform 0.2s, -webkit-transform 0.2s;
+  transition: -webkit-transform var(--transition-fast);
+  transition: transform var(--transition-fast);
 }
 
 .ruler-point-el:hover {
   -webkit-transform: scale(1.4);
   transform: scale(1.4);
-  background: #ff0000 !important;
+  background: var(--color-accent) !important;
 }
 
 .distance-container {
@@ -200,10 +232,10 @@ select {
   top: 10px;
   right: 50px;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.85);
-  color: #00ff00;
+  background: var(--bg-overlay);
+  color: var(--color-main);
   padding: 12px;
-  border: 1px solid #00ff00;
+  border: var(--border-width) solid var(--color-main);
   font-weight: bold;
   font-size: 14px;
   line-height: 1.5;
@@ -212,54 +244,53 @@ select {
 
 button.main-btn {
   padding: 10px 20px;
-  background: #003300;
-  color: #00ff00;
-  border: 1px solid #00ff00;
+  background: var(--color-main-dark);
+  color: var(--color-main);
+  border: var(--border-width) solid var(--color-main);
   cursor: pointer;
   text-transform: uppercase;
   width: 100%;
   font-family: inherit;
-  margin-top: 5px;
+  margin-top: var(--gap-small);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 button.main-btn:hover {
-  background: #00ff00;
-  color: #000;
+  background: var(--color-main);
+  color: var(--bg-black);
+}
 
-  button.main-btn,
-  .btn-copy-small {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
+button.main-btn,
+.btn-copy-small {
+  font-family: var(--font-main);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .hint {
   font-size: 9px;
-  color: #666;
+  color: var(--text-dark-grey);
   margin-top: 8px;
   border-top: 1px solid #222;
-  padding-top: 5px;
+  padding-top: var(--gap-small);
 }
 
 select.speed-select {
   width: 100%;
   padding: 5px;
   font-size: 11px;
-  margin-bottom: 10px;
+  margin-bottom: var(--gap-medium);
   cursor: pointer;
 }
 
-/* Рамка выделения области */
 .selection-box {
   position: absolute;
-  border: 2px dashed #00ff00;
+  border: 2px dashed var(--color-main);
   background: rgba(0, 255, 0, 0.2);
   z-index: 20;
-  pointer-events: none; /* Щоб мишка не "застрягла" на самому діві */
+  pointer-events: none;
   display: none;
 }
 
@@ -271,10 +302,10 @@ select.speed-select {
   right: 10px;
   width: 280px;
   max-height: 80vh;
-  background: rgba(0, 15, 0, 0.9);
-  border: 1px solid #00ff00;
-  color: #00ff00;
-  padding: 15px;
+  background: var(--bg-panel);
+  border: var(--border-width) solid var(--color-main);
+  color: var(--color-main);
+  padding: var(--panel-padding);
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -282,12 +313,12 @@ select.speed-select {
 }
 
 .panel-header {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--font-main);
   font-weight: 700;
   letter-spacing: 1px;
-  border-bottom: 1px solid #00ff00;
+  border-bottom: var(--border-width) solid var(--color-main);
   padding-bottom: 8px;
-  margin-bottom: 10px;
+  margin-bottom: var(--gap-medium);
   text-align: center;
 }
 
@@ -298,16 +329,16 @@ select.speed-select {
 
 .point-item {
   padding: 4px;
-  border: 1px solid #003300;
-  margin-bottom: 5px;
+  border: var(--border-width) solid var(--color-main-dark);
+  margin-bottom: var(--gap-small);
   cursor: pointer;
-  transition: 0.2s;
+  transition: var(--transition-fast);
   font-size: 12px;
 }
 
 .point-item:hover {
   background: rgba(0, 255, 0, 0.2);
-  border-color: #00ff00;
+  border-color: var(--color-main);
 }
 
 .point-item b {
@@ -315,28 +346,23 @@ select.speed-select {
 }
 
 .coord-text {
-  color: #888;
+  color: var(--text-grey);
   font-size: 10px;
   display: block;
   margin-top: 3px;
 }
 
-/* Оновлюємо моноширинні елементи для координат (опційно) */
 .coord-text,
 #mgrs-info,
 #elevation-info {
-  /* Для координат краще залишити Roboto або інший чіткий шрифт */
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--font-main);
   letter-spacing: 0.5px;
 }
 
-/* Стилі для знайдених сканером точок */
-/* Контейнер, який MapLibre вішає на координату */
 .maplibregl-marker {
   z-index: 9999 !important;
 }
 
-/* ПРИМУСОВИЙ ВИВОД ТОЧОК СКАНУВАННЯ */
 .scan-marker-svg {
   display: block !important;
   overflow: visible !important;
@@ -347,31 +373,25 @@ select.speed-select {
 }
 
 .scan-marker-label-text {
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-weight: bold;
   font-size: 12px;
-  fill: #00ff00;
-  stroke: #000;
+  fill: var(--color-main);
+  stroke: var(--bg-black);
   stroke-width: 0.5px;
   paint-order: stroke;
 }
 
-/* Новий клас, який ігнорує всі нульові розміри */
-/* ПРАВИЛЬНЕ ВІДОБРАЖЕННЯ ТОЧОК */
-/* КЛАС ДЛЯ ТОЧОК СКАНЕРА */
 .scan-result-marker {
   width: 16px !important;
   height: 16px !important;
   border: 2px solid rgba(0, 0, 0, 0.45) !important;
-  border-radius: 50% !important; /* Квадратні за ТЗ */
+  border-radius: 50% !important;
   box-sizing: border-box !important;
-  /* Z-index нижче ніж у .data-panel та .results-panel (які мають 10 та 100) */
   z-index: 1 !important;
   cursor: pointer !important;
 }
 
-/* ПІДПИС ВИСОТИ (Тільки текст) */
-/* ПІДПИС НАЗВИ ТОЧКИ (БЕЗ ВИСОТИ) */
 .scan-marker-label {
   position: absolute;
   bottom: 20px;
@@ -379,11 +399,11 @@ select.speed-select {
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
   background: rgba(0, 10, 0, 0.85);
-  color: #00ff00;
+  color: var(--color-main);
   padding: 0px 5px;
   font-size: 11px;
   font-weight: bold;
-  border: 1px solid #00ff00;
+  border: var(--border-width) solid var(--color-main);
   pointer-events: none;
   white-space: nowrap;
   z-index: 5;
@@ -392,8 +412,8 @@ select.speed-select {
 
 .copy-hint {
   font-size: 9px;
-  color: #555;
-  margin-left: 10px;
+  color: var(--text-dim);
+  margin-left: var(--gap-medium);
   vertical-align: middle;
 }
 
@@ -401,7 +421,6 @@ select.speed-select {
   background: rgba(0, 255, 0, 0.4);
 }
 
-/* Спливаюче повідомлення про копіювання */
 .copy-toast {
   position: fixed;
   bottom: 20px;
@@ -409,33 +428,33 @@ select.speed-select {
   z-index: 10;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
-  color: #00ff00;
+  background: var(--bg-overlay);
+  color: var(--color-main);
   padding: 12px;
   font-weight: bold;
-  border-radius: 2px;
+  border-radius: var(--border-radius);
   display: none;
   font-size: 14px;
   line-height: 1.5;
+  border: var(--border-width) solid var(--color-main);
 }
 
-/* Кнопка копіювання всередині елемента списку */
 .btn-copy-small {
   padding: 2px 8px;
-  background: #003300;
-  color: #00ff00;
-  border: 1px solid #00ff00;
+  background: var(--color-main-dark);
+  color: var(--color-main);
+  border: var(--border-width) solid var(--color-main);
   cursor: pointer;
   font-family: inherit;
   font-size: 10px;
   text-transform: uppercase;
-  transition: 0.2s;
-  border-radius: 2px;
+  transition: var(--transition-fast);
+  border-radius: var(--border-radius);
 }
 
 .btn-copy-small:hover {
-  background: #00ff00;
-  color: #000;
+  background: var(--color-main);
+  color: var(--bg-black);
 }
 
 .mgrs-copy-zone {
@@ -447,7 +466,6 @@ select.speed-select {
   border-top: 1px solid rgba(0, 255, 0, 0.1);
 }
 
-/* Контейнер для радіо-групи */
 .radio-group {
   display: flex;
   gap: 20px;
@@ -455,69 +473,99 @@ select.speed-select {
   justify-content: center;
 }
 
-/* Приховуємо дефолтний вхід */
 .radio-group input[type='radio'] {
   display: none;
 }
 
-/* Стиль для лейбла (нашої нової кнопки) */
 .radio-label {
   padding: 8px 20px;
-  border: 1px solid #004400;
-  color: #004400;
+  border: var(--border-width) solid var(--color-main-muted);
+  color: var(--color-main-muted);
   cursor: pointer;
   font-weight: bold;
   font-size: 12px;
-  transition: 0.3s;
+  transition: var(--transition-normal);
   text-transform: uppercase;
   letter-spacing: 1px;
   background: rgba(0, 20, 0, 0.5);
 }
 
-/* Ефект при наведенні */
 .radio-label:hover {
-  border-color: #00ff00;
-  color: #00ff00;
+  border-color: var(--color-main);
+  color: var(--color-main);
 }
 
-/* Стиль для ВИБРАНОГО радіо-баттона */
 .radio-group input[type='radio']:checked + .radio-label {
-  background: #00ff00;
-  color: #000;
-  border-color: #00ff00;
+  background: var(--color-main);
+  color: var(--bg-black);
+  border-color: var(--color-main);
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
 }
 
-/* Клас для приховування елементів */
 .interface-hidden {
   opacity: 0 !important;
-  pointer-events: none; /* Щоб не можна було випадково натиснути під час руху */
-  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+  transition: var(--transition-normal);
 }
 
-/* Додай перехід до основних елементів, щоб вони ховались плавно */
 #map-controls,
 #results-sidebar,
 #distance-info,
 #search-overlay {
-  transition: opacity 0.3s ease-in-out;
+  transition: var(--transition-normal);
 }
 
-/* Базові переходи для панелей */
 #map-controls,
 #results-sidebar {
-  transition: -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide);
 }
 
-/* Стан приховання (ліва панель їде вліво, права вправо) */
 .ui-left-hidden {
   -webkit-transform: translateX(-100%);
   transform: translateX(-100%);
 }
-
 .ui-right-hidden {
   -webkit-transform: translateX(100%);
   transform: translateX(100%);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: var(--bg-panel);
+  border: 1px solid var(--color-main);
+  width: 320px;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+}
+
+.main-input {
+  background: #000;
+  color: var(--color-main);
+  border: 1px solid var(--color-main);
+  padding: 10px;
+  font-family: var(--font-main);
+  outline: none;
+}
+
+.panel-header {
+  font-family: var(--font-main);
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-bottom: var(--border-width) solid var(--color-main);
+  padding-bottom: 8px;
+  margin-bottom: var(--gap-medium);
+  text-align: center;
+  color: var(--color-main);
 }

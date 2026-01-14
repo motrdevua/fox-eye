@@ -28,7 +28,6 @@
         clear: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="margin-right:8px"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/></svg>`,
         ruler: `<svg viewBox="0 0 24 24"><path d="M7,2H17A2,2 0 0,1 19,4V20A2,2 0 0,1 17,22H7A2,2 0 0,1 5,20V4A2,2 0 0,1 7,2M7,4V6H10V8H7V10H12V12H7V14H10V16H7V18H12V20H17V4H7Z"/></svg>`,
         compass: `<svg viewBox="0 0 24 24"><path d="M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M9.2,5.2L10.5,5.2L11,8.1L11.5,5.2L12.8,5.2L13.3,8.1L13.8,5.2L15.1,5.2L13.6,15H15V17H13.3L12.8,20.2L12.5,22H11.5L11.2,20.2L10.7,17H9V15H10.4L8.9,5.2M12,9L11.5,12H12.5L12,9Z"/></svg>`,
-        path: `<svg viewBox="0 0 24 24"><path d="M15,15H17V11H15V15M11,15H13V11H11V15M7,15H9V11H7V15M3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H5A2,2 0 0,0 3,5M5,5H19V19H5V5Z"/></svg>`,
         scan: `<svg viewBox="0 0 24 24"><path d="M14,6L10.25,11L13.1,14.8L11.5,16C9.81,13.75 7,10 7,10L1,18H23L14,6Z"/></svg>`,
         eye: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg>`,
       };
@@ -99,16 +98,7 @@
             document.write(icons.compass);
           </script>
         </button>
-        <button
-          class="icon-btn"
-          id="ruler-btn-3"
-          onclick="setActiveTool('path')"
-          title="Шлях"
-        >
-          <script>
-            document.write(icons.path);
-          </script>
-        </button>
+
         <button
           class="icon-btn"
           id="ruler-btn-4"
@@ -158,6 +148,49 @@
         </script>
         ОЧИСТИТИ
       </button>
+    </div>
+
+    <div id="modal-prompt" class="modal-overlay" style="display: none">
+      <div class="modal-content">
+        <div class="panel-header" id="modal-prompt-title">ЗАПИТ ДАНИХ</div>
+        <div style="padding: 20px">
+          <p
+            id="modal-prompt-text"
+            style="margin-bottom: 15px; color: var(--color-main)"
+          ></p>
+          <input
+            type="text"
+            id="modal-prompt-input"
+            class="main-input"
+            style="width: 100%"
+          />
+          <div style="display: flex; gap: 10px; margin-top: 20px">
+            <button class="main-btn" id="modal-prompt-ok">ПІДТВЕРДИТИ</button>
+            <button
+              class="main-btn"
+              id="modal-prompt-cancel"
+              style="background: var(--color-accent); color: white"
+            >
+              СКАСУВАТИ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-alert" class="modal-overlay" style="display: none">
+      <div class="modal-content">
+        <div
+          class="panel-header"
+          style="color: var(--color-accent); border-color: var(--color-accent)"
+        >
+          УВАГА!
+        </div>
+        <div style="padding: 20px; text-align: center">
+          <p id="modal-alert-text" style="margin-bottom: 20px; color: #fff"></p>
+          <button class="main-btn" id="modal-alert-ok">ЗРОЗУМІЛО</button>
+        </div>
+      </div>
     </div>
 
     <script src="./app.js"></script>
