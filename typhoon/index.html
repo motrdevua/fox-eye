@@ -37,7 +37,7 @@
   <body>
     <div id="search-overlay">
       <div class="search-box">
-        <h2 style="margin-top: 0">FOX-EYE v0.1 (Pre-release)</h2>
+        <h2 style="margin-top: 0">FOX-EYE</h2>
         <div class="radio-group">
           <input
             type="radio"
@@ -47,7 +47,7 @@
             checked
             onclick="updatePlaceholder()"
           />
-          <label for="type-city" class="radio-label">МІСТО</label>
+          <label for="type-city" class="radio-label">НП</label>
           <input
             type="radio"
             name="search-type"
@@ -60,7 +60,7 @@
         <input
           type="text"
           id="city-input"
-          placeholder="ВВЕДІТЬ НАЗВУ МІСТА..."
+          placeholder="ВВЕДІТЬ НАЗВУ НП..."
           onkeypress="if(event.key==='Enter') performSearch()"
         />
         <br />
@@ -153,7 +153,7 @@
     <div id="modal-prompt" class="modal-overlay" style="display: none">
       <div class="modal-content">
         <div class="panel-header" id="modal-prompt-title">ЗАПИТ ДАНИХ</div>
-        <div style="padding: 20px">
+        <div style="padding: 12px">
           <p
             id="modal-prompt-text"
             style="margin-bottom: 15px; color: var(--color-main)"
@@ -164,7 +164,7 @@
             class="main-input"
             style="width: 100%"
           />
-          <div style="display: flex; gap: 10px; margin-top: 20px">
+          <div style="display: flex; gap: 10px">
             <button class="main-btn" id="modal-prompt-ok">ПІДТВЕРДИТИ</button>
             <button
               class="main-btn"
@@ -182,7 +182,7 @@
       <div class="modal-content">
         <div
           class="panel-header"
-          style="color: var(--color-accent); border-color: var(--color-accent)"
+          style="color: var(--color-accent); border-color: var(--color-main)"
         >
           УВАГА!
         </div>

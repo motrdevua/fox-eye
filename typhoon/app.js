@@ -17,6 +17,7 @@ let isDrawingCompass = false;
 const colorClasses = ['m-green', 'm-red', 'm-blue', 'm-yellow'];
 
 // --- ТЕХНІЧНІ ФУНКЦІЇ ---
+
 function updatePlaceholder() {
   const input = document.getElementById('city-input');
   const type = document.querySelector(
@@ -25,7 +26,7 @@ function updatePlaceholder() {
 
   input.value = ''; // Очищення при зміні типу
   input.placeholder =
-    type === 'city' ? 'ВВЕДІТЬ НАЗВУ МІСТА...' : '36U VV 12345 67890';
+    type === 'city' ? 'ВВЕДІТЬ НАЗВУ НП...' : '36U VV 12345 67890';
 
   // Видаляємо старі слухачі маски, якщо вони були
   input.oninput = type === 'mgrs' ? handleMgrsMask : null;
@@ -44,7 +45,18 @@ function handleMgrsMask(e) {
   e.target.value = parts.join(' ');
 }
 
-// Оновлена перевірка в performSearch
+function startMap(lon, lat) {
+  document.getElementById('search-overlay').style.display = 'none';
+  document.getElementById('map-controls').style.display = 'block';
+  initMap(lon, lat);
+}
+
+function syncStorage() {
+  localStorage.setItem('typhoon_v1.4_data', JSON.stringify(markersData));
+}
+
+// --- ПОШУК НА МАПІ ---
+
 async function performSearch() {
   const input = document.getElementById('city-input');
   const query = input.value.trim();
@@ -108,17 +120,8 @@ async function performSearch() {
   }
 }
 
-function startMap(lon, lat) {
-  document.getElementById('search-overlay').style.display = 'none';
-  document.getElementById('map-controls').style.display = 'block';
-  initMap(lon, lat);
-}
+// --- ПЕРЕВІРКА WEBGL ---
 
-function syncStorage() {
-  localStorage.setItem('typhoon_v1.4_data', JSON.stringify(markersData));
-}
-
-// --- ПРОВЕРКА WEBGL ---
 function checkWebGL() {
   try {
     const canvas = document.createElement('canvas');
@@ -150,6 +153,7 @@ function showWebGLError() {
 }
 
 // --- ОНОВЛЕНА ІНІЦІАЛІЗАЦІЯ КАРТИ ---
+
 function initMap(lon, lat) {
   // 1. Перевірка WebGL перед запуском
   if (!checkWebGL()) {
@@ -219,7 +223,6 @@ function initMap(lon, lat) {
         source: 'ruler-source',
         paint: { 'fill-color': '#00ff00', 'fill-opacity': 0.1 },
       });
-      loadSavedMarkers();
       map.addLayer({
         id: 'ruler-layer-line',
         type: 'line',
@@ -390,6 +393,7 @@ function initMap(lon, lat) {
 }
 
 // --- ІНСТРУМЕНТИ ---
+
 function setActiveTool(tool) {
   const prevTool = activeTool;
   clearRuler();
@@ -414,7 +418,7 @@ function setActiveTool(tool) {
     let btnId = 1;
     if (tool === 'compass') btnId = 2;
     if (tool === 'path') btnId = 3;
-    if (tool === 'scan') btnId = 4; // НОВЕ
+    if (tool === 'scan') btnId = 4;
 
     document.getElementById(`ruler-btn-${btnId}`).classList.add('active');
     document.getElementById('distance-info').style.display = 'block';
@@ -637,7 +641,7 @@ function handleShiftMeasure(id, lngLat) {
   }
 }
 
-// Вспомогательная функция для очистки результатов
+// Допоміжна функція для очистки результатів
 function clearScanResults() {
   // 1. Проверка: если карта еще не создана или не загружена, просто выходим
   if (!map || !map.getStyle()) return;
@@ -665,7 +669,7 @@ function clearScanResults() {
   showCopyToast('КАРТУ ОЧИЩЕНО');
 }
 
-// Вспомогательная функция для удаления слоев (вызывайте её вместо прямого map.removeLayer)
+// Допоміжна функція для видалення шарів (викликати ії замість прямого map.removeLayer)
 function safeRemoveLayer(id) {
   if (map && map.getStyle()) {
     if (map.getLayer(id)) map.removeLayer(id);
@@ -673,7 +677,7 @@ function safeRemoveLayer(id) {
   }
 }
 
-// Функция центрирования карты на точке из списка
+// Функція центруваня мапи на точці зі списку
 function focusPoint(lng, lat) {
   map.flyTo({
     center: [lng, lat],
@@ -736,19 +740,19 @@ async function findHighestPoints(p1, p2) {
     if (!isTooClose) filtered.push(p);
   }
 
-  // 1. Берем ТОП-50 точек по предварительным данным карты.
-  // (GET-запрос имеет лимит длины URL, поэтому 50 точек — безопасный максимум за раз, и этого более чем достаточно)
+  // 1. Беремо ТОП-50 точок за попередніми даними мапи.
+  // (GET-запрос має ліміт довжини URL, тому 50 точок — безпечний максимум за раз, і цього більш ніж достатньо)
   filtered.sort((a, b) => b.elevation - a.elevation);
   const fastCandidates = filtered.slice(0, 50);
 
-  showCopyToast(`ЗАПИТ ДО OPEN-METEO (High Speed)...`);
+  showCopyToast(`ЗАПИТ ДО NASA SRTM та OPEN-METEO (High Speed)...`);
 
   try {
-    // Формируем URL для пакетного запроса (координаты через запятую)
+    // Формуємо URL для пакетного запросу (координати через кому)
     const lats = fastCandidates.map((p) => p.lat).join(',');
     const lngs = fastCandidates.map((p) => p.lng).join(',');
 
-    // Open-Meteo Elevation API: мгновенный ответ, данные Copernicus DEM 30m
+    // Open-Meteo Elevation API: миттєва відповідь, дані Copernicus DEM 30m
     const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lngs}`;
 
     const response = await fetch(url);
@@ -756,10 +760,10 @@ async function findHighestPoints(p1, p2) {
     if (response.ok) {
       const data = await response.json();
 
-      // Open-Meteo возвращает массив { elevation: [261, 245, ...] }
+      // Open-Meteo повертає масив { elevation: [261, 245, ...] }
       if (data.elevation && data.elevation.length === fastCandidates.length) {
         fastCandidates.forEach((p, index) => {
-          // Обновляем высоту
+          // Оновлюємо висоту
           p.elevation = Math.round(data.elevation[index]);
         });
       }
@@ -768,22 +772,23 @@ async function findHighestPoints(p1, p2) {
     }
   } catch (e) {
     console.error('Ошибка API, використовуємо дані мапи:', e);
-    // showCopyToast(`ПОМИЛКА МЕРЕЖІ`); // Можно раскомментировать для отладки
+    showCopyToast(`ПОМИЛКА МЕРЕЖІ`);
   }
 
-  // 2. Финальная сортировка уже по точным данным
+  // 2. Фінальне сортування вже за точними даними
   fastCandidates.sort((a, b) => b.elevation - a.elevation);
 
   // 3. Рендер результата
-  // Берем именно fastCandidates, так как мы обновили высоту только в них
+  // Беремо fastCandidates, оскільки ми оновили висоту сам в них
+
   const finalResult = fastCandidates.slice(0, pointsCount);
-  console.log(finalResult);
 
   renderScanResults(finalResult);
   setActiveTool(null);
 }
 
-// Допоміжна функція для виводу результатів
+// --- Допоміжна функція для виводу результатів ---
+
 function renderScanResults(filtered) {
   const listEl = document.getElementById('points-list');
   listEl.innerHTML = '';
@@ -814,19 +819,10 @@ function renderScanResults(filtered) {
       /(.{3})(.{2})(.{5})(.{5})/,
       '$1 $2 $3 $4'
     );
-
     const item = document.createElement('div');
+
     item.className = 'point-item';
     item.style.borderLeft = `5px solid ${color}`;
-
-    // --- ДОДАЄМО ОБРОБНИК КЛІКУ ДЛЯ ЗУМУ ---
-    item.onclick = (e) => {
-      // Перевіряємо, щоб клік не був по кнопці копіювання
-      if (e.target.tagName !== 'BUTTON') {
-        focusPoint(p.lng, p.lat);
-      }
-    };
-
     item.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items: baseline; pointer-events: none;">
           <b style="color: ${color}; font-size: 14px;">${pointName}</b>
@@ -840,7 +836,15 @@ function renderScanResults(filtered) {
       </div>
     `;
 
-    // Кнопка копіювання (stopPropagation щоб не спрацював зум при копіюванні)
+    // 3. Додаємо обробник кліку для зуму
+    item.onclick = (e) => {
+      // Перевіряємо, щоб клік не був по кнопці копіювання
+      if (e.target.tagName !== 'BUTTON') {
+        focusPoint(p.lng, p.lat);
+      }
+    };
+
+    // 4. Кнопка копіювання (stopPropagation щоб не спрацював зум при копіюванні)
     const copyBtn = item.querySelector('.btn-copy-mgrs');
     copyBtn.onclick = (e) => {
       e.stopPropagation();
@@ -853,6 +857,8 @@ function renderScanResults(filtered) {
   });
 }
 
+// --- СПЛИВАЮЧІ ПОВІДОМЛЕННЯ
+
 function showCopyToast(text) {
   let toast = document.getElementById('copy-toast');
   if (!toast) {
@@ -861,88 +867,45 @@ function showCopyToast(text) {
     toast.className = 'copy-toast';
     document.body.appendChild(toast);
   }
+
   toast.innerText = text;
   toast.style.display = 'block';
+
+  // Додаємо клас для анімації
+  toast.classList.add('modal-success');
+
+  // Плавне зникнення через 2 секунди
   setTimeout(() => {
-    toast.style.display = 'none';
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      toast.style.opacity = '1';
+    }, 300);
   }, 2000);
 }
 
-async function calculateVisibility(obsLng, obsLat, obsElev, radius, obsHeight) {
-  if (!map) return;
-
-  showCopyToast(`АНАЛІЗ: ${radius}км | h=${obsHeight}м...`);
-
-  const steps = radius > 5 ? 50 : 25;
-  const rays = 120;
-  // Сумуємо висоту рельєфу та висоту об'єкта
-  const totalObsHeight = obsElev + obsHeight;
-
-  if (map.getLayer('visibility-canvas')) map.removeLayer('visibility-canvas');
-  if (map.getSource('visibility-canvas')) map.removeSource('visibility-canvas');
-
-  const canvasData = {
-    type: 'FeatureCollection',
-    features: [],
-  };
-
-  for (let i = 0; i < rays; i++) {
-    const bearing = (i * 360) / rays;
-    let maxSlope = -Infinity;
-
-    for (let j = 1; j <= steps; j++) {
-      const dist = (j / steps) * radius;
-      const dest = turf.destination([obsLng, obsLat], dist, bearing, {
-        units: 'kilometers',
-      });
-      const coords = dest.geometry.coordinates;
-
-      // Отримуємо висоту рельєфу в точці цілі
-      const targetElev = map.queryTerrainElevation(coords) || 0;
-
-      // Расчет уклона (slope) для определения, видна ли точка
-      // Математична модель Line of Sight
-      // slope = (висота_цілі - висота_спостерігача) / відстань
-      const slope = (targetElev - totalObsHeight) / (dist * 1000);
-
-      if (slope < maxSlope) {
-        // Точка нижче лінії погляду — додаємо в маску
-        const pointRadius = (radius / steps) * 0.75;
-        canvasData.features.push(
-          turf.circle(coords, pointRadius, { steps: 6, units: 'kilometers' })
-        );
-      } else {
-        // Точка видима — вона стає новим "горизонтом" для цього променя
-        maxSlope = slope;
-      }
-    }
-  }
-
-  map.addSource('visibility-canvas', {
-    type: 'geojson',
-    data: canvasData,
-  });
-
-  map.addLayer({
-    id: 'visibility-canvas',
-    type: 'fill',
-    source: 'visibility-canvas',
-    paint: {
-      'fill-color': '#ff0000',
-      'fill-opacity': 0.35, // Напівпрозорий червоний "туман"
-    },
-  });
-}
-
 // --- КАСТОМНІ МОДАЛКИ ЗАМІСТЬ alert ТА prompt ---
+
 function customAlert(text) {
   return new Promise((resolve) => {
     const modal = document.getElementById('modal-alert');
+    const content = modal.querySelector('.modal-content'); // Знаходимо внутрішній блок
+
     document.getElementById('modal-alert-text').innerText = text;
+
+    // Додаємо клас помилки
+    content.classList.add('modal-error');
+
     modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
+
     document.getElementById('modal-alert-ok').onclick = () => {
-      modal.style.display = 'none';
-      resolve();
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        content.classList.remove('modal-error'); // Прибираємо після закриття
+        resolve();
+      }, 100);
     };
   });
 }
@@ -951,24 +914,40 @@ function customPrompt(text, defaultValue) {
   return new Promise((resolve) => {
     const modal = document.getElementById('modal-prompt');
     const input = document.getElementById('modal-prompt-input');
+    const content = modal.querySelector('.modal-content');
+    content.classList.add('modal-success');
     document.getElementById('modal-prompt-text').innerText = text;
     input.value = defaultValue;
-    modal.style.display = 'flex';
-    input.focus();
 
-    document.getElementById('modal-prompt-ok').onclick = () => {
-      modal.style.display = 'none';
-      resolve(input.value);
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      modal.classList.add('active');
+      input.focus();
+    }, 10);
+
+    const closePrompt = (result) => {
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        resolve(result);
+      }, 100);
     };
-    document.getElementById('modal-prompt-cancel').onclick = () => {
-      modal.style.display = 'none';
-      resolve(null);
+
+    document.getElementById('modal-prompt-ok').onclick = () =>
+      closePrompt(input.value);
+    document.getElementById('modal-prompt-cancel').onclick = () =>
+      closePrompt(null);
+
+    // Додаємо підтримку клавіші Enter для зручності
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') closePrompt(input.value);
+      if (e.key === 'Escape') closePrompt(null);
     };
   });
 }
 
-// Вместо открытых вызовов map.getLayer в конце файла,
-// используем только обработчик загрузки окна.
+// Замість відкритих викликів map.getLayer використовуємо тільки обробник завантаження вікна
+
 window.onload = () => {
   const input = document.getElementById('city-input');
   if (input) {
