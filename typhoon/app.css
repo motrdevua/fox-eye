@@ -1,12 +1,19 @@
 :root {
   /* Кольори інтерфейсу (основні) */
-  --color-main: #00ff00; /* Яскраво-зелений (текст, рамки) */
-  --color-main-dark: #003300; /* Темно-зелений (кнопки) */
-  --color-main-deep: #001500; /* Глибокий зелений (фон панелей) */
-  --color-main-muted: #004400; /* Мутний зелений (радіо-кнопки) */
-  --color-accent: #ff0000; /* Акцентний колір (активна лінійка/видалення) */
-  --color-accent-blue: #008cff; /* Синій маркер */
-  --color-accent-yellow: #ffff00; /* Жовтий маркер */
+  --color-main: #00ff00;
+  /* Яскраво-зелений (текст, рамки) */
+  --color-main-dark: #003300;
+  /* Темно-зелений (кнопки) */
+  --color-main-deep: #001500;
+  /* Глибокий зелений (фон панелей) */
+  --color-main-muted: #004400;
+  /* Мутний зелений (радіо-кнопки) */
+  --color-accent: #ff0000;
+  /* Акцентний колір (активна лінійка/видалення) */
+  --color-accent-blue: #008cff;
+  /* Синій маркер */
+  --color-accent-yellow: #ffff00;
+  /* Жовтий маркер */
 
   /* Фон та текст */
   --bg-black: #000000;
@@ -72,6 +79,7 @@ body {
   display: flex;
   justify-content: center;
   flex-direction: column;
+  border-radius: 4px;
 }
 
 input[type='text'],
@@ -96,6 +104,7 @@ select {
   padding: var(--panel-padding);
   border: var(--border-width) solid var(--color-main);
   min-width: 220px;
+  border-radius: 4px;
 }
 
 .label-desc {
@@ -110,27 +119,6 @@ select {
   display: flex;
   gap: 8px;
   margin-bottom: var(--gap-medium);
-}
-
-.icon-btn {
-  background: var(--color-main-dark);
-  border: var(--border-width) solid var(--color-main);
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-fast);
-}
-
-.icon-btn svg {
-  width: 22px;
-  height: 22px;
-  fill: var(--color-main);
-}
-
-.icon-btn.active svg {
-  fill: #fff;
 }
 
 .marker-wrapper {
@@ -195,16 +183,19 @@ select {
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
+
 .label-right {
   left: 15px;
   top: -7px;
 }
+
 .label-bottom {
   top: 15px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
+
 .label-left {
   right: 15px;
   top: -7px;
@@ -232,6 +223,7 @@ select {
   font-size: 14px;
   line-height: 1.5;
   min-width: 180px;
+  border-radius: 4px;
 }
 
 button.main-btn {
@@ -247,6 +239,7 @@ button.main-btn {
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 4px;
 }
 
 button.main-btn:hover {
@@ -302,6 +295,7 @@ select.speed-select {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-radius: 4px;
 }
 
 .points-list {
@@ -502,48 +496,13 @@ select.speed-select {
 #results-sidebar {
   transition: -webkit-transform var(--transition-slide);
   transition: transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
-  transition: transform var(--transition-slide),
-    -webkit-transform var(--transition-slide);
 }
 
 .ui-left-hidden {
   -webkit-transform: translateX(-100%);
   transform: translateX(-100%);
 }
+
 .ui-right-hidden {
   -webkit-transform: translateX(100%);
   transform: translateX(100%);
@@ -555,14 +514,17 @@ select.speed-select {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0); /* Початковий стан */
-  display: none; /* Керується через JS */
+  background: rgba(0, 0, 0, 0);
+  /* Початковий стан */
+  display: none;
+  /* Керується через JS */
   align-items: center;
   justify-content: center;
   z-index: 2000;
   transition: background var(--transition-fast);
   -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px); /* Легке розмиття карти на фоні */
+  backdrop-filter: blur(2px);
+  /* Легке розмиття карти на фоні */
 }
 
 /* Активний стан підкладки */
@@ -577,15 +539,18 @@ select.speed-select {
   width: 340px;
   box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
   -webkit-transform: translateY(20px) scale(0.95);
-  transform: translateY(20px) scale(0.95); /* Початкова позиція (нижче і менше) */
+  transform: translateY(20px) scale(0.95);
+  /* Початкова позиція (нижче і менше) */
   opacity: 0;
   transition: all var(--transition-fast);
+  border-radius: 4px;
 }
 
 /* Активний стан вікна */
 .modal-overlay.active .modal-content {
   -webkit-transform: translateY(0) scale(1);
-  transform: translateY(0) scale(1); /* Фінальна позиція */
+  transform: translateY(0) scale(1);
+  /* Фінальна позиція */
   opacity: 1;
 }
 
@@ -626,24 +591,29 @@ select.speed-select {
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
     border-color: #ff0000;
   }
+
   50% {
     box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
     border-color: #ff4444;
   }
+
   100% {
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
     border-color: #ff0000;
   }
 }
+
 @keyframes error-glow {
   0% {
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
     border-color: #ff0000;
   }
+
   50% {
     box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
     border-color: #ff4444;
   }
+
   100% {
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
     border-color: #ff0000;
@@ -669,10 +639,12 @@ select.speed-select {
     -webkit-transform: translateX(0);
     transform: translateX(0);
   }
+
   25% {
     -webkit-transform: translateX(-5px);
     transform: translateX(-5px);
   }
+
   75% {
     -webkit-transform: translateX(5px);
     transform: translateX(5px);
@@ -685,10 +657,12 @@ select.speed-select {
     -webkit-transform: translateX(0);
     transform: translateX(0);
   }
+
   25% {
     -webkit-transform: translateX(-5px);
     transform: translateX(-5px);
   }
+
   75% {
     -webkit-transform: translateX(5px);
     transform: translateX(5px);
@@ -707,24 +681,29 @@ select.speed-select {
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
     border-color: var(--color-main);
   }
+
   50% {
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
     border-color: #55ff55;
   }
+
   100% {
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
     border-color: var(--color-main);
   }
 }
+
 @keyframes success-glow {
   0% {
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
     border-color: var(--color-main);
   }
+
   50% {
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
     border-color: #55ff55;
   }
+
   100% {
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
     border-color: var(--color-main);
@@ -745,6 +724,28 @@ select.speed-select {
   animation: success-glow 1.5s infinite ease-in-out;
   background: var(--bg-panel);
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+  border-radius: 4px;
+}
+.icon-btn {
+  background: var(--color-main-dark);
+  border: var(--border-width) solid var(--color-main);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  border-radius: 4px;
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--color-main);
+}
+
+.icon-btn.active svg {
+  fill: #fff;
 }
 
 /* Ефект при наведенні на кнопки інструментів */
@@ -752,8 +753,10 @@ select.speed-select {
   background: var(--color-main);
   color: var(--bg-black);
 }
+
 .icon-btn:hover svg {
-  fill: var(--bg-black); /* Іконка стає чорною на зеленому фоні */
+  fill: var(--bg-black);
+  /* Іконка стає чорною на зеленому фоні */
 }
 
 /* Плавний перехід для всіх станів */
@@ -763,8 +766,18 @@ select.speed-select {
 
 /* Спеціальний стан для активної кнопки при наведенні */
 .icon-btn.active {
-  background: var(--color-accent); /* Трохи світліший червоний */
+  background: var(--color-accent);
+  /* Трохи світліший червоний */
   border: var(--border-width) solid var(--color-main);
+}
+
+#toggle-contours-btn:hover svg path {
+  stroke: var(--bg-black);
+  /* Іконка стає чорною на зеленому фоні */
+}
+
+#toggle-contours-btn.active svg path {
+  stroke: #fff;
 }
 
 /* Стиль для SVG-маркера лінійки */
@@ -776,35 +789,13 @@ select.speed-select {
   cursor: pointer;
   transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  -webkit-transform: scale(1) translate(0, 7px);
-  transform: scale(1) translate(0, 7px);
+  -webkit-transform: scale(1);
+  transform: scale(1);
 }
 
 .ruler-point-svg:hover {
-  -webkit-transform: scale(1.1) translate(0, 5px);
-  transform: scale(1.1) translate(0, 5px);
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
   transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -821,9 +812,9 @@ select.speed-select {
   font-weight: bold;
   font-size: 12px;
   text-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
-  pointer-events: none; /* Щоб напис не заважав клікати по маячку */
+  pointer-events: none;
+  /* Щоб напис не заважав клікати по маячку */
   white-space: nowrap;
-  margin-top: -40px; /* Піднімаємо текст над маячком */
   text-align: center;
 }
 
@@ -835,7 +826,6 @@ select.speed-select {
   padding: 2px 5px;
   border-radius: 2px;
   border: 1px solid rgba(var(--color-main), 0.3);
-  margin-bottom: 4px;
   letter-spacing: 0.5px;
   font-family: var(--font-mono);
   border-radius: 6px;
@@ -878,7 +868,8 @@ select.speed-select {
   /* Залишаємо бічну панель збоку (якщо треба список координат на друку) */
   #results-sidebar {
     display: block !important;
-    background: white !important; /* На папері краще світлий фон */
+    background: white !important;
+    /* На папері краще світлий фон */
     color: black !important;
     border: 1px solid #000 !important;
     position: absolute;
@@ -892,4 +883,37 @@ select.speed-select {
     border-bottom: 1px solid #ccc !important;
     color: black !important;
   }
+}
+
+.compass-dot {
+  z-index: 10;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Це змусить мапу змінити стандартну "руку" на точне перехрестя */
+.compass-active-cursor .maplibregl-canvas {
+  cursor: crosshair !important;
+}
+
+/* Стиль самої точки для максимальної точності */
+.compass-marker-dot {
+  pointer-events: none;
+  /* Щоб точка не перехоплювала кліки під собою */
+  transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.compass-marker-dot:hover,
+.compass-marker-dot:focus,
+.compass-marker-dot:active {
+  -webkit-filter: drop-shadow(0 0 5px #fff);
+  filter: drop-shadow(0 0 5px #fff);
+  transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Всі маркери та підписи на мапі */
+.maplibregl-marker,
+.ruler-point-wrapper,
+.ruler-label,
+.ruler-dist-label {
+  z-index: 1 !important;
 }

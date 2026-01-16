@@ -46,10 +46,38 @@ function handleMgrsMask(e) {
   e.target.value = parts.join(' ');
 }
 
+// Функція для перемикання видимості шарів
+function toggleMapLayer(layerId, btnId) {
+  if (!map.getLayer(layerId)) return;
+
+  const currentVisibility = map.getLayoutProperty(layerId, 'visibility');
+
+  // Якщо властивість undefined (стандарт стилю) або 'none' — вмикаємо, інакше вимикаємо
+  const newVisibility = currentVisibility === 'none' ? 'visible' : 'none';
+
+  map.setLayoutProperty(layerId, 'visibility', newVisibility);
+
+  // Оновлюємо візуал кнопки
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    if (newVisibility === 'visible') {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  }
+}
+
 function startMap(lon, lat) {
   document.getElementById('search-overlay').style.display = 'none';
   document.getElementById('map-controls').style.display = 'block';
   initMap(lon, lat);
+  // Реєстрація подій після ініціалізації мапи
+  document.getElementById('toggle-contours-btn').onclick = () => {
+    // Вкажіть правильний ID шару для ліній контуру
+    toggleMapLayer('contour-lines', 'toggle-contours-btn');
+    toggleMapLayer('contour-labels', 'toggle-contours-btn');
+  };
 }
 
 function syncStorage() {
@@ -156,7 +184,15 @@ function showWebGLError() {
 // --- ОНОВЛЕНА ІНІЦІАЛІЗАЦІЯ КАРТИ ---
 
 function initMap(lon, lat) {
-  // 1. Перевірка WebGL перед запуском
+  if (typeof maplibregl === 'undefined') {
+    console.error('Бібліотека MapLibre не завантажена!');
+    customAlert(
+      'КРИТИЧНА ПОМИЛКА: Бібліотека карти не знайдена. Перевірте інтернет або індексний файл.'
+    );
+    return;
+  }
+
+  //  Перевірка WebGL перед запуском
   if (!checkWebGL()) {
     showWebGLError();
     return;
@@ -170,6 +206,7 @@ function initMap(lon, lat) {
       zoom: 13,
       style: {
         version: 8,
+        glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${apiKey}`,
         sources: {
           'google-satellite': {
             type: 'raster',
@@ -224,6 +261,14 @@ function initMap(lon, lat) {
 
     map.on('load', () => {
       if (!map.getSource('terrain-data')) return;
+      // Список ID шарів, які відповідають за рельєф у вашому стилі
+      const contourLayers = ['contour', 'contour_label'];
+
+      contourLayers.forEach((layerId) => {
+        if (map.getLayer(layerId)) {
+          map.setLayoutProperty(layerId, 'visibility', 'none');
+        }
+      });
       loadSavedMarkers();
       map.addSource('ruler-source', {
         type: 'geojson',
@@ -250,6 +295,28 @@ function initMap(lon, lat) {
           'line-color': '#00ff00',
           'line-width': 2,
           'line-dasharray': [4, 2], // Короткі штрихи: 2px лінія, 2px пробіл
+        },
+      });
+      map.addLayer({
+        id: 'ruler-labels',
+        type: 'symbol',
+        source: 'ruler-source',
+        layout: {
+          'symbol-placement': 'line',
+          'text-field': ['get', 'distanceText'],
+          // Використовуємо стандартні шрифти MapTiler/MapLibre
+          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+          'text-size': 12,
+          'text-offset': [0, -1],
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+          'text-max-width': 10,
+          'symbol-spacing': 250,
+        },
+        paint: {
+          'text-color': '#00ff00',
+          'text-halo-color': '#000000',
+          'text-halo-width': 1,
         },
       });
       // 1. Добавляем источник векторных данных контуров
@@ -286,13 +353,15 @@ function initMap(lon, lat) {
         type: 'symbol',
         source: 'contours',
         'source-layer': 'contour',
-        filter: ['==', ['get', 'nth_line'], 5], // Подписываем только жирные линии
+        // filter: ['==', ['get', 'nth_line'], 5], // Подписываем только жирные линии
         layout: {
           'symbol-placement': 'line',
-          'text-field': ['concat', ['get', 'ele'], 'м'],
-          'text-font': ['Roboto Bold'],
+          // Використовуємо to-string, щоб гарантувати відображення числа
+          'text-field': ['concat', ['to-string', ['get', 'height']], ' м'],
+          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
           'text-size': 10,
           'text-allow-overlap': false,
+          'symbol-spacing': 350, // Відстань між повторами цифр на одній лінії
         },
         paint: {
           'text-color': '#ffcc00',
@@ -305,10 +374,12 @@ function initMap(lon, lat) {
     map.on('mousemove', (e) => {
       try {
         const m = mgrs.forward([e.lngLat.lng, e.lngLat.lat]);
-        document.getElementById('mgrs-info').innerText = m.replace(
-          /(.{3})(.{2})(.{5})(.{5})/,
-          '$1 $2 $3 $4'
-        );
+        if (document.getElementById('mgrs-info')) {
+          document.getElementById('mgrs-info').innerText = m.replace(
+            /(.{3})(.{2})(.{5})(.{5})/,
+            '$1 $2 $3 $4'
+          );
+        }
       } catch (err) {}
       if (activeTool === 'compass' && isDrawingCompass && compassCenter) {
         updateCompassVisual(e.lngLat);
@@ -387,7 +458,7 @@ function initMap(lon, lat) {
       uiElements.forEach((el) => {
         if (el) el.classList.remove('interface-hidden');
       });
-      // Запускаємо пошук висот
+      // Запускаємо пошук висот у виділеній області
       findHighestPoints(selectionStart.lngLat, endLngLat);
     });
 
@@ -419,7 +490,14 @@ function initMap(lon, lat) {
 
 function setActiveTool(tool) {
   const prevTool = activeTool;
-  clearRuler();
+
+  // Прибираємо клас курсору при будь-якій зміні інструменту
+  document.body.classList.remove('compass-active-cursor');
+
+  if (tool !== null) {
+    clearSidebar(); // Чистимо тільки якщо вмикаємо НОВИЙ інструмент
+    clearRuler();
+  }
 
   // Скидання виділення, якщо воно було
   if (selectionBoxEl) {
@@ -440,11 +518,14 @@ function setActiveTool(tool) {
 
     // ДОДАЙ ЦЮ ПЕРЕВІРКУ:
     if (tool) {
+      // ДОДАЄМО КЛАС ДЛЯ КУРСОРУ, якщо обрано Циркуль або Лінійку (за бажанням)
+      if (tool === 'compass' || tool === 'ruler') {
+        document.body.classList.add('compass-active-cursor');
+      }
+
       let btnId = 1;
       if (tool === 'compass') btnId = 2;
       if (tool === 'scan') btnId = 3;
-      if (tool === 'pdf') btnId = 4;
-      if (tool === 'style') btnId = 5;
 
       const btn = document.getElementById(`ruler-btn-${btnId}`);
       if (btn) btn.classList.add('active');
@@ -452,10 +533,11 @@ function setActiveTool(tool) {
       document.getElementById('distance-info').style.display = 'block';
 
       let text = 'ОЧІКУВАННЯ...';
-      if (tool === 'scan') text = 'ЗАТИСНІТЬ ТА ТЯГНІТЬ ДЛЯ ВИДІЛЕННЯ ОБЛАСТІ';
+      if (tool === 'scan') {
+        text = 'ЗАТИСНІТЬ ТА ТЯГНІТЬ ДЛЯ ВИДІЛЕННЯ ОБЛАСТІ';
+        document.body.classList.remove('compass-active-cursor'); // Для сканування хрестик зазвичай не потрібен
+      }
       if (tool === 'compass') text = 'ОБЕРІТЬ ЦЕНТР';
-      if (tool === 'pdf') text = 'ДРУК/ЗБЕРЕЖЕННЯ КАРТИ';
-      if (tool === 'style') text = 'СТИЛЬ КАРТИ';
 
       document.getElementById('distance-info').innerHTML = text;
     }
@@ -481,64 +563,112 @@ function updateCompassVisual(currentLngLat) {
   const center = compassCenter;
   const edge = [currentLngLat.lng, currentLngLat.lat];
   const radiusKm = turf.distance(center, edge, { units: 'kilometers' });
+  const distText =
+    radiusKm < 1
+      ? Math.round(radiusKm * 1000) + ' м'
+      : radiusKm.toFixed(2) + ' км';
+
   const circle = turf.circle(center, radiusKm, {
-    steps: 64,
+    steps: 128,
     units: 'kilometers',
   });
+  const radiusLine = turf.lineString([center, edge], {
+    distanceText: distText,
+  });
 
-  map.getSource('ruler-source').setData(circle);
+  map.getSource('ruler-source').setData({
+    type: 'FeatureCollection',
+    features: [circle, radiusLine],
+  });
 
   document.getElementById('distance-info').innerHTML = `
         <span style='color:#00ff00'>ЦИРКУЛЬ (АКТИВНО):</span><br>
-        РАДІУС: ${
-          radiusKm < 1
-            ? Math.round(radiusKm * 1000) + ' м'
-            : radiusKm.toFixed(2) + ' км'
-        }`;
+        РАДІУС: ${distText}`;
 }
 
 function addRulerPoint(lngLat) {
+  // 1. ЛОГІКА ДЛЯ ЦИРКУЛЯ: Очищення перед початком НОВОГО кола
+  if (activeTool === 'compass' && rulerPoints.length >= 2) {
+    clearRuler();
+  }
   const pointId = Date.now();
   rulerPoints.push({ id: pointId, coords: [lngLat.lng, lngLat.lat] });
 
-  const wrapper = document.createElement('div');
-  wrapper.className = 'ruler-point-wrapper';
-  wrapper.style.cssText =
-    'display:flex; flex-direction:column; align-items:center;';
+  let markerElement = document.createElement('div');
+  //  для кожного нового маркера
+  markerElement.style.zIndex = '1';
 
-  // 1. Елемент для відстані (з'являється з PT-2)
-  const distLabel = document.createElement('div');
-  distLabel.className = 'ruler-dist-label';
-  distLabel.style.display = 'none';
-  wrapper.appendChild(distLabel);
+  let anchorPoint = 'bottom';
+  let labelElement = null;
 
-  // 2. Елемент для номера
-  const label = document.createElement('div');
-  label.className = 'ruler-label';
-  wrapper.appendChild(label);
+  if (activeTool === 'compass') {
+    if (rulerPoints.length === 2) {
+      document.body.classList.remove('compass-active-cursor');
+    }
+    // ДЛЯ ЦИРКУЛЯ: Створюємо максимально "чистий" об'єкт
+    markerElement.className = 'compass-marker-dot';
 
-  // SVG іконка маячка
-  const icon = document.createElement('div');
-  icon.innerHTML = `
-    <svg class="ruler-point-svg" viewBox="0 0 24 24" style="width:24px; height:24px;">
-      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#00ff00" stroke="#000"/>
-    </svg>
-  `;
-  wrapper.appendChild(icon);
+    // ВАЖЛИВО: задаємо розміри та скидаємо всі відступи
+    Object.assign(markerElement.style, {
+      width: '14px',
+      height: '14px',
+      backgroundColor: '#ffff00',
+      border: '1px solid #000',
+      borderRadius: '50%',
+      boxSizing: 'border-box',
+      margin: '0',
+      padding: '0',
+      pointerEvents: 'auto', // Дозволяє тягати вже поставлену точку
+      display: 'block',
+      margin: '6px 0px 0px 0px',
+    });
 
-  wrapper.oncontextmenu = (e) => {
+    const m = new maplibregl.Marker({
+      element: markerElement,
+      draggable: true,
+      anchor: 'center', // Це найважливіше для збігу з курсором
+    })
+      .setLngLat(lngLat)
+      .addTo(map);
+
+    rulerMarkers.push({ id: pointId, marker: m, labelElement: null });
+  } else {
+    // ДЛЯ ЛІНІЙКИ: залишаємо стандартний маячок
+    markerElement.className = 'ruler-point-wrapper';
+    markerElement.style.cssText =
+      'display:flex; flex-direction:column; align-items:center;';
+
+    const distLabel = document.createElement('div');
+    distLabel.className = 'ruler-dist-label';
+    distLabel.style.display = 'none';
+    markerElement.appendChild(distLabel);
+
+    labelElement = document.createElement('div');
+    labelElement.className = 'ruler-label';
+    markerElement.appendChild(labelElement);
+
+    const icon = document.createElement('div');
+    icon.innerHTML = `
+      <svg class="ruler-point-svg" viewBox="0 0 24 24" style="width:24px; height:24px; display:block;">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#00ff00" stroke="#000"/>
+      </svg>`;
+    markerElement.appendChild(icon);
+    anchorPoint = 'bottom';
+  }
+
+  const m = new maplibregl.Marker({
+    element: markerElement,
+    draggable: true,
+    anchor: anchorPoint, // Для циркуля тут буде 'center'
+  })
+    .setLngLat(lngLat)
+    .addTo(map);
+
+  markerElement.oncontextmenu = (e) => {
     e.stopPropagation();
     e.preventDefault();
     removeRulerPoint(pointId);
   };
-
-  const m = new maplibregl.Marker({
-    element: wrapper,
-    draggable: true,
-    anchor: 'bottom',
-  })
-    .setLngLat(lngLat)
-    .addTo(map);
 
   m.on('drag', () => {
     const newCoords = m.getLngLat();
@@ -550,9 +680,7 @@ function addRulerPoint(lngLat) {
     }
   });
 
-  rulerMarkers.push({ id: pointId, marker: m, labelElement: label });
-
-  // Після додавання оновлюємо всі індекси
+  rulerMarkers.push({ id: pointId, marker: m, labelElement: labelElement });
   reindexRulerPoints();
 
   if (activeTool !== 'compass' || !isDrawingCompass) {
@@ -561,18 +689,29 @@ function addRulerPoint(lngLat) {
 }
 
 function reindexRulerPoints() {
-  let totalSoFar = 0;
   const listEl = document.getElementById('points-list');
   const sidebar = document.getElementById('results-sidebar');
 
-  // Якщо точок немає — ховаємо панель
-  if (rulerPoints.length === 0) {
-    sidebar.style.display = 'none';
+  // Додайте перевірку на ваш новий стан
+  if (activeTool === 'scan' || activeTool === 'scan_results') return;
+  // 2. Якщо ЦИРКУЛЬ — ХОВАЄМО (тут сайдбар не потрібен)
+  if (activeTool === 'compass') {
+    if (sidebar) sidebar.style.display = 'none';
     return;
   }
 
-  listEl.innerHTML = ''; // Очищуємо список перед оновленням
-  sidebar.style.display = 'flex';
+  // 3. Логіка ЛІНІЙКИ (показуємо сайдбар тільки якщо є > 1 точки)
+  if (rulerPoints.length < 2) {
+    if (listEl) listEl.innerHTML = '';
+    if (sidebar) sidebar.style.display = 'none';
+    return;
+  }
+
+  // Якщо ми дійшли сюди — значить активна Лінійка і точок багато
+  if (sidebar) sidebar.style.display = 'flex';
+  if (listEl) listEl.innerHTML = '';
+
+  let totalSoFar = 0;
 
   rulerMarkers.forEach((mObj, index) => {
     const el = mObj.marker.getElement();
@@ -580,7 +719,6 @@ function reindexRulerPoints() {
     const distLabel = el.querySelector('.ruler-dist-label');
     const coords = rulerPoints[index].coords;
 
-    // Розрахунок відстані
     if (index > 0) {
       const segmentDist = turf.distance(rulerPoints[index - 1].coords, coords, {
         units: 'kilometers',
@@ -593,14 +731,12 @@ function reindexRulerPoints() {
         ? `${Math.round(totalSoFar * 1000)}м`
         : `${totalSoFar.toFixed(2)}км`;
 
-    // 1. Оновлюємо мітки на самій карті
     if (label) label.innerText = `ТОЧКА ${index + 1}`;
     if (distLabel) {
       distLabel.innerText = displayDist;
       distLabel.style.display = index === 0 ? 'none' : 'block';
     }
 
-    // 2. Створюємо елемент у бічній панелі
     const rawMgrs = mgrs.forward(coords);
     const formattedMgrs = rawMgrs.replace(
       /(.{3})(.{2})(.{5})(.{5})/,
@@ -612,7 +748,7 @@ function reindexRulerPoints() {
     item.style.borderLeft = `5px solid var(--color-main)`;
     item.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items: baseline;">
-          <b style="color: var(--color-main);">PT-${index + 1}</b>
+          <b style="color: var(--color-main);">ТОЧКА ${index + 1}</b>
           <b style="background:var(--color-main); color:black; padding:2px 6px; border-radius:2px; font-size:11px;">
             ${index === 0 ? 'START' : displayDist}
           </b>
@@ -622,89 +758,166 @@ function reindexRulerPoints() {
           <button class="btn-copy-small" onclick="event.stopPropagation(); navigator.clipboard.writeText('${rawMgrs}'); showCopyToast('MGRS СКОПІЙОВАНО')">COPY</button>
       </div>
     `;
-
-    // Клік по пункту в списку центрує карту на цій точці
     item.onclick = () => focusPoint(coords[0], coords[1]);
-    listEl.appendChild(item);
+    if (listEl) listEl.appendChild(item);
   });
 }
 
 function removeRulerPoint(id) {
-  // 1. Видаляємо маркер з карти
+  // 1. Видаляємо маркер з карти та масивів
   rulerMarkers = rulerMarkers.filter((m) => {
-    if (m.id === id) m.marker.remove();
-    return m.id !== id;
+    if (m.id === id) {
+      m.marker.remove();
+      return false;
+    }
+    return true;
   });
-
-  // 2. Видаляємо координати з масиву
   rulerPoints = rulerPoints.filter((p) => p.id !== id);
 
-  // 3. ПЕРЕВІРКА: якщо залишилася лише одна точка — видаляємо і її (повне очищення)
-  if (rulerPoints.length === 1) {
-    clearRuler(); // Використовуємо твою існуючу функцію для повного скидання
-    document.getElementById('distance-info').innerHTML = 'ВІДСТАНЬ: 0 м';
-    return;
-  }
-
-  // 4. Логіка для циркуля або багатоточкової лінійки
+  // 2. СПЕЦІАЛЬНА ЛОГІКА ДЛЯ ЦИРКУЛЯ
   if (activeTool === 'compass') {
+    clearSidebar();
     isDrawingCompass = false;
     compassCenter = null;
-    if (map.getSource('ruler-source'))
+
+    // Очищуємо графіку циркуля на карті
+    if (map.getSource('ruler-source')) {
       map
         .getSource('ruler-source')
         .setData({ type: 'FeatureCollection', features: [] });
+    }
+
+    // Повне скидання масивів для циркуля
+    rulerMarkers.forEach((m) => m.marker.remove());
+    rulerMarkers = [];
+    rulerPoints = [];
+
     document.getElementById('distance-info').innerHTML =
       'ЦИРКУЛЬ СКИНУТО. ОБЕРІТЬ ЦЕНТР';
-  } else {
-    // Якщо точок 0 (всі видалені)
-    if (rulerPoints.length === 0) {
-      if (map.getSource('ruler-source')) {
-        map
-          .getSource('ruler-source')
-          .setData({ type: 'FeatureCollection', features: [] });
-      }
-      document.getElementById('distance-info').innerHTML = 'ВІДСТАНЬ: 0 м';
-    } else {
-      // Якщо точок 2 і більше — перераховуємо лінію
-      updateMeasurements();
-    }
+
+    // Гарантовано ховаємо сайдбар, якщо він був відкритий іншим інструментом
+    clearSidebar();
+    return; // ПРИПИНЯЄМО виконання функції
   }
 
-  // 5. КРИТИЧНО: Пересчитываем номера оставшихся точек
-  reindexRulerPoints();
+  // 3. ЛОГІКА ДЛЯ ЛІНІЙКИ (Multi-point ruler)
+  if (rulerPoints.length < 2) {
+    // Якщо точок замало для лінії — чистимо все
+    if (map.getSource('ruler-source')) {
+      map
+        .getSource('ruler-source')
+        .setData({ type: 'FeatureCollection', features: [] });
+    }
 
-  // 6. Обновляем саму линию
-  updateMeasurements();
+    // Видаляємо останню одиноку точку, якщо вона була
+    rulerMarkers.forEach((m) => m.marker.remove());
+    rulerMarkers = [];
+    rulerPoints = [];
+
+    document.getElementById('distance-info').innerHTML = 'ВІДСТАНЬ: 0 м';
+    clearSidebar(); // Знищуємо сайдбар
+  } else {
+    // Якщо точок 2 і більше — оновлюємо лінію та сайдбар
+    if (map.getSource('ruler-source')) {
+      map.getSource('ruler-source').setData({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: rulerPoints.map((p) => p.coords),
+        },
+      });
+    }
+
+    // Оновлюємо розрахунки та список у сайдбарі
+    updateMeasurements();
+    reindexRulerPoints();
+  }
+}
+
+function clearSidebar() {
+  const listEl = document.getElementById('points-list');
+  const sidebar = document.getElementById('results-sidebar');
+  if (listEl) listEl.innerHTML = '';
+  if (sidebar) sidebar.style.display = 'none';
 }
 
 function updateMeasurements() {
-  if (rulerPoints.length < 2) return;
-  const coords = rulerPoints.map((p) => p.coords);
+  if (!map.getSource('ruler-source')) return;
+
+  const features = [];
+  let totalDist = 0;
 
   if (activeTool === 'compass') {
-    const radiusKm = turf.distance(coords[0], coords[coords.length - 1], {
-      units: 'kilometers',
-    });
-    const circle = turf.circle(coords[0], radiusKm, {
-      steps: 64,
-      units: 'kilometers',
-    });
-    map.getSource('ruler-source').setData(circle);
-    document.getElementById('distance-info').innerHTML = `
-            <span style='color:#00ff00'>РАДІУС ЗАФІКСОВАНО:</span><br>
-            ВІДСТАНЬ: ${radiusKm.toFixed(2)} км`;
+    if (rulerPoints.length >= 2) {
+      const center = rulerPoints[0].coords;
+      const edge = rulerPoints[1].coords;
+
+      // Розрахунок відстані
+      const radius = turf.distance(center, edge, { units: 'kilometers' });
+
+      // Створюємо текст відстані тут (доступний для всього блоку)
+      const distText =
+        radius < 1
+          ? Math.round(radius * 1000) + ' м'
+          : radius.toFixed(2) + ' км';
+
+      // Геометрія кола з високою точністю
+      const circleGeo = turf.circle(center, radius, {
+        steps: 256,
+        units: 'kilometers',
+      });
+      const lineGeo = turf.lineString([center, edge]);
+
+      features.push({
+        type: 'Feature',
+        geometry: circleGeo.geometry,
+        properties: {},
+      });
+
+      features.push({
+        type: 'Feature',
+        geometry: lineGeo.geometry,
+        properties: {
+          distanceText: distText, // Тепер змінна точно визначена
+        },
+      });
+
+      // Оновлення текстового інфо-блоку в UI
+      const infoEl = document.getElementById('distance-info');
+      if (infoEl) {
+        infoEl.innerHTML = `РАДІУС ЗАФІКСОВАНО: <span style="color:#00ff00">${distText}</span>`;
+      }
+    }
   } else {
-    const line = turf.lineString(coords);
-    const km = turf.length(line, { units: 'kilometers' });
-    const p1 = coords[coords.length - 2];
-    const p2 = coords[coords.length - 1];
-    const az = (turf.bearing(p1, p2) + 360) % 360;
-    map.getSource('ruler-source').setData(line);
-    document.getElementById(
-      'distance-info'
-    ).innerHTML = `ВІДСТАНЬ: ${km.toFixed(2)} км<br>АЗИМУТ: ${Math.round(az)}°`;
+    // ЛОГІКА ДЛЯ ЗВИЧАЙНОЇ ЛІНІЙКИ
+    if (rulerPoints.length >= 2) {
+      const coords = rulerPoints.map((p) => p.coords);
+      const lineGeo = turf.lineString(coords);
+      totalDist = turf.length(lineGeo, { units: 'kilometers' });
+
+      const distText =
+        totalDist < 1
+          ? Math.round(totalDist * 1000) + ' м'
+          : totalDist.toFixed(2) + ' км';
+
+      features.push({
+        type: 'Feature',
+        geometry: lineGeo.geometry,
+        properties: { distanceText: distText },
+      });
+
+      const infoEl = document.getElementById('distance-info');
+      if (infoEl) {
+        infoEl.innerHTML = `ВІДСТАНЬ: <span style="color:#00ff00">${distText}</span>`;
+      }
+    }
   }
+
+  // Завантажуємо дані в джерело одним масивом features
+  map.getSource('ruler-source').setData({
+    type: 'FeatureCollection',
+    features: features,
+  });
 }
 
 function clearRuler() {
@@ -876,14 +1089,13 @@ async function findHighestPoints(p1, p2) {
     Math.max(p1.lat, p2.lat),
   ];
 
-  // Створюємо дуже щільну сітку (крок 10 метрів для максимальної точності)
-  // Використовуємо 0.01 км, щоб точно влучити в центр найменшої ізогіпси
-  const grid = turf.pointGrid(bbox, 0.01, { units: 'kilometers' });
+  // Створюємо дуже щільну сітку (крок 20 метрів для максимальної точності)
+  // Використовуємо 0.02 км, щоб точно влучити в центр найменшої ізогіпси
+  const grid = turf.pointGrid(bbox, 0.02, { units: 'kilometers' });
 
   const results = [];
 
   // Пряме опитування карти (MapLibre Terrain)
-  // ... всередині findHighestPoints ...
   grid.features.forEach((f) => {
     const coords = f.geometry.coordinates;
     const elev = map.queryTerrainElevation(coords) || 0;
@@ -953,15 +1165,23 @@ async function findHighestPoints(p1, p2) {
   const finalResult = fastCandidates.slice(0, pointsCount);
 
   renderScanResults(finalResult);
-  setActiveTool(null);
+  activeTool = null;
+  document
+    .querySelectorAll('.icon-btn')
+    .forEach((b) => b.classList.remove('active'));
 }
 
 // --- Допоміжна функція для виводу результатів ---
 
 function renderScanResults(filtered) {
+  const sidebar = document.getElementById('results-sidebar');
   const listEl = document.getElementById('points-list');
+
+  if (!sidebar || !listEl) return;
+
+  activeTool = 'scan_results'; // ДОДАЙТЕ ЦЕ. Це "фейковий" стан, щоб система знала, що панель зараз потрібна
+  sidebar.style.display = 'flex';
   listEl.innerHTML = '';
-  document.getElementById('results-sidebar').style.display = 'flex';
 
   filtered.forEach((p, i) => {
     const color = `hsl(${(i / filtered.length) * 240}, 100%, 50%)`;
