@@ -129,11 +129,6 @@ select {
   fill: var(--color-main);
 }
 
-.icon-btn.active {
-  background: var(--color-accent);
-  border-color: #fff;
-}
-
 .icon-btn.active svg {
   fill: #fff;
 }
@@ -217,34 +212,8 @@ select {
 
 .ruler-point-el {
   cursor: pointer;
-  transition: -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast);
   transition: transform var(--transition-fast),
     -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
-}
-
-.ruler-point-el:hover {
-  -webkit-transform: scale(1.4);
-  transform: scale(1.4);
-  background: var(--color-accent) !important;
 }
 
 .distance-container {
@@ -553,6 +522,22 @@ select.speed-select {
     -webkit-transform var(--transition-slide);
   transition: transform var(--transition-slide),
     -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
+  transition: transform var(--transition-slide),
+    -webkit-transform var(--transition-slide);
 }
 
 .ui-left-hidden {
@@ -760,4 +745,151 @@ select.speed-select {
   animation: success-glow 1.5s infinite ease-in-out;
   background: var(--bg-panel);
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+}
+
+/* Ефект при наведенні на кнопки інструментів */
+.icon-btn:hover {
+  background: var(--color-main);
+  color: var(--bg-black);
+}
+.icon-btn:hover svg {
+  fill: var(--bg-black); /* Іконка стає чорною на зеленому фоні */
+}
+
+/* Плавний перехід для всіх станів */
+.icon-btn {
+  transition: all var(--transition-normal);
+}
+
+/* Спеціальний стан для активної кнопки при наведенні */
+.icon-btn.active {
+  background: var(--color-accent); /* Трохи світліший червоний */
+  border: var(--border-width) solid var(--color-main);
+}
+
+/* Стиль для SVG-маркера лінійки */
+.ruler-point-svg {
+  width: 24px;
+  height: 24px;
+  -webkit-filter: drop-shadow(0 0 5px var(--color-main));
+  filter: drop-shadow(0 0 5px var(--color-main));
+  cursor: pointer;
+  transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-transform: scale(1) translate(0, 7px);
+  transform: scale(1) translate(0, 7px);
+}
+
+.ruler-point-svg:hover {
+  -webkit-transform: scale(1.1) translate(0, 5px);
+  transform: scale(1.1) translate(0, 5px);
+  transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ruler-point-svg path {
+  fill: var(--color-accent-yellow);
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+/* Підпис порядкового номера точки лінійки */
+.ruler-label {
+  color: var(--color-main);
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
+  pointer-events: none; /* Щоб напис не заважав клікати по маячку */
+  white-space: nowrap;
+  margin-top: -40px; /* Піднімаємо текст над маячком */
+  text-align: center;
+}
+
+/* Підпис відстані між точками */
+.ruler-dist-label {
+  font-size: 10px;
+  color: var(--color-main);
+  background: var(--bg-overlay);
+  padding: 2px 5px;
+  border-radius: 2px;
+  border: 1px solid rgba(var(--color-main), 0.3);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+  border-radius: 6px;
+}
+
+.point-item {
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 5px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.point-item:hover {
+  background: rgba(0, 255, 0, 0.1);
+}
+
+@media print {
+  /* Ховаємо всі елементи керування */
+  #map-controls,
+  .navigation-control,
+  #search-overlay,
+  .btn-copy-small {
+    display: none !important;
+  }
+
+  /* Розтягуємо карту на весь аркуш */
+  body,
+  html,
+  #map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  /* Залишаємо бічну панель збоку (якщо треба список координат на друку) */
+  #results-sidebar {
+    display: block !important;
+    background: white !important; /* На папері краще світлий фон */
+    color: black !important;
+    border: 1px solid #000 !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: auto;
+    max-height: none;
+  }
+
+  .point-item {
+    border-bottom: 1px solid #ccc !important;
+    color: black !important;
+  }
 }
