@@ -1,4 +1,8 @@
-const apiKey = '39vWsRU1aZVglDrRNJUv';
+// Замість одного рядка
+const _0x1a = '39vWsR';
+const _0x1b = 'U1aZVgl';
+const _0x1c = 'DrRNJUv';
+const apiKey = _0x1a + _0x1b + _0x1c;
 let map;
 let markerCount = 0;
 let markersData = [];
@@ -14,140 +18,6 @@ let currentStyle = 'sat';
 // Динамічний циркуль
 let compassCenter = null;
 let isDrawingCompass = false;
-
-const colorClasses = ['m-green', 'm-red', 'm-blue', 'm-yellow'];
-
-// --- ТЕХНІЧНІ ФУНКЦІЇ ---
-
-function updatePlaceholder() {
-  const input = document.getElementById('city-input');
-  const type = document.querySelector(
-    'input[name="search-type"]:checked'
-  ).value;
-
-  input.value = ''; // Очищення при зміні типу
-  input.placeholder =
-    type === 'city' ? 'ВВЕДІТЬ НАЗВУ НП...' : '36U VV 12345 67890';
-
-  // Видаляємо старі слухачі маски, якщо вони були
-  input.oninput = type === 'mgrs' ? handleMgrsMask : null;
-}
-
-function handleMgrsMask(e) {
-  let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  let parts = [];
-
-  // Маска MGRS: 36U VV 12345 67890
-  if (v.length > 0) parts.push(v.substring(0, 3)); // 36U
-  if (v.length > 3) parts.push(v.substring(3, 5)); // VV
-  if (v.length > 5) parts.push(v.substring(5, 10)); // 12345
-  if (v.length > 10) parts.push(v.substring(10, 15)); // 67890
-
-  e.target.value = parts.join(' ');
-}
-
-// Функція для перемикання видимості шарів
-function toggleMapLayer(layerId, btnId) {
-  if (!map.getLayer(layerId)) return;
-
-  const currentVisibility = map.getLayoutProperty(layerId, 'visibility');
-
-  // Якщо властивість undefined (стандарт стилю) або 'none' — вмикаємо, інакше вимикаємо
-  const newVisibility = currentVisibility === 'none' ? 'visible' : 'none';
-
-  map.setLayoutProperty(layerId, 'visibility', newVisibility);
-
-  // Оновлюємо візуал кнопки
-  const btn = document.getElementById(btnId);
-  if (btn) {
-    if (newVisibility === 'visible') {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  }
-}
-
-function startMap(lon, lat) {
-  document.getElementById('search-overlay').style.display = 'none';
-  document.getElementById('map-controls').style.display = 'block';
-  initMap(lon, lat);
-  // Реєстрація подій після ініціалізації мапи
-  document.getElementById('toggle-contours-btn').onclick = () => {
-    // Вкажіть правильний ID шару для ліній контуру
-    toggleMapLayer('contour-lines', 'toggle-contours-btn');
-    toggleMapLayer('contour-labels', 'toggle-contours-btn');
-  };
-}
-
-function syncStorage() {
-  localStorage.setItem('typhoon_v1.4_data', JSON.stringify(markersData));
-}
-
-// --- ПОШУК НА МАПІ ---
-
-async function performSearch() {
-  const input = document.getElementById('city-input');
-  const query = input.value.trim();
-  if (!query) return;
-
-  const type = document.querySelector(
-    'input[name="search-type"]:checked'
-  ).value;
-
-  if (type === 'mgrs') {
-    // Перевірка формату (мінімум зона, квадрат і по 1 цифрі координат)
-    const cleanMgrs = query.replace(/\s/g, '');
-    // Знайти рядок з alert('ПОМИЛКА: Недостатньо символів...') і замінити на:
-    if (cleanMgrs.length < 7) {
-      customAlert('ПОМИЛКА: Недостатньо символів для MGRS (мін. 7)');
-      return;
-    }
-    // ЛОГІКА ДЛЯ MGRS
-    try {
-      // Очищення пробілів та перетворення в координати
-      const cleanMgrs = query.replace(/\s/g, '');
-      const coords = mgrs.toPoint(cleanMgrs);
-      const lngLat = { lng: coords[0], lat: coords[1] };
-
-      // 1. Запуск карти
-      startMap(lngLat.lng, lngLat.lat);
-
-      // 2. Створення маркера (через 500мс, щоб карта встигла ініціалізуватися)
-      setTimeout(() => {
-        // Перевіряємо, чи немає вже маркера з таким ім'ям
-        const name = `SEARCH ${cleanMgrs.slice(-5)}`; // Використовуємо хвіст MGRS для назви
-        createMarker(lngLat, {
-          id: Date.now(),
-          lngLat: lngLat,
-          name: name,
-          colorIdx: 1, // Червоний колір для пошукового маркера
-          posIdx: 0,
-        });
-      }, 500);
-    } catch (e) {
-      customAlert('ПОМИЛКА: Невірний формат MGRS');
-      console.error(e);
-    }
-  } else {
-    // ... логіка City ...
-    const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(
-      query
-    )}.json?key=${apiKey}&country=ua&language=uk`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.features?.length > 0) {
-        const [lon, lat] = data.features[0].center;
-        startMap(lon, lat);
-        // Для міста маркер зазвичай не ставимо, щоб не засмічувати центр населеного пункту,
-        // але якщо потрібно — можемо додати і сюди.
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-}
 
 // --- ПЕРЕВІРКА WEBGL ---
 
@@ -181,25 +51,193 @@ function showWebGLError() {
     `;
 }
 
+// --- ТЕХНІЧНІ ФУНКЦІЇ ---
+
+function updatePlaceholder() {
+  const input = document.getElementById('city-input');
+  const type = document.querySelector(
+    'input[name="search-type"]:checked',
+  ).value;
+
+  input.value = ''; // Очищення при зміні типу
+  input.placeholder =
+    type === 'city' ? 'ВВЕДІТЬ НАЗВУ НП...' : '36U VV 12345 67890';
+
+  // Видаляємо старі слухачі маски, якщо вони були
+  input.oninput = type === 'mgrs' ? handleMgrsMask : null;
+}
+
+function handleMgrsMask(e) {
+  const input = e.target;
+  let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Тільки букви та цифри
+
+  // Якщо натиснуто Backspace (обробляється окремо для комфорту)
+  if (e.inputType === 'deleteContentBackward') {
+    return; // Дозволяємо браузеру просто видалити символ
+  }
+
+  let formatted = '';
+
+  if (value.length > 0) {
+    // 1. Зона (напр. 36U)
+    const zone = value.substring(0, 3);
+    formatted = zone;
+
+    if (value.length > 3) {
+      // 2. Квадрат (напр. VV)
+      const square = value.substring(3, 5);
+      formatted += ' ' + square;
+
+      if (value.length > 5) {
+        // 3. Координати (цифри)
+        const coords = value.substring(5, 15); // макс 10 цифр
+        formatted += ' ' + coords;
+      }
+    }
+  }
+
+  input.value = formatted.trim();
+}
+
+// Функція для перемикання видимості шарів
+
+function toggleMapLayer(layerId, btnId) {
+  if (!map.getLayer(layerId)) return;
+
+  const currentVisibility = map.getLayoutProperty(layerId, 'visibility');
+
+  // Якщо властивість undefined (стандарт стилю) або 'none' — вмикаємо, інакше вимикаємо
+  const newVisibility = currentVisibility === 'none' ? 'visible' : 'none';
+
+  map.setLayoutProperty(layerId, 'visibility', newVisibility);
+
+  // Оновлюємо візуал кнопки
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    if (newVisibility === 'visible') {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  }
+}
+
+function initButtons() {
+  document
+    .getElementById('toggle-contours-btn')
+    .addEventListener('click', toggleContours);
+}
+
+function syncStorage() {
+  localStorage.setItem('typhoon_v1.4_data', JSON.stringify(markersData));
+}
+
+function startMap(lon, lat) {
+  document.getElementById('search-overlay').style.display = 'none';
+  document.getElementById('map-controls').style.display = 'block';
+  initMap(lon, lat);
+  initButtons();
+}
+
+// --- ПОШУК НА МАПІ ---
+
+async function performSearch() {
+  const input = document.getElementById('city-input');
+  const type = document.querySelector(
+    'input[name="search-type"]:checked',
+  ).value;
+
+  const rawValue = input.value.trim();
+  if (!rawValue) return;
+
+  if (type === 'mgrs') {
+    try {
+      // Перевірка формату (мінімум зона, квадрат і по 1 цифрі координат)
+
+      // Видаляємо всі пробіли перед відправкою в бібліотеку mgrs
+      const cleanMgrs = rawValue.replace(/\s+/g, '');
+
+      // 1. Виділяємо тільки цифрову частину (все, що після перших 5 символів: 36U VV)
+      const numericPart = cleanMgrs.substring(5);
+
+      // 2. Перевірка довжини (стандарт MGRS: зона(3) + квадрат(2) + цифри(парна кількість)). Довжина має бути принаймні 2 цифри (мінімальна точність) і загальна кількість цифр має бути парною
+      if (numericPart.length < 2 || numericPart.length % 2 !== 0) {
+        customAlert(
+          'ПОМИЛКА: MGRS має містити парну кількість цифр (напр. 12, 1234, 123456)',
+        );
+        return;
+      }
+
+      // 3. Передаємо ОЧИЩЕНІ дані в конвертер
+      const coords = mgrs.toPoint(cleanMgrs);
+      const lat = coords[1];
+      const lng = coords[0];
+
+      // Запускаємо мапу
+      startMap(lat, lng);
+
+      // 2. Створення маркера (через 500мс, щоб карта встигла ініціалізуватися)
+      setTimeout(() => {
+        // Перевіряємо, чи немає вже маркера з таким ім'ям
+        const name = `SEARCH ${cleanMgrs.slice(-5)}`; // Використовуємо хвіст MGRS для назви
+        createMarker(lngLat, {
+          id: Date.now(),
+          lngLat: lngLat,
+          name: name,
+          colorIdx: 1, // Червоний колір для пошукового маркера
+          posIdx: 0,
+        });
+      }, 500);
+    } catch (e) {
+      customAlert('НЕКОРЕКТНИЙ ФОРМАТ MGRS');
+      console.error(e);
+    }
+  } else {
+    // ... логіка City ...
+    const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(
+      rawValue,
+    )}.json?key=${apiKey}&country=ua&language=uk`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.features?.length > 0) {
+        const [lon, lat] = data.features[0].center;
+        startMap(lon, lat);
+        // Для міста маркер зазвичай не ставимо, щоб не засмічувати центр населеного пункту,
+        // але якщо потрібно — можемо додати і сюди.
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+}
+
 // --- ОНОВЛЕНА ІНІЦІАЛІЗАЦІЯ КАРТИ ---
 
 function initMap(lon, lat) {
+  // 1. Перевірка наявності бібліотеки (Твій код)
   if (typeof maplibregl === 'undefined') {
     console.error('Бібліотека MapLibre не завантажена!');
     customAlert(
-      'КРИТИЧНА ПОМИЛКА: Бібліотека карти не знайдена. Перевірте інтернет або індексний файл.'
+      'КРИТИЧНА ПОМИЛКА: Бібліотека карти не знайдена. Перевірте інтернет або індексний файл.',
     );
     return;
   }
 
-  //  Перевірка WebGL перед запуском
+  // 2. Перевірка WebGL перед запуском
   if (!checkWebGL()) {
     showWebGLError();
     return;
   }
 
+  // 3. Видаляємо стару мапу, якщо вона є
+  if (map) {
+    console.log('Знищення попереднього екземпляра мапи...');
+    map.remove(); // Повністю видаляє мапу, її шари та обробники подій
+    map = null; // Обнуляємо змінну
+  }
+
   try {
-    // Внутри функции initMap(lon, lat)
     map = new maplibregl.Map({
       container: 'map',
       center: [lon, lat],
@@ -244,245 +282,384 @@ function initMap(lon, lat) {
       },
     });
 
-    map.addControl(new maplibregl.NavigationControl());
-    map.doubleClickZoom.disable();
-
-    // Обробка критичної помилки WebGL після ініціалізації
-    map.on('error', (e) => {
-      if (e.error && e.error.message.includes('WebGL')) {
-        showWebGLError();
-      }
-    });
-
-    // Створення елемента для виділення області
-    selectionBoxEl = document.createElement('div');
-    selectionBoxEl.className = 'selection-box';
-    document.getElementById('map').appendChild(selectionBoxEl);
-
-    map.on('load', () => {
-      if (!map.getSource('terrain-data')) return;
-      // Список ID шарів, які відповідають за рельєф у вашому стилі
-      const contourLayers = ['contour', 'contour_label'];
-
-      contourLayers.forEach((layerId) => {
-        if (map.getLayer(layerId)) {
-          map.setLayoutProperty(layerId, 'visibility', 'none');
-        }
-      });
-      loadSavedMarkers();
-      map.addSource('ruler-source', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] },
-      });
-      // Добавляем невидимый слой для принудительной подгрузки DEM-тайлов
-      map.addLayer({
-        id: 'terrain-helper',
-        type: 'hillshade',
-        source: 'terrain-data',
-        paint: { 'hillshade-exaggeration': 0 },
-      });
-      map.addLayer({
-        id: 'ruler-layer-fill',
-        type: 'fill',
-        source: 'ruler-source',
-        paint: { 'fill-color': '#00ff00', 'fill-opacity': 0.1 },
-      });
-      map.addLayer({
-        id: 'ruler-layer-line',
-        type: 'line',
-        source: 'ruler-source',
-        paint: {
-          'line-color': '#00ff00',
-          'line-width': 2,
-          'line-dasharray': [4, 2], // Короткі штрихи: 2px лінія, 2px пробіл
-        },
-      });
-      map.addLayer({
-        id: 'ruler-labels',
-        type: 'symbol',
-        source: 'ruler-source',
-        layout: {
-          'symbol-placement': 'line',
-          'text-field': ['get', 'distanceText'],
-          // Використовуємо стандартні шрифти MapTiler/MapLibre
-          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
-          'text-size': 12,
-          'text-offset': [0, -1],
-          'text-allow-overlap': true,
-          'text-ignore-placement': true,
-          'text-max-width': 10,
-          'symbol-spacing': 250,
-        },
-        paint: {
-          'text-color': '#00ff00',
-          'text-halo-color': '#000000',
-          'text-halo-width': 1,
-        },
-      });
-      // 1. Добавляем источник векторных данных контуров
-      map.addSource('contours', {
-        type: 'vector',
-        url: `https://api.maptiler.com/tiles/contours/tiles.json?key=${apiKey}`,
-      });
-      // 2. Линии рельефа (Изогипсы)
-      map.addLayer({
-        id: 'contour-lines',
-        type: 'line',
-        source: 'contours',
-        'source-layer': 'contour',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round',
-        },
-        paint: {
-          // Светло-оранжевый или коричневый цвет, характерный для топокарт
-          'line-color': '#ffcc00',
-          'line-opacity': 0.6,
-          'line-width': [
-            'match',
-            ['get', 'nth_line'],
-            5,
-            1.5, // Каждая 5-я линия (жирная)
-            0.6, // Остальные (тонкие)
-          ],
-        },
-      });
-      // 3. Подписи высот на линиях
-      map.addLayer({
-        id: 'contour-labels',
-        type: 'symbol',
-        source: 'contours',
-        'source-layer': 'contour',
-        // filter: ['==', ['get', 'nth_line'], 5], // Подписываем только жирные линии
-        layout: {
-          'symbol-placement': 'line',
-          // Використовуємо to-string, щоб гарантувати відображення числа
-          'text-field': ['concat', ['to-string', ['get', 'height']], ' м'],
-          'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
-          'text-size': 10,
-          'text-allow-overlap': false,
-          'symbol-spacing': 350, // Відстань між повторами цифр на одній лінії
-        },
-        paint: {
-          'text-color': '#ffcc00',
-          'text-halo-color': '#000',
-          'text-halo-width': 1,
-        },
-      });
-    });
-
-    map.on('mousemove', (e) => {
-      try {
-        const m = mgrs.forward([e.lngLat.lng, e.lngLat.lat]);
-        if (document.getElementById('mgrs-info')) {
-          document.getElementById('mgrs-info').innerText = m.replace(
-            /(.{3})(.{2})(.{5})(.{5})/,
-            '$1 $2 $3 $4'
-          );
-        }
-      } catch (err) {}
-      if (activeTool === 'compass' && isDrawingCompass && compassCenter) {
-        updateCompassVisual(e.lngLat);
-      }
-    });
-
-    map.on('click', (e) => {
-      if (activeTool) handleToolClick(e.lngLat);
-    });
-
-    map.on('dblclick', (e) => {
-      if (activeTool || e.originalEvent.target.closest('.marker-wrapper'))
-        return;
-      createMarker(e.lngLat);
-    });
-
-    // --- ЛОГІКА ВИДІЛЕННЯ ОБЛАСТІ (SCAN) ---
-    map.getCanvas().addEventListener('mousedown', (e) => {
-      if (activeTool !== 'scan') return;
-      if (e.button !== 0) return; // Тільки ліва кнопка
-
-      clearScanResults();
-
-      isSelecting = true;
-      map.dragPan.disable(); // Вимикаємо рух карти поки малюємо
-
-      const rect = map.getCanvas().getBoundingClientRect();
-      selectionStart = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        lngLat: map.unproject([e.clientX - rect.left, e.clientY - rect.top]), // Запам'ятовуємо координати карти
-      };
-
-      selectionBoxEl.style.left = selectionStart.x + 'px';
-      selectionBoxEl.style.top = selectionStart.y + 'px';
-      selectionBoxEl.style.width = '0px';
-      selectionBoxEl.style.height = '0px';
-      selectionBoxEl.style.display = 'block';
-
-      uiElements.forEach((el) => {
-        if (el) el.classList.add('interface-hidden');
-      });
-    });
-
-    map.getCanvas().addEventListener('mousemove', (e) => {
-      if (!isSelecting || activeTool !== 'scan') return;
-
-      const rect = map.getCanvas().getBoundingClientRect();
-      const currentX = e.clientX - rect.left;
-      const currentY = e.clientY - rect.top;
-
-      const width = Math.abs(currentX - selectionStart.x);
-      const height = Math.abs(currentY - selectionStart.y);
-      const newX = Math.min(currentX, selectionStart.x);
-      const newY = Math.min(currentY, selectionStart.y);
-
-      selectionBoxEl.style.left = newX + 'px';
-      selectionBoxEl.style.top = newY + 'px';
-      selectionBoxEl.style.width = width + 'px';
-      selectionBoxEl.style.height = height + 'px';
-    });
-
-    map.getCanvas().addEventListener('mouseup', (e) => {
-      if (!isSelecting || activeTool !== 'scan') return;
-
-      isSelecting = false;
-      map.dragPan.enable(); // Вмикаємо карту назад
-      selectionBoxEl.style.display = 'none';
-
-      const rect = map.getCanvas().getBoundingClientRect();
-      const endLngLat = map.unproject([
-        e.clientX - rect.left,
-        e.clientY - rect.top,
-      ]);
-
-      uiElements.forEach((el) => {
-        if (el) el.classList.remove('interface-hidden');
-      });
-      // Запускаємо пошук висот у виділеній області
-      findHighestPoints(selectionStart.lngLat, endLngLat);
-    });
-
-    // --- АВТОМАТИЧНЕ ПРИХОВУВАННЯ ІНТЕРФЕЙСУ ---
-    const uiElements = [
-      document.getElementById('map-controls'),
-      document.getElementById('results-sidebar'),
-      document.getElementById('distance-info'),
-    ];
-
-    map.on('movestart', () => {
-      uiElements.forEach((el) => {
-        if (el) el.classList.add('interface-hidden');
-      });
-    });
-
-    map.on('moveend', () => {
-      uiElements.forEach((el) => {
-        if (el) el.classList.remove('interface-hidden');
-      });
-    });
-  } catch (err) {
-    console.error('MapLibre critical error:', err);
+    // Навішуємо всі події
+    setupMapEvents();
+  } catch (error) {
+    console.error('Помилка ініціалізації:', error);
+    customAlert('ПОМИЛКА КАРТИ: ' + error.message);
     showWebGLError();
+  }
+}
+
+// Сюди переносимо всі map.addSource та map.addLayer
+// (наприклад, для контурів, лінійки, циркуля)
+function addMapLayers() {
+  if (!map.getSource('terrain-data')) return;
+
+  // 1. Додаємо джерело для контурів (рельєфу)
+  map.addSource('contours', {
+    type: 'vector',
+    url: `https://api.maptiler.com/tiles/contours/tiles.json?key=${apiKey}`,
+  });
+
+  // 2. Лінії рельєфу (ізогіпси) з початковою видимістю "вимкнено"
+  map.addLayer({
+    id: 'contour-lines',
+    type: 'line',
+    source: 'contours',
+    'source-layer': 'contour',
+    layout: {
+      visibility: 'none',
+      'line-join': 'round',
+      'line-cap': 'round',
+    },
+    paint: {
+      // Колір та стиль ліній ізогіпс (жовтий з прозорістю) характерний для топографічних карт
+      'line-color': '#ffcc00',
+      'line-opacity': 0.6,
+      'line-width': [
+        'match',
+        ['get', 'nth_line'],
+        5,
+        1.5, // кожна 5-та (жирна)
+        0.6, // решта (тонкі)
+      ],
+    },
+  });
+
+  // 3. Підписи висот на ізогіпсах
+  map.addLayer({
+    id: 'contour-labels',
+    type: 'symbol',
+    source: 'contours',
+    'source-layer': 'contour',
+    // filter: ['==', ['get', 'nth_line'], 5], // підписи тільки для кожної 5-ї лінії
+    layout: {
+      visibility: 'none',
+      'symbol-placement': 'line',
+      // Використовуємо to-string, щоб гарантувати відображення числа
+      'text-field': ['concat', ['to-string', ['get', 'height']], ' м'],
+      'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+      'text-size': 10,
+      'text-allow-overlap': false,
+      'symbol-spacing': 350, // Відстань між повторами цифр на одній лінії
+    },
+    paint: {
+      'text-color': '#ffcc00',
+      'text-halo-color': '#000',
+      'text-halo-width': 1,
+    },
+  });
+
+  // 4. Додаємо порожні джерела для інструментів, щоб вони були готові до роботи
+
+  // 4.1 Лінійка
+  map.addSource('ruler-source', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+  });
+
+  // Шар для самої лінійки
+  map.addLayer({
+    id: 'ruler-layer-line',
+    type: 'line',
+    source: 'ruler-source',
+    paint: {
+      'line-color': '#00ff00',
+      'line-width': 1,
+      'line-dasharray': [4, 2], // Короткі штрихи: 2px лінія, 2px пробіл
+    },
+  });
+
+  // Шар для підписів лінійки
+  map.addLayer({
+    id: 'ruler-labels',
+    type: 'symbol',
+    source: 'ruler-source',
+    layout: {
+      'symbol-placement': 'line',
+      'text-field': ['get', 'distanceText'],
+      // Використовуємо стандартні шрифти MapTiler/MapLibre
+      'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+      'text-size': 12,
+      'text-offset': [0, -1],
+      'text-allow-overlap': true,
+      'text-ignore-placement': true,
+      'text-max-width': 10,
+      'symbol-spacing': 250,
+    },
+    paint: {
+      'text-color': '#00ff00',
+      'text-halo-color': '#000000',
+      'text-halo-width': 1,
+    },
+  });
+
+  // 4.2 Циркуль
+  map.addSource('compass-arc', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+  });
+
+  // Шар для заповнення КОЛА
+  map.addLayer({
+    id: 'compass-circle-fill',
+    type: 'fill',
+    source: 'compass-arc',
+    filter: ['==', '$type', 'Polygon'], // малювати тільки полігони (коло)
+    paint: { 'fill-color': '#00ff00', 'fill-opacity': 0.1 },
+  });
+
+  // Шар для самого КОЛА
+  map.addLayer({
+    id: 'compass-circle-layer',
+    type: 'line', // 'line' або 'fill', якщо хочеш зафарбоване коло
+    source: 'compass-arc',
+    paint: {
+      'line-color': '#00ff00',
+      'line-width': 1,
+      'line-dasharray': [4, 2], // Короткі штрихи: 2px лінія, 2px пробіл
+    },
+  });
+
+  // Шар для РАДІУСА (лінія від центру до миші)
+  map.addLayer({
+    id: 'compass-radius-line',
+    type: 'line',
+    source: 'compass-arc',
+    filter: ['==', '$type', 'LineString'], // малювати тільки лінії (радіус)
+    paint: {
+      'line-color': '#00ff00',
+      'line-width': 1,
+      'line-dasharray': [4, 2],
+    },
+  });
+
+  // Шар для підписів радіуса
+  map.addLayer({
+    id: 'compass-radius-labels',
+    type: 'symbol',
+    source: 'compass-arc',
+    layout: {
+      'symbol-placement': 'line',
+      'text-field': ['get', 'distanceText'],
+      // Використовуємо стандартні шрифти MapTiler/MapLibre
+      'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+      'text-size': 12,
+      'text-offset': [0, -1],
+      'text-allow-overlap': true,
+      'text-ignore-placement': true,
+      'text-max-width': 10,
+      'symbol-spacing': 250,
+    },
+    paint: {
+      'text-color': '#ffcc00',
+      'text-halo-color': '#000000',
+      'text-halo-width': 1,
+    },
+  });
+
+  // Додаємо шар для DEM (висотних даних)
+  // Цей шар (terrain-helper) потрібен не для того, щоб змусити браузер завантажити дані про висоти (DEM — Digital Elevation Model).
+  map.addLayer({
+    id: 'terrain-helper',
+    type: 'hillshade',
+    source: 'terrain-data',
+    paint: { 'hillshade-exaggeration': 0 },
+  });
+}
+
+// Спеціальна функція для рельєфу (вмикати/вимикати ізогіпси)
+function toggleContours() {
+  if (!map.getLayer('contour-lines')) return;
+
+  const btn = document.getElementById('toggle-contours-btn');
+  const currentVisibility = map.getLayoutProperty(
+    'contour-lines',
+    'visibility',
+  );
+
+  if (currentVisibility === 'visible') {
+    map.setLayoutProperty('contour-lines', 'visibility', 'none');
+    map.setLayoutProperty('contour-labels', 'visibility', 'none'); // якщо є підписи
+    btn.classList.remove('active');
+  } else {
+    map.setLayoutProperty('contour-lines', 'visibility', 'visible');
+    map.setLayoutProperty('contour-labels', 'visibility', 'visible');
+    btn.classList.add('active');
+  }
+}
+
+function setupMapEvents() {
+  if (!map) return;
+
+  map.addControl(new maplibregl.NavigationControl());
+  map.doubleClickZoom.disable();
+
+  // Обробка критичної помилки WebGL після ініціалізації
+  map.on('error', (e) => {
+    if (e.error && e.error.message.includes('WebGL')) {
+      showWebGLError();
+    }
+  });
+
+  // 1. Подія завантаження мапи (Load)
+  map.on('load', () => {
+    // console.log('Мапа завантажена, додаємо шари...');
+    addMapLayers();
+    loadSavedMarkers();
+  });
+
+  // Створення елемента для виділення області
+  selectionBoxEl = document.createElement('div');
+  selectionBoxEl.className = 'selection-box';
+  document.getElementById('map').appendChild(selectionBoxEl);
+
+  // 2. Обробка кліків на мапі
+  map.on('click', (e) => {
+    if (activeTool) handleToolClick(e.lngLat);
+  });
+
+  // 3. Обробка подвійних кліків на мапі
+  map.on('dblclick', (e) => {
+    if (activeTool || e.originalEvent.target.closest('.marker-wrapper')) return;
+    createMarker(e.lngLat);
+  });
+
+  // 3. Обробка руху миші (MouseMove) — для циркуля та лінійки
+  map.on('mousemove', (e) => {
+    // Якщо вибрано циркуль І ми вже поставили першу точку (центр)
+    if (activeTool === 'compass' && isDrawingCompass) {
+      updateCompassVisual(e.lngLat);
+    }
+    try {
+      const mgrsString = mgrs.forward([e.lngLat.lng, e.lngLat.lat]);
+      // Форматуємо для читабельності: 36U VV 12345 67890
+      const formattedMgrs = mgrsString.replace(
+        /(.{3})(.{2})(.{5})(.{5})/,
+        '$1 $2 $3 $4',
+      );
+      // Оновлюємо елемент в UI (якщо він є)
+      const coordsDisplay = document.getElementById('live-coords');
+      if (coordsDisplay) {
+        coordsDisplay.innerText = `MGRS: ${formattedMgrs}`;
+      }
+    } catch (err) {
+      // Поза зоною MGRS
+    }
+  });
+
+  // 4. Обробка контекстного меню (правий клік)
+  map.on('contextmenu', (e) => {
+    e.preventDefault();
+  });
+
+  // 5. Обробка переміщення карти (Drag) (Автоматичне приховування UI під час руху карти)
+  const uiElements = [
+    document.getElementById('map-controls'),
+    document.getElementById('results-sidebar'),
+    document.getElementById('distance-info'),
+  ];
+  map.on('movestart', () => {
+    uiElements.forEach((el) => {
+      if (el) el.classList.add('interface-hidden');
+    });
+  });
+  map.on('moveend', () => {
+    uiElements.forEach((el) => {
+      if (el) el.classList.remove('interface-hidden');
+    });
+  });
+
+  // --- ЛОГІКА ВИДІЛЕННЯ ОБЛАСТІ (SCAN) ---
+  map.getCanvas().addEventListener('mousedown', (e) => {
+    if (activeTool !== 'scan') return;
+    if (e.button !== 0) return; // Тільки ліва кнопка
+
+    clearScanResults();
+
+    isSelecting = true;
+    map.dragPan.disable(); // Вимикаємо рух карти поки малюємо
+
+    const rect = map.getCanvas().getBoundingClientRect();
+    selectionStart = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      lngLat: map.unproject([e.clientX - rect.left, e.clientY - rect.top]), // Запам'ятовуємо координати карти
+    };
+
+    selectionBoxEl.style.left = selectionStart.x + 'px';
+    selectionBoxEl.style.top = selectionStart.y + 'px';
+    selectionBoxEl.style.width = '0px';
+    selectionBoxEl.style.height = '0px';
+    selectionBoxEl.style.display = 'block';
+
+    uiElements.forEach((el) => {
+      if (el) el.classList.add('interface-hidden');
+    });
+  });
+
+  map.getCanvas().addEventListener('mouseup', (e) => {
+    if (!isSelecting || activeTool !== 'scan') return;
+
+    isSelecting = false;
+    map.dragPan.enable(); // Вмикаємо карту назад
+    selectionBoxEl.style.display = 'none';
+
+    const rect = map.getCanvas().getBoundingClientRect();
+    const endLngLat = map.unproject([
+      e.clientX - rect.left,
+      e.clientY - rect.top,
+    ]);
+
+    uiElements.forEach((el) => {
+      if (el) el.classList.remove('interface-hidden');
+    });
+    // Запускаємо пошук висот у виділеній області
+    findHighestPoints(selectionStart.lngLat, endLngLat);
+  });
+
+  map.getCanvas().addEventListener('mousemove', (e) => {
+    if (!isSelecting || activeTool !== 'scan') return;
+
+    const rect = map.getCanvas().getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+
+    const width = Math.abs(currentX - selectionStart.x);
+    const height = Math.abs(currentY - selectionStart.y);
+    const newX = Math.min(currentX, selectionStart.x);
+    const newY = Math.min(currentY, selectionStart.y);
+
+    selectionBoxEl.style.left = newX + 'px';
+    selectionBoxEl.style.top = newY + 'px';
+    selectionBoxEl.style.width = width + 'px';
+    selectionBoxEl.style.height = height + 'px';
+  });
+}
+
+function handleToolClick(lngLat) {
+  if (activeTool === 'compass') {
+    if (!isDrawingCompass) {
+      // 1. Починаємо малювати
+      // ПЕРШИЙ КЛІК: Встановлюємо центр
+      isDrawingCompass = true;
+      // Зберігаємо як чистий об'єкт з числами
+      compassCenter = { lng: lngLat.lng, lat: lngLat.lat };
+      showCopyToast('ЦЕНТР ВСТАНОВЛЕНО - ОБЕРІТЬ РАДІУС');
+      // Додаємо візуальну точку в центрі (опціонально)
+      addRulerPoint(lngLat);
+    } else {
+      // 2. Фіксуємо результат
+      // ДРУГИЙ КЛІК: Фіксуємо циркуль
+      isDrawingCompass = false;
+      // Тут ми НЕ зануляємо compassCenter відразу, щоб коло залишилося на екрані
+      showCopyToast('ЦИРКУЛЬ ЗАФІКСОВАНО');
+      // compassCenter = null; // скидати після завершення
+      addRulerPoint(lngLat);
+    }
+  } else {
+    addRulerPoint(lngLat);
   }
 }
 
@@ -513,10 +690,10 @@ function setActiveTool(tool) {
     document.getElementById('distance-info').style.display = 'none';
   } else {
     activeTool = tool;
-    isDrawingCompass = false;
-    compassCenter = null;
 
-    // ДОДАЙ ЦЮ ПЕРЕВІРКУ:
+    // Очищаємо шар циркуля з мапи, щоб старе коло зникло
+    clearCompass();
+
     if (tool) {
       // ДОДАЄМО КЛАС ДЛЯ КУРСОРУ, якщо обрано Циркуль або Лінійку (за бажанням)
       if (tool === 'compass' || tool === 'ruler') {
@@ -544,46 +721,59 @@ function setActiveTool(tool) {
   }
 }
 
-function handleToolClick(lngLat) {
-  if (activeTool === 'compass') {
-    if (!isDrawingCompass) {
-      compassCenter = [lngLat.lng, lngLat.lat];
-      isDrawingCompass = true;
-      addRulerPoint(lngLat);
-    } else {
-      isDrawingCompass = false;
-      addRulerPoint(lngLat);
-    }
-  } else {
-    addRulerPoint(lngLat);
-  }
-}
+let lastCompassUpdate = 0; // Змінна для контролю часу
 
 function updateCompassVisual(currentLngLat) {
-  const center = compassCenter;
-  const edge = [currentLngLat.lng, currentLngLat.lat];
-  const radiusKm = turf.distance(center, edge, { units: 'kilometers' });
-  const distText =
-    radiusKm < 1
-      ? Math.round(radiusKm * 1000) + ' м'
-      : radiusKm.toFixed(2) + ' км';
+  // 1. Перевірка: чи є центр і чи є поточні координати миші
+  if (!compassCenter || !currentLngLat) return;
 
-  const circle = turf.circle(center, radiusKm, {
-    steps: 128,
-    units: 'kilometers',
-  });
-  const radiusLine = turf.lineString([center, edge], {
-    distanceText: distText,
-  });
+  const now = Date.now();
+  // Оновлюємо не частіше ніж раз на 20 мс (~50 FPS)
+  if (now - lastCompassUpdate < 20) return;
+  lastCompassUpdate = now;
 
-  map.getSource('ruler-source').setData({
-    type: 'FeatureCollection',
-    features: [circle, radiusLine],
-  });
+  // 2. Формуємо масиви координат [longitude, latitude]
+  // Turf.js ПРИЙМАЄ ТІЛЬКИ МАСИВИ [lng, lat]
+  const start = [compassCenter.lng, compassCenter.lat];
+  const end = [currentLngLat.lng, currentLngLat.lat];
 
-  document.getElementById('distance-info').innerHTML = `
-        <span style='color:#00ff00'>ЦИРКУЛЬ (АКТИВНО):</span><br>
-        РАДІУС: ${distText}`;
+  try {
+    // 3. Перевірка на "нульову" відстань (якщо миша в тій же точці, що і центр)
+    if (start[0] === end[0] && start[1] === end[1]) return;
+    // console.log(start, end);
+
+    const distance = turf.distance(start, end, { units: 'kilometers' });
+    // Ігноруємо занадто малу відстань
+    if (distance <= 0.001) return;
+
+    const distText =
+      distance < 1
+        ? Math.round(distance * 1000) + ' м'
+        : distance.toFixed(2) + ' км';
+
+    // 1. Створюємо коло
+    const circle = turf.circle(start, distance, {
+      steps: 64,
+      units: 'kilometers',
+    });
+    // 2. Створюємо лінію радіуса
+    const radiusLine = turf.lineString([start, end], {
+      distanceText: distText,
+    });
+    // 3. Об'єднуємо їх у колекцію
+    const data = {
+      type: 'FeatureCollection',
+      features: [circle, radiusLine],
+    };
+
+    const source = map.getSource('compass-arc');
+    if (source) {
+      source.setData(data);
+    }
+  } catch (err) {
+    // Виводимо помилку в консоль
+    console.error('Помилка візуалізації циркуля:', err.message);
+  }
 }
 
 function addRulerPoint(lngLat) {
@@ -740,7 +930,7 @@ function reindexRulerPoints() {
     const rawMgrs = mgrs.forward(coords);
     const formattedMgrs = rawMgrs.replace(
       /(.{3})(.{2})(.{5})(.{5})/,
-      '$1 $2 $3 $4'
+      '$1 $2 $3 $4',
     );
 
     const item = document.createElement('div');
@@ -776,25 +966,11 @@ function removeRulerPoint(id) {
 
   // 2. СПЕЦІАЛЬНА ЛОГІКА ДЛЯ ЦИРКУЛЯ
   if (activeTool === 'compass') {
-    clearSidebar();
-    isDrawingCompass = false;
-    compassCenter = null;
-
     // Очищуємо графіку циркуля на карті
-    if (map.getSource('ruler-source')) {
-      map
-        .getSource('ruler-source')
-        .setData({ type: 'FeatureCollection', features: [] });
-    }
-
-    // Повне скидання масивів для циркуля
-    rulerMarkers.forEach((m) => m.marker.remove());
-    rulerMarkers = [];
-    rulerPoints = [];
+    clearCompass();
 
     document.getElementById('distance-info').innerHTML =
       'ЦИРКУЛЬ СКИНУТО. ОБЕРІТЬ ЦЕНТР';
-
     // Гарантовано ховаємо сайдбар, якщо він був відкритий іншим інструментом
     clearSidebar();
     return; // ПРИПИНЯЄМО виконання функції
@@ -803,11 +979,7 @@ function removeRulerPoint(id) {
   // 3. ЛОГІКА ДЛЯ ЛІНІЙКИ (Multi-point ruler)
   if (rulerPoints.length < 2) {
     // Якщо точок замало для лінії — чистимо все
-    if (map.getSource('ruler-source')) {
-      map
-        .getSource('ruler-source')
-        .setData({ type: 'FeatureCollection', features: [] });
-    }
+    clearRuler();
 
     // Видаляємо останню одиноку точку, якщо вона була
     rulerMarkers.forEach((m) => m.marker.remove());
@@ -842,28 +1014,34 @@ function clearSidebar() {
 }
 
 function updateMeasurements() {
-  if (!map.getSource('ruler-source')) return;
+  // Перевірка наявності джерел перед роботою
+  const rulerSource = map.getSource('ruler-source');
+  const compassSource = map.getSource('compass-arc');
+  if (!rulerSource || !compassSource) return;
 
   const features = [];
-  let totalDist = 0;
+  const infoEl = document.getElementById('distance-info');
 
+  // 1. ЛОГІКА ДЛЯ ЦИРКУЛЯ
   if (activeTool === 'compass') {
     if (rulerPoints.length >= 2) {
       const center = rulerPoints[0].coords;
       const edge = rulerPoints[1].coords;
 
-      // Розрахунок відстані
       const radius = turf.distance(center, edge, { units: 'kilometers' });
+      // Розрахунок азимута (bearing повертає від -180 до 180)
+      let bearing = turf.bearing(center, edge);
+      if (bearing < 0) bearing += 360; // Переводимо у формат 0-360 градусів
 
-      // Створюємо текст відстані тут (доступний для всього блоку)
       const distText =
         radius < 1
           ? Math.round(radius * 1000) + ' м'
           : radius.toFixed(2) + ' км';
+      const azimuthText = Math.round(bearing) + '°';
 
-      // Геометрія кола з високою точністю
+      // Створюємо геометрію
       const circleGeo = turf.circle(center, radius, {
-        steps: 256,
+        steps: 64,
         units: 'kilometers',
       });
       const lineGeo = turf.lineString([center, edge]);
@@ -871,34 +1049,48 @@ function updateMeasurements() {
       features.push({
         type: 'Feature',
         geometry: circleGeo.geometry,
-        properties: {},
+        properties: { type: 'circle' },
       });
 
       features.push({
         type: 'Feature',
         geometry: lineGeo.geometry,
         properties: {
-          distanceText: distText, // Тепер змінна точно визначена
+          distanceText: distText,
+          type: 'radius',
         },
       });
 
-      // Оновлення текстового інфо-блоку в UI
-      const infoEl = document.getElementById('distance-info');
-      if (infoEl) {
-        infoEl.innerHTML = `РАДІУС ЗАФІКСОВАНО: <span style="color:#00ff00">${distText}</span>`;
-      }
+      // ОНОВЛЮЄМО ТІЛЬКИ ЦИРКУЛЬ
+      compassSource.setData({ type: 'FeatureCollection', features: features });
+
+      // Очищуємо лінійку, щоб вона не заважала
+      rulerSource.setData({ type: 'FeatureCollection', features: [] });
+
+      if (infoEl)
+        infoEl.innerHTML = `РАДІУС: <span style="color:#ffcc00">${distText}</span> | АЗИМУТ: <span style="color:#ffcc00">${azimuthText}</span>`;
     }
-  } else {
-    // ЛОГІКА ДЛЯ ЗВИЧАЙНОЇ ЛІНІЙКИ
+  }
+  // 2. ЛОГІКА ДЛЯ ЛІНІЙКИ
+  else {
     if (rulerPoints.length >= 2) {
       const coords = rulerPoints.map((p) => p.coords);
       const lineGeo = turf.lineString(coords);
-      totalDist = turf.length(lineGeo, { units: 'kilometers' });
+      const totalDist = turf.length(lineGeo, { units: 'kilometers' });
+
+      // Розрахунок азимута останнього сегмента
+      const lastIdx = rulerPoints.length - 1;
+      let lastBearing = turf.bearing(
+        rulerPoints[lastIdx - 1].coords,
+        rulerPoints[lastIdx].coords,
+      );
+      if (lastBearing < 0) lastBearing += 360;
 
       const distText =
         totalDist < 1
           ? Math.round(totalDist * 1000) + ' м'
           : totalDist.toFixed(2) + ' км';
+      const azimuthText = Math.round(lastBearing) + '°';
 
       features.push({
         type: 'Feature',
@@ -906,28 +1098,39 @@ function updateMeasurements() {
         properties: { distanceText: distText },
       });
 
-      const infoEl = document.getElementById('distance-info');
-      if (infoEl) {
-        infoEl.innerHTML = `ВІДСТАНЬ: <span style="color:#00ff00">${distText}</span>`;
-      }
+      // ОНОВЛЮЄМО ТІЛЬКИ ЛІНІЙКУ
+      rulerSource.setData({ type: 'FeatureCollection', features: features });
+
+      // Очищуємо циркуль
+      compassSource.setData({ type: 'FeatureCollection', features: [] });
+
+      if (infoEl)
+        infoEl.innerHTML = `ВІДСТАНЬ: <span style="color:#ffcc00">${distText}</span> | АЗИМУТ : <span style="color:#ffcc00">${azimuthText}</span>`;
     }
   }
+}
 
-  // Завантажуємо дані в джерело одним масивом features
-  map.getSource('ruler-source').setData({
-    type: 'FeatureCollection',
-    features: features,
-  });
+function clearGeo() {
+  rulerMarkers.forEach((m) => m.marker.remove());
+  rulerPoints = [];
+  rulerMarkers = [];
+  // Очищаємо всі джерела даних
+  const clearGeoJSON = { type: 'FeatureCollection', features: [] };
+  if (map.getSource('compass-arc'))
+    map.getSource('compass-arc').setData(clearGeoJSON);
+  if (map.getSource('ruler-source'))
+    map.getSource('ruler-source').setData(clearGeoJSON);
 }
 
 function clearRuler() {
-  rulerPoints = [];
-  rulerMarkers.forEach((m) => m.marker.remove());
-  rulerMarkers = [];
-  if (map && map.getSource('ruler-source'))
-    map
-      .getSource('ruler-source')
-      .setData({ type: 'FeatureCollection', features: [] });
+  clearGeo();
+}
+
+function clearCompass() {
+  // Скидаємо стан малювання
+  isDrawingCompass = false;
+  compassCenter = null;
+  clearGeo();
 }
 
 function createMarker(lngLat, savedData = null) {
@@ -936,6 +1139,7 @@ function createMarker(lngLat, savedData = null) {
   const colorIdx = savedData ? savedData.colorIdx : 0;
   const posIdx = savedData ? savedData.posIdx : 0;
   const positions = ['label-top', 'label-right', 'label-bottom', 'label-left'];
+  const colorClasses = ['m-green', 'm-red', 'm-blue', 'm-yellow'];
 
   const wrapper = document.createElement('div');
   wrapper.className = 'marker-wrapper';
@@ -1013,11 +1217,8 @@ function handleShiftMeasure(id, lngLat) {
     ]);
     const km = turf.length(line, { units: 'kilometers' });
     document.getElementById('distance-info').style.display = 'block';
-    document.getElementById(
-      'distance-info'
-    ).innerHTML = `<span style='color:#00ff00'>ЗАМІР:</span> ${km.toFixed(
-      2
-    )} км`;
+    document.getElementById('distance-info').innerHTML =
+      `<span style='color:#00ff00'>ЗАМІР:</span> ${km.toFixed(2)} км`;
     map.getSource('ruler-source').setData(line);
     shiftSelectedMarkers = [];
   }
@@ -1039,8 +1240,8 @@ function clearScanResults() {
   if (pointsList) pointsList.innerHTML = '';
 
   // 4. Безопасное удаление слоев видимости
-  if (map.getLayer('visibility-canvas')) map.removeLayer('visibility-canvas');
-  if (map.getSource('visibility-canvas')) map.removeSource('visibility-canvas');
+  if (map.getLayer('visibility-canvas')) safeRemoveLayer('visibility-canvas');
+  if (map.getSource('visibility-canvas')) safeRemoveLayer('visibility-canvas');
 
   // 5. Удаление маркеров сканирования
   if (window.scanMarkersList && window.scanMarkersList.length > 0) {
@@ -1072,7 +1273,7 @@ function focusPoint(lng, lat) {
 async function findHighestPoints(p1, p2) {
   const pointsCountInput = await customPrompt(
     'Скільки найвищих точок знайти?',
-    '5'
+    '5',
   );
 
   if (pointsCountInput === null) {
@@ -1116,7 +1317,7 @@ async function findHighestPoints(p1, p2) {
     const isTooClose = filtered.some(
       (f) =>
         turf.distance([p.lng, p.lat], [f.lng, f.lat], { units: 'kilometers' }) <
-        0.3
+        0.3,
     );
     if (!isTooClose) filtered.push(p);
   }
@@ -1206,7 +1407,7 @@ function renderScanResults(filtered) {
     const rawMgrs = mgrs.forward([p.lng, p.lat]);
     const formattedMgrs = rawMgrs.replace(
       /(.{3})(.{2})(.{5})(.{5})/,
-      '$1 $2 $3 $4'
+      '$1 $2 $3 $4',
     );
     const item = document.createElement('div');
 
@@ -1216,8 +1417,8 @@ function renderScanResults(filtered) {
       <div style="display:flex; justify-content:space-between; align-items: baseline; pointer-events: none;">
           <b style="color: ${color}; font-size: 14px;">${pointName}</b>
           <b style="background:${color}; color:black; padding:2px 6px; border-radius:2px; font-size: 14px;">${Math.round(
-      p.elevation
-    )} м</b>
+            p.elevation,
+          )} м</b>
       </div>
       <div class="mgrs-copy-zone">
           <span class="coord-text" style="color: #00ff00; opacity: 0.8;">${formattedMgrs}</span>

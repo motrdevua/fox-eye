@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
   <head>
     <meta charset="utf-8" />
@@ -34,6 +34,7 @@
         map: `<svg viewBox="0 0 24 24" style="width: 20px; height: 20px"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>`,
         izogips: `<svg viewBox="0 0 24 24" width="24" height="24"><path d="M3.5 18.5L9.5 12.5L13.5 16.5L20.5 9.5" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/><path d="M3.5 12.5L9.5 6.5L13.5 10.5L20.5 3.5" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/>
     </svg>`,
+        nightMode: `<svg viewBox="0 0 24 24" width="20" height="20"><path d="M17.75,4.09L15.22,6.03L16.13,9.09L13.5,7.28L10.87,9.09L11.78,6.03L9.25,4.09L12.44,4.03L13.5,1L14.56,4.03L17.75,4.09M21.25,11L19.61,12.25L20.2,14.23L18.5,13.06L16.8,14.23L17.39,12.25L15.75,11L17.81,10.95L18.5,9L19.19,10.95L21.25,11M18.97,15.95C18.39,15.92 17.77,15.96 17.13,16.07C14.5,16.5 12.42,18.39 11.77,20.74C10.12,20.39 8.6,19.35 7.55,17.91C6.5,16.46 6,14.76 6.12,13.05C6.28,10.78 7.42,8.74 9.21,7.39C7.45,8.06 5.92,9.35 4.88,11.03C3.84,12.7 3.33,14.66 3.43,16.63C3.69,21.31 7.71,24.87 12.4,24.61C14.83,24.47 16.97,23.32 18.43,21.6C16.92,21.92 15.3,21.72 13.84,20.89C15.42,19.92 17.1,19.37 18.93,19.33C19,19.33 19.07,19.33 19.14,19.33C19.46,19.33 19.78,19.35 20.09,19.39C19.86,18.17 19.43,17.03 18.77,16.03C18.84,15.99 18.91,15.96 18.97,15.95Z" /></svg>`,
       };
     </script>
   </head>
@@ -65,7 +66,7 @@
           type="text"
           id="city-input"
           placeholder="ВВЕДІТЬ НАЗВУ НП..."
-          onkeypress="if(event.key==='Enter') performSearch()"
+          onkeypress="if (event.key === 'Enter') performSearch();"
         />
         <br />
         <button class="main-btn" onclick="performSearch()" style="width: auto">
@@ -115,12 +116,6 @@
           </script>
         </button>
 
-        <button class="icon-btn" onclick="printMap()" title="ДРУК/ЗБЕРЕЖЕННЯ">
-          <script>
-            document.write(icons.print);
-          </script>
-        </button>
-
         <button
           class="icon-btn"
           id="style-toggle"
@@ -141,11 +136,30 @@
             document.write(icons.izogips);
           </script>
         </button>
+
+        <button class="icon-btn" onclick="printMap()" title="ДРУК/ЗБЕРЕЖЕННЯ">
+          <script>
+            document.write(icons.print);
+          </script>
+        </button>
+
+        <button
+          id="btn-night-mode"
+          class="icon-btn control-btn"
+          onclick="toggleNightMode()"
+          title="Нічний режим (Red Vision)"
+        >
+          <script>
+            document.write(icons.nightMode);
+          </script>
+        </button>
       </div>
 
       <div>
         <span class="label-desc">MGRS</span>
-        <span id="mgrs-info" style="font-size: 16px; font-weight: bold"
+        <span
+          id="live-coords"
+          style="color: #ffcc00; font-size: 16px; font-weight: bold"
           >---</span
         >
       </div>
