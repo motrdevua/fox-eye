@@ -145,8 +145,13 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
+  overflow: hidden;
   width: 100%;
+
+  /* фоновий колір, щоб не було "спалаху" контенту */
+  background: var(--bg-black);
 }
+
 
 #map-controls,
 #results-sidebar,
@@ -269,6 +274,8 @@ select {
 
 .marker-label {
   position: absolute;
+  bottom: 15px;
+  left: 50%;
   z-index: 3;
   padding: 2px 6px;
   border: var(--border-width) solid var(--color-main);
@@ -278,35 +285,13 @@ select {
   font-weight: 700;
   font-size: 11px;
   cursor: pointer;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
 
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-.label-top {
-  bottom: 15px;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
-}
-
-.label-right {
-  top: -7px;
-  left: 15px;
-}
-
-.label-bottom {
-  top: 15px;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
-}
-
-.label-left {
-  top: -7px;
-  right: 15px;
 }
 
 .ruler-point-el {
@@ -414,7 +399,7 @@ select.speed-select {
 .point-item {
   margin-bottom: var(--gap-small);
   padding: 4px;
-  border: var(--border-width) solid var(--color-main-dark);
+  border-left: 5px solid var(--color-main);
   font-size: 12px;
   cursor: pointer;
   transition: var(--transition-fast);
@@ -872,62 +857,42 @@ select.speed-select {
 
 .maplibregl-marker,
 .ruler-point-wrapper,
-.ruler-label,
-.ruler-dist-label {
+.ruler-label {
   z-index: 1 !important;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
-/* Ефект для самої карти */
-.night-vision-active #map canvas {
-  -webkit-filter: sepia(1) hue-rotate(-50deg) saturate(2) brightness(.7) contrast(1.2);
-  filter: sepia(1) hue-rotate(-50deg) saturate(2) brightness(.7) contrast(1.2);
+.ruler-dist-label {
+  display: none;
 }
 
-/* Зміна кольорів інтерфейсу при нічному режимі */
-body.night-vision-active {
-  background-color: #1a0000 !important;
+.static-marker .custom-marker {
+  /* Прибирає "руку" перетягування */
+  -webkit-filter: brightness(1.2);
+  filter: brightness(1.2);
+  cursor: default !important;
+  /* Робимо пошуковий маркер трохи яскравішим */
 }
 
-.night-vision-active .map-overlay-panel,
-.night-vision-active #map-controls,
-.night-vision-active #results-sidebar {
-  border-color: #ff0000 !important;
-  background: rgba(40, 0, 0, .9) !important;
-  box-shadow: 0 0 15px rgba(255, 0, 0, .3) !important;
-  color: #ff0000 !important;
+/* Режим друку через клас */
+body.printing-mode #map-controls,
+body.printing-mode #search-overlay,
+body.printing-mode .btn-copy-small,
+body.printing-mode #modal-alert {
+  display: none !important;
 }
 
-.night-vision-active .control-btn {
-  border-color: #550000 !important;
-  color: #ff0000 !important;
-}
+/* Налаштування розміру сторінки */
+@media print {
+  @page {
+    margin: 0;
 
-.night-vision-active .control-btn.active {
-  background-color: #ff0000 !important;
-  color: #000000 !important;
-}
+    size: A4 landscape;
+  }
 
-/* Підсвітка MGRS та інформації в червоному */
-.night-vision-active #live-coords,
-.night-vision-active #distance-info {
-  color: #ff0000 !important;
-  text-shadow: 0 0 5px rgba(255, 0, 0, .5);
-}
-
-.night-vision-active #map::after {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  /* Щоб не заважало клікати по карті */
-  z-index: 5;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(0deg,
-      rgba(255, 0, 0, .03) 0px,
-      rgba(255, 0, 0, .03) 1px,
-      transparent 1px,
-      transparent 2px);
-  content: "";
-  pointer-events: none;
+  body {
+    background: white;
+  }
 }
