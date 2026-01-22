@@ -1047,8 +1047,10 @@ body.printing-mode #modal-alert {
 .selection-box {
   position: absolute;
   z-index: 2000;
-  display: none;
+  display: flex;
   overflow: hidden;
+  align-items: center;
+  justify-content: center;
 
   /* Зелена рамка */
   border: 2px dashed var(--color-main);
@@ -1059,6 +1061,31 @@ body.printing-mode #modal-alert {
   /* Зелене світіння */
   box-shadow: 0 0 10px rgba(0, 255, 0, .2), inset 0 0 10px rgba(0, 255, 0, .05);
   pointer-events: none;
+}
+
+/* Новий стиль для тексту площі */
+.selection-area-label {
+  /* Темна підкладка для читабельності */
+  padding: 4px 8px;
+  border: 1px solid var(--color-main-dark);
+  border-radius: 2px;
+
+  /* Зелений текст */
+  background-color: rgba(0, 0, 0, .7);
+  color: var(--color-main);
+
+  /* Щоб не заважав клікам */
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 12px;
+  font-family: var(--font-mono);
+
+  /* Розмиття фону під текстом */
+  pointer-events: none;
+
+  backdrop-filter: blur(2px);
+
+  /* Текст в один рядок */
 }
 
 .selection-box::after {

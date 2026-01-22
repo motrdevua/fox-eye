@@ -541,8 +541,65 @@ function setupMapEvents() {
 
   // 4. Рух миші (MouseMove) - Циркуль та MGRS
   map.on('mousemove', (e) => {
-    if (state.activeTool === 'compass' && state.compass.isDrawing)
+    if (state.activeTool === 'compass' && state.compass.isDrawing) {
       updateCompassVisual(e.lngLat);
+    }
+    // Знайди в setupMapEvents -> map.on('mousemove', ...)
+    // Заміни весь блок "if (state.isSelecting && state.selectionBoxEl)" на цей:
+
+    if (state.isSelecting && state.selectionBoxEl) {
+      // 1. Використовуємо e.point (точність MapLibre), а не clientX
+      const currentPoint = e.point;
+
+      // Перераховуємо стартову точку в пікселі (гарантує точність навіть при зміщенні)
+      const startPoint = state.map.project(state.selectionStart.lngLat);
+
+      const minX = Math.min(startPoint.x, currentPoint.x);
+      const maxX = Math.max(startPoint.x, currentPoint.x);
+      const minY = Math.min(startPoint.y, currentPoint.y);
+      const maxY = Math.max(startPoint.y, currentPoint.y);
+
+      // Оновлюємо візуал рамки
+      state.selectionBoxEl.style.left = minX + 'px';
+      state.selectionBoxEl.style.top = minY + 'px';
+      state.selectionBoxEl.style.width = maxX - minX + 'px';
+      state.selectionBoxEl.style.height = maxY - minY + 'px';
+
+      // === 2. ТОЧНИЙ РОЗРАХУНОК (ГЕКТАРИ) ===
+      const label = state.selectionBoxEl.querySelector('.selection-area-label');
+      if (label) {
+        // Беремо координати середини сторін (це компенсує кривизну Землі)
+        const leftMid = state.map.unproject([minX, (minY + maxY) / 2]);
+        const rightMid = state.map.unproject([maxX, (minY + maxY) / 2]);
+        const topMid = state.map.unproject([(minX + maxX) / 2, minY]);
+        const bottomMid = state.map.unproject([(minX + maxX) / 2, maxY]);
+
+        // Рахуємо дистанцію в метрах
+        const widthM = leftMid.distanceTo(rightMid);
+        const heightM = topMid.distanceTo(bottomMid);
+
+        const area = widthM * heightM;
+
+        // === 3. ФОРМАТУВАННЯ (M² -> HA -> KM²) ===
+        let text = '';
+        if (area >= 1000000) {
+          // Більше 1 км² (1 000 000 м²) -> показуємо км²
+          text = (area / 1000000).toFixed(2) + ' km²';
+        } else if (area >= 10000) {
+          // Більше 1 Гектара (10 000 м²) -> показуємо Гектари (ha)
+          // Це прибере "дві тризначні цифри". 500 000 м² стане 50.00 ha
+          text = (area / 10000).toFixed(2) + ' ha';
+        } else {
+          // Менше 1 га -> показуємо метри
+          text =
+            Math.round(area)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' m²';
+        }
+
+        label.innerText = text;
+      }
+    }
     updateLiveCoords(e.lngLat);
   });
 
@@ -1135,7 +1192,9 @@ function focusPoint(lng, lat) {
 
 function handleScanStart(e) {
   if (state.activeTool !== 'scan' || e.button !== 0) return;
-
+  // === ВАЖЛИВО! БЛОКУЄМО СТАНДАРТНУ ПОВЕДІНКУ ===
+  e.preventDefault();
+  // ==============================================
   clearScanResults();
   state.isSelecting = true;
   state.map.dragPan.disable();
@@ -1149,6 +1208,14 @@ function handleScanStart(e) {
   if (!state.selectionBoxEl) {
     state.selectionBoxEl = document.createElement('div');
     state.selectionBoxEl.className = 'selection-box';
+
+    // === НОВЕ: Створюємо лейбл для тексту один раз ===
+    const label = document.createElement('span');
+    label.className = 'selection-area-label';
+    label.innerText = '0 m²';
+    state.selectionBoxEl.appendChild(label);
+    // ================================================
+
     document.getElementById('map').appendChild(state.selectionBoxEl);
   }
 
