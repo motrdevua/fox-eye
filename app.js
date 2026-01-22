@@ -42,7 +42,62 @@ const state = {
   },
 };
 
-// 3. ІКОНКИ
+// 3. СИСТЕМА ЗБЕРЕЖЕННЯ
+const AppState = {
+  // Зберігаємо стан у пам'ять
+  save: () => {
+    const data = {
+      // Зберігаємо тільки координати точок
+      points: state.rulerPoints.map((p) => p.coords),
+      tool: state.activeTool,
+      mapCenter: state.map.getCenter(),
+      mapZoom: state.map.getZoom(),
+    };
+    localStorage.setItem('fox-eye-tools', JSON.stringify(data));
+    console.log('State saved');
+  },
+
+  // Відновлюємо стан при старті
+  load: () => {
+    const raw = localStorage.getItem('fox-eye-tools');
+    if (!raw) return;
+
+    try {
+      const data = JSON.parse(raw);
+
+      // 1. Відновлюємо позицію мапи
+      if (data.mapCenter && data.mapZoom) {
+        state.map.jumpTo({ center: data.mapCenter, zoom: data.mapZoom });
+      }
+
+      // 2. Відновлюємо інструмент (якщо був)
+      if (data.tool) {
+        setActiveTool(data.tool);
+      }
+
+      // 3. Відновлюємо точки
+      if (data.points && Array.isArray(data.points) && data.points.length > 0) {
+        // Очищаємо масиви перед завантаженням (на всяк випадок)
+        state.rulerPoints = [];
+        state.rulerMarkers = [];
+
+        // Проходимо по збережених координатах і ставимо точки
+        // Важливо: передаємо false, щоб не викликати збереження під час завантаження
+        data.points.forEach((coords) => {
+          // Перетворюємо назад у об'єкт {lng, lat} для нашої функції
+          const lngLat = { lng: coords[0], lat: coords[1] };
+          addRulerPoint(lngLat, false);
+        });
+
+        showCopyToast('МАРШРУТ ВІДНОВЛЕНО');
+      }
+    } catch (e) {
+      console.error('Save file corrupted', e);
+    }
+  },
+};
+
+// 4. ІКОНКИ
 const ICONS = {
   launch: `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="margin-right:8px"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg>`,
   reset: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="margin-right:8px"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/></svg>`,
@@ -53,6 +108,9 @@ const ICONS = {
   map: `<svg viewBox="0 0 24 24" style="width: 20px; height: 20px"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>`,
   izogips: `<svg viewBox="0 0 24 24" width="24" height="24"><path d="M3.5 18.5L9.5 12.5L13.5 16.5L20.5 9.5" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/><path d="M3.5 12.5L9.5 6.5L13.5 10.5L20.5 3.5" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/></svg>`,
   print: `<svg viewBox="0 0 24 24" style="width: 20px; height: 20px"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>`,
+  download: `<svg viewBox="0 0 24 24"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/></svg>`,
+  upload: `<svg viewBox="0 0 24 24"><path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"/></svg>`,
+  help: `<svg viewBox="0 0 24 24"><path d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"/></svg>`,
 };
 
 // --- UI ТА HELPER ФУНКЦІЇ ---
@@ -184,6 +242,12 @@ function clearSidebar() {
   if (sidebar) sidebar.style.display = 'none';
 }
 
+function clearInfobar() {
+  const infobar = document.getElementById('infobar');
+  if (infobar) infobar.innerHTML = '';
+  if (infobar) infobar.style.display = 'none';
+}
+
 // --- MAP CORE ---
 
 function startMap(lon, lat) {
@@ -204,7 +268,7 @@ function initMap(lon, lat) {
 
   const baseStyle = {
     version: 8,
-    glyphs: CONFIG.urls.glyphs.replace('{key}', CONFIG.apiKey),
+    glyphs: `${CONFIG.urls.glyphs}?key=${CONFIG.apiKey}`,
     sources: {
       'google-satellite': {
         type: 'raster',
@@ -250,6 +314,12 @@ function initMap(lon, lat) {
       attributionControl: false,
     });
     setupMapEvents();
+    // === ДОДАЄМО МАСШТАБНУ ШКАЛУ (SCALE CONTROL) ===
+    const scale = new maplibregl.ScaleControl({
+      maxWidth: 150,
+      unit: 'metric', // Тільки метри/кілометри
+    });
+    state.map.addControl(scale, 'bottom-right'); // Розміщення: знизу праворуч
   } catch (e) {
     customAlert('Map Error: ' + e.message);
   }
@@ -273,7 +343,7 @@ function updateLiveCoords(lngLat) {
       /(.{3})(.{2})(.{5})(.{5})/,
       '$1 $2 $3 $4',
     );
-    coordsDisplay.innerText = `MGRS: ${formatted}`;
+    coordsDisplay.innerText = `${formatted}`;
   } catch (err) {
     coordsDisplay.innerText = '---';
   }
@@ -314,7 +384,7 @@ function addMapLayers() {
       visibility: 'none',
       'symbol-placement': 'line',
       'text-field': ['concat', ['to-string', ['get', 'height']], ' м'],
-      // 'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+      'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
       'text-size': 10,
       'symbol-spacing': 350,
     },
@@ -353,7 +423,7 @@ function addMapLayers() {
     layout: {
       'symbol-placement': 'line',
       'text-field': ['get', 'distanceText'],
-      // 'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
+      'text-font': ['Noto Sans Regular', 'Arial Unicode MS Regular'],
       'text-size': 12,
       'symbol-spacing': 250,
     },
@@ -439,10 +509,29 @@ function setupMapEvents() {
   map.on('load', () => {
     addMapLayers(); // Додаємо шари
     loadSavedMarkers(); // Завантажуємо маркери з пам'яті
+    AppState.load();
   });
 
   // 2. Клік (Click) - Тільки для інструментів (Лінійка/Циркуль)
   map.on('click', (e) => (state.activeTool ? handleToolClick(e.lngLat) : null));
+
+  map.on('contextmenu', (e) => {
+    // Якщо ми зараз малюємо компасом (поставили центр, але ще не поставили радіус)
+    if (state.activeTool === 'compass' && state.compass.isDrawing) {
+      // 1. Зупиняємо малювання
+      state.compass.isDrawing = false;
+      state.compass.center = null;
+
+      // 2. Очищаємо все (видаляємо точку центру і червоне коло)
+      clearMeasurements();
+
+      // 3. Даємо знати користувачу
+      showCopyToast('МАЛЮВАННЯ СКАСОВАНО');
+
+      // 4. Запобігаємо появі стандартного контекстного меню браузера
+      e.preventDefault();
+    }
+  });
 
   // 3. Подвійний клік (Double Click) - Створення маркерів
   map.on('dblclick', (e) => {
@@ -461,7 +550,7 @@ function setupMapEvents() {
   const ui = [
     document.getElementById('map-controls'),
     document.getElementById('results-sidebar'),
-    document.getElementById('distance-info'),
+    document.getElementById('infobar'),
   ];
 
   map.on('movestart', () =>
@@ -496,7 +585,7 @@ function setActiveTool(tool) {
   // Якщо інструмент змінився - скидаємо старі виміри
   if (tool !== null && tool !== prevTool) {
     clearSidebar();
-    clearRuler();
+    clearMeasurements();
     // Якщо вмикаємо щось інше, ніж Scan - очищаємо результати сканування
     if (tool !== 'scan_results') clearScanResults();
   }
@@ -508,7 +597,7 @@ function setActiveTool(tool) {
   // Логіка Toggle (вимкнення при повторному кліку)
   if (tool === prevTool) {
     state.activeTool = null;
-    document.getElementById('distance-info').style.display = 'none';
+    document.getElementById('infobar').style.display = 'none';
   } else {
     state.activeTool = tool;
 
@@ -525,7 +614,7 @@ function setActiveTool(tool) {
     }
 
     // Інфо-панель
-    const infoBox = document.getElementById('distance-info');
+    const infoBox = document.getElementById('infobar');
     infoBox.style.display = 'block';
 
     if (tool === 'compass' || tool === 'ruler')
@@ -540,16 +629,20 @@ function setActiveTool(tool) {
   }
 }
 
-function addRulerPoint(lngLat) {
-  // 1. ЛОГІКА ДЛЯ ЦИРКУЛЯ: Очищення перед початком НОВОГО кола
-  if (state.activeTool === 'compass' && state.rulerPoints.length >= 2)
-    clearRuler();
+function generateId() {
+  // Використовуємо substring замість substr
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
 
-  const pointId = Date.now();
+function addRulerPoint(lngLat, shouldSave = true) {
+  const pointId = generateId();
+
   state.rulerPoints.push({ id: pointId, coords: [lngLat.lng, lngLat.lat] });
 
-  // Створення маркера
   const el = document.createElement('div');
+  el.onclick = (e) => {
+    e.stopPropagation(); // Це не дозволить мапі отримати клік
+  };
   el.className = 'ruler-point-wrapper';
   let anchor = 'bottom';
 
@@ -620,6 +713,8 @@ function addRulerPoint(lngLat) {
   if (state.activeTool !== 'compass' || !state.compass.isDrawing) {
     updateMeasurements();
   }
+
+  if (shouldSave) AppState.save();
 }
 
 function removeRulerPoint(id) {
@@ -631,10 +726,8 @@ function removeRulerPoint(id) {
   state.rulerPoints = state.rulerPoints.filter((p) => p.id !== id);
 
   // 2. СПЕЦІАЛЬНА ЛОГІКА ДЛЯ ЦИРКУЛЯ
-  if (state.activeTool === 'compass') {
-    clearCompass();
-  } else if (state.rulerPoints.length < 2) {
-    clearRuler();
+  if (state.activeTool === 'compass' || state.rulerPoints.length < 2) {
+    clearMeasurements();
   } else {
     // Оновлюємо лінію
     const source = state.map.getSource('ruler-source');
@@ -649,23 +742,48 @@ function removeRulerPoint(id) {
     updateMeasurements();
     reindexRulerPoints();
   }
+
+  AppState.save();
 }
 
 function handleToolClick(lngLat) {
   if (state.activeTool === 'compass') {
+    // 1. ПЕРЕВІРКА: Якщо вже є 2 точки (центр і радіус) — це старе коло.
+    // Очищаємо все ПЕРЕД тим, як почати нове.
+    if (state.rulerPoints.length >= 2) {
+      clearMeasurements();
+      // Тепер rulerPoints = [], isDrawing = false
+    }
+
     if (!state.compass.isDrawing) {
+      // ПОЧАТОК НОВОГО КОЛА (Клік 1)
       state.compass.isDrawing = true;
       state.compass.center = { lng: lngLat.lng, lat: lngLat.lat };
       showCopyToast('ЦЕНТР ВСТАНОВЛЕНО');
-      addRulerPoint(lngLat);
+      addRulerPoint(lngLat); // Додаємо центр
     } else {
+      // ЗАВЕРШЕННЯ КОЛА (Клік 2)
       state.compass.isDrawing = false;
       showCopyToast('ЦИРКУЛЬ ЗАФІКСОВАНО');
-      addRulerPoint(lngLat);
+      addRulerPoint(lngLat); // Додаємо радіус
     }
   } else {
+    // Для лінійки логіка проста
     addRulerPoint(lngLat);
   }
+}
+
+// Отримати азимут (0-360) між двома координатами
+function getAzimuth(start, end) {
+  let bearing = turf.bearing(start, end);
+  if (bearing < 0) bearing += 360;
+  return Math.round(bearing);
+}
+
+// Форматування відстані (м/км)
+function formatDistance(km) {
+  if (km < 1) return Math.round(km * 1000) + ' м';
+  return km.toFixed(2) + ' км';
 }
 
 function updateMeasurements() {
@@ -674,7 +792,7 @@ function updateMeasurements() {
 
   const rSrc = state.map.getSource('ruler-source');
   const cSrc = state.map.getSource('compass-arc');
-  const infoEl = document.getElementById('distance-info');
+  const infoEl = document.getElementById('infobar'); // Верхня плашка (загальна інфо)
 
   if (!rSrc || !cSrc) return;
 
@@ -682,13 +800,9 @@ function updateMeasurements() {
   if (state.activeTool === 'compass' && state.rulerPoints.length >= 2) {
     const start = state.rulerPoints[0].coords;
     const end = state.rulerPoints[1].coords;
+    const azimuth = getAzimuth(start, end);
     const radius = turf.distance(start, end, { units: 'kilometers' });
-    let bearing = turf.bearing(start, end);
-    if (bearing < 0) bearing += 360;
-
-    const distText =
-      radius < 1 ? Math.round(radius * 1000) + ' м' : radius.toFixed(2) + ' км';
-
+    const distText = formatDistance(radius);
     // Малюємо коло і радіус
     cSrc.setData({
       type: 'FeatureCollection',
@@ -701,124 +815,178 @@ function updateMeasurements() {
 
     if (infoEl) {
       infoEl.style.display = 'block';
-      infoEl.innerHTML = `РАДІУС: <span style="color:${CONFIG.colors.accentYellow}">${distText}</span> | АЗИМУТ: <span style="color:${CONFIG.colors.accentYellow}">${Math.round(bearing)}°</span>`;
+      infoEl.innerHTML = `РАДІУС: <span style="color:${CONFIG.colors.accentYellow}">${distText}</span> | АЗИМУТ: <span style="color:${CONFIG.colors.accentYellow}">${azimuth}°</span>`;
     }
 
-    // --- ЛОГІКА ЛІНІЙКИ ---
-  } else if (state.rulerPoints.length >= 2) {
-    const coords = state.rulerPoints.map((p) => p.coords);
-    const line = turf.lineString(coords);
-    const dist = turf.length(line, { units: 'kilometers' });
+    // --- НОВА ЛОГІКА ЛІНІЙКИ ---
+  } else if (state.rulerPoints.length > 0) {
+    const features = [];
+    let totalDist = 0;
 
-    // Азимут останнього відрізка
-    const lastIdx = coords.length - 1;
-    let bearing = turf.bearing(coords[lastIdx - 1], coords[lastIdx]);
-    if (bearing < 0) bearing += 360;
+    // 1. Проходимо по точках і будуємо сегменти
+    for (let i = 1; i < state.rulerPoints.length; i++) {
+      const prev = state.rulerPoints[i - 1].coords;
+      const curr = state.rulerPoints[i].coords;
 
-    const distText =
-      dist < 1 ? Math.round(dist * 1000) + ' м' : dist.toFixed(2) + ' км';
+      const line = turf.lineString([prev, curr]);
+      const segmentDist = turf.length(line, { units: 'kilometers' });
+      totalDist += segmentDist;
 
+      // Додаємо властивість distanceText саме для цього сегмента
+      line.properties = { distanceText: formatDistance(segmentDist) };
+      features.push(line);
+    }
+
+    // Оновлюємо дані на мапі
     rSrc.setData({
       type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: line.geometry,
-          properties: { distanceText: distText },
-        },
-      ],
+      features: features,
     });
-    cSrc.setData({ type: 'FeatureCollection', features: [] }); // Чистимо циркуль
+    cSrc.setData({ type: 'FeatureCollection', features: [] });
 
+    // Оновлюємо верхню плашку (загальна сума)
     if (infoEl) {
-      infoEl.style.display = 'block';
-      infoEl.innerHTML = `ВІДСТАНЬ: <span style="color:${CONFIG.colors.accentYellow}">${distText}</span> | АЗИМУТ: <span style="color:${CONFIG.colors.accentYellow}">${Math.round(bearing)}°</span>`;
+      if (state.rulerPoints.length > 1) {
+        infoEl.style.display = 'block';
+        infoEl.innerHTML = `ЗАГАЛЬНА ДИСТАНЦІЯ: <span style="color:${CONFIG.colors.accentYellow}">${formatDistance(totalDist)}</span>`;
+      } else {
+        infoEl.style.display = 'none';
+      }
     }
+
+    // Оновлюємо сайдбар (список точок)
+    reindexRulerPoints();
+  } else {
+    // Якщо точок немає - чистимо все
+    rSrc.setData({ type: 'FeatureCollection', features: [] });
+    if (infoEl) infoEl.style.display = 'none';
+    reindexRulerPoints();
   }
 }
 
 function reindexRulerPoints() {
-  // Не показуємо список точок для сканера або циркуля, тільки для лінійки
   if (state.activeTool === 'scan' || state.activeTool === 'compass') return;
   if (typeof turf === 'undefined') return;
 
   const listEl = document.getElementById('points-list');
   const sidebar = document.getElementById('results-sidebar');
-  const infoEl = document.getElementById('distance-info');
 
   if (state.rulerPoints.length < 2) {
     if (sidebar) sidebar.classList.add('interface-hidden');
-    if (infoEl) infoEl.innerHTML = '...';
     return;
   }
 
+  if (sidebar) sidebar.classList.remove('interface-hidden');
   if (sidebar) sidebar.style.display = 'flex';
   if (listEl) listEl.innerHTML = '';
 
-  let totalSoFar = 0;
+  // 1. Виносимо змінну за межі циклу, щоб рахувати загальну дистанцію
+  let totalDist = 0;
 
-  state.rulerMarkers.forEach((mObj, index) => {
-    // Оновлюємо лейбли НА КАРТІ
-    const el = mObj.marker.getElement();
-    const label = el.querySelector('.ruler-label');
-    const distLabel = el.querySelector('.ruler-dist-label');
+  state.rulerPoints.forEach((pointData, index) => {
+    const markerWrapper = state.rulerMarkers[index];
+    const realMarker =
+      markerWrapper && markerWrapper.marker
+        ? markerWrapper.marker
+        : markerWrapper;
 
-    // Рахуємо відстань
-    if (index > 0) {
-      const segmentDist = turf.distance(
-        state.rulerPoints[index - 1].coords,
-        state.rulerPoints[index].coords,
-        { units: 'kilometers' },
-      );
-      totalSoFar += segmentDist;
+    // --- РОЗРАХУНКИ ---
+    let segmentDist = '';
+    let azimuthText = '';
+
+    if (index !== 0) {
+      const prev = state.rulerPoints[index - 1].coords;
+      const curr = pointData.coords;
+      const dist = turf.distance(prev, curr, { units: 'kilometers' });
+
+      // 2. Плюсуємо до загальної дистанції
+      totalDist += dist;
+
+      segmentDist = formatDistance(dist);
+
+      const azimuth = getAzimuth(prev, curr);
+      azimuthText = `${azimuth}°`;
     }
 
-    const displayDist =
-      totalSoFar < 1
-        ? `${Math.round(totalSoFar * 1000)}м`
-        : `${totalSoFar.toFixed(2)}км`;
+    // --- ОНОВЛЕННЯ МАРКЕРА ---
+    // Тепер працюємо з realMarker, який точно має метод getElement
+    if (realMarker && typeof realMarker.getElement === 'function') {
+      const el = realMarker.getElement();
+      const label = el.querySelector('.ruler-label');
+      const distLabel = el.querySelector('.ruler-dist-label');
 
-    // Ставимо текст у маркери
-    if (label) label.innerText = `ТОЧКА ${index + 1}`;
-    if (distLabel) {
-      distLabel.innerText = displayDist;
-      distLabel.style.display = index === 0 ? 'none' : 'block'; // Першу точку не підписуємо відстанню
+      if (label) label.innerText = `Точка ${index + 1}`;
+
+      // 4. У distLabel пишемо загальну накопичену дистанцію
+      if (distLabel) {
+        if (index === 0) distLabel.innerText = 'START';
+        else distLabel.innerText = formatDistance(totalDist);
+
+        distLabel.style.display = 'block';
+      }
     }
 
-    const coords = state.rulerPoints[index].coords;
-    const rawMgrs = mgrs.forward(coords);
-    const formattedMgrs = rawMgrs.replace(
-      /(.{3})(.{2})(.{5})(.{5})/,
-      '$1 $2 $3 $4',
-    );
+    // --- MGRS ---
+    const coords = pointData.coords;
+    let rawMgrs = '';
+    let formattedMgrs = 'N/A';
 
+    if (typeof mgrs !== 'undefined') {
+      try {
+        rawMgrs = mgrs.forward(coords);
+        formattedMgrs = rawMgrs.replace(
+          /(.{3})(.{2})(.{5})(.{5})/,
+          '$1 $2 $3 $4',
+        );
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // --- САЙДБАР ---
     const item = document.createElement('div');
     item.className = 'point-item';
+
     item.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items: baseline;">
+      <div style="display:flex; justify-content:space-between; align-items: baseline; margin-bottom: 4px;">
           <b style="color: var(--color-main);">ТОЧКА ${index + 1}</b>
-          
-          <b style="background:${CONFIG.colors.yellow}; color:black; padding:2px 6px; border-radius:2px; font-size:12px;">
-            ${index === 0 ? 'START' : displayDist}
-          </b>
+          <div style="text-align:right;">
+             ${
+               index === 0
+                 ? `<span style="background:${CONFIG.colors.main}; color:black; padding:1px 4px; border-radius:2px; font-size:11px; font-weight:bold;">START</span>`
+                 : `<span style="color:#000; padding:1px 4px; border-radius:2px; font-size:11px;  font-weight:bold;background:${CONFIG.colors.yellow};">DIST: ${segmentDist} <span style="font-size:0.9em">( Σ ${formatDistance(totalDist)} )</span></span>
+                 <span style="color:#000; padding:1px 4px; border-radius:2px; font-size:11px; font-weight:bold; background:${CONFIG.colors.yellow}; margin-left:5px;">AZ: ${azimuthText}</span>`
+             }
+          </div>
       </div>
-      <div class="mgrs-copy-zone">
-          <span class="coord-text" style="font-size:12px;">${formattedMgrs}</span>
+      
+      <div class="mgrs-copy-zone" style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="coord-text" style="font-family:var(--font-mono); font-size:12px; color:#ccc;">${formattedMgrs}</span>
           <button class="btn-copy-small" onclick="event.stopPropagation(); navigator.clipboard.writeText('${rawMgrs}'); showCopyToast('MGRS СКОПІЙОВАНО')">COPY</button>
       </div>
     `;
-    item.onclick = () => focusPoint(coords[0], coords[1]);
+
+    item.onclick = () => {
+      if (typeof focusPoint === 'function') focusPoint(coords[0], coords[1]);
+      else state.map.flyTo({ center: coords, zoom: 14 });
+    };
+
     if (listEl) listEl.appendChild(item);
   });
 }
 
-function clearRuler() {
-  state.rulerMarkers.forEach((mObj) => mObj.marker.remove());
-  state.rulerMarkers = [];
-  state.rulerPoints = [];
-  state.compass.isDrawing = false;
-  state.compass.center = null;
+function clearMeasurements() {
+  // 1. Видаляємо всі маркери з карти
+  state.rulerMarkers.forEach((item) => {
+    const marker = item.marker || item; // Підстраховка (обгортка чи сам маркер)
+    marker.remove();
+  });
 
+  // 2. Очищаємо масиви в стані
+  state.rulerPoints = [];
+  state.rulerMarkers = [];
+
+  // 3. Очищаємо графіку на карті (лінії та кола)
   const clearGeoJSON = { type: 'FeatureCollection', features: [] };
   const rSrc = state.map.getSource('ruler-source');
   const cSrc = state.map.getSource('compass-arc');
@@ -826,7 +994,15 @@ function clearRuler() {
   if (rSrc) rSrc.setData(clearGeoJSON);
   if (cSrc) cSrc.setData(clearGeoJSON);
 
+  // 4. Скидаємо стан малювання
+  state.compass.isDrawing = false;
+  state.compass.center = null;
+
+  // 5. Оновлюємо інтерфейс (ховаємо панелі)
   reindexRulerPoints();
+  clearInfobar();
+
+  localStorage.removeItem('fox-eye-tools'); // Видаляємо запис про інструменти
 }
 
 function updateCompassVisual(currentLngLat) {
@@ -856,25 +1032,6 @@ function updateCompassVisual(currentLngLat) {
   };
   const source = state.map.getSource('compass-arc');
   if (source) source.setData(data);
-}
-
-function clearCompass() {
-  // Скидаємо стан малювання
-  state.compass.isDrawing = false;
-  state.compass.center = null;
-  clearRuler();
-}
-
-function initButtons() {
-  const btn = document.getElementById('toggle-contours-btn');
-  if (btn)
-    btn.onclick = () => {
-      const vis = state.map.getLayoutProperty('contour-lines', 'visibility');
-      const next = vis === 'visible' ? 'none' : 'visible';
-      state.map.setLayoutProperty('contour-lines', 'visibility', next);
-      state.map.setLayoutProperty('contour-labels', 'visibility', next);
-      btn.classList.toggle('active', next === 'visible');
-    };
 }
 
 // --- РОБОТА З МАРКЕРАМИ ---
@@ -1198,7 +1355,7 @@ function clearScanResults() {
     state.scanMarkers.forEach((m) => m.remove());
     state.scanMarkers = [];
   }
-  clearRuler();
+  clearMeasurements();
   clearSidebar();
   safeRemoveLayer('visibility-canvas'); // Про всяк випадок
 
@@ -1281,7 +1438,7 @@ async function printMap() {
   const ui = [
     document.getElementById('map-controls'),
     document.getElementById('results-sidebar'),
-    document.getElementById('distance-info'),
+    document.getElementById('infobar'),
   ];
   ui.forEach((el) => el && el.classList.add('interface-hidden'));
 
@@ -1310,9 +1467,191 @@ function showWebGLError() {
     '<h1 style="color:red; text-align:center; padding:50px">WebGL НЕ ПРАЦЮЄ</h1>';
 }
 
+// === СИСТЕМА ОБМІНУ ДАНИМИ (EXPORT/IMPORT) ===
+
+const DataManager = {
+  // 1. ЕКСПОРТ (Скачування файлу)
+  exportToFile: () => {
+    // Збираємо повну картину
+    const data = {
+      version: '0.1',
+      timestamp: Date.now(),
+      dateString: new Date().toLocaleString(),
+      mapView: {
+        center: state.map.getCenter(),
+        zoom: state.map.getZoom(),
+      },
+      // Дані лінійки та компаса
+      tools: {
+        active: state.activeTool,
+        points: state.rulerPoints.map((p) => p.coords),
+      },
+      // Дані звичайних маркерів
+      markers: state.markersData,
+    };
+
+    // Конвертуємо в JSON
+    const jsonString = JSON.stringify(data, null, 2);
+
+    // Створюємо файл
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    // Генеруємо ім'я файлу: SITREP_2023-10-25_1430.json
+    const date = new Date();
+    const filename = `SITREP_${date.toISOString().slice(0, 10)}_${date.getHours()}${date.getMinutes()}.json`;
+
+    // Тригеримо скачування
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+
+    // Прибираємо сміття
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showCopyToast('ФАЙЛ ЗБЕРЕЖЕНО');
+  },
+
+  // 2. ІМПОРТ (Читання файлу)
+  importFromFile: (file) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+
+        // Валідація (чи це наш файл?)
+        if (!data.mapView || !data.tools) {
+          customAlert('НЕВІДОМИЙ ФОРМАТ ФАЙЛУ');
+          return;
+        }
+
+        // Очищаємо поточну карту перед завантаженням
+        clearMeasurements();
+        state.markersData.forEach((m) => {
+          // Знаходимо реальний маркер через ID і видаляємо (це складно, простіше перезавантажити сторінку, але ми зробимо "м'яке" очищення)
+          // Тут краще використати логіку "стерти все"
+        });
+        // Просте очищення маркерів:
+        document
+          .querySelectorAll('.marker-wrapper')
+          .forEach((el) => el.remove());
+        state.markersData = [];
+
+        // === ВІДНОВЛЕННЯ ===
+
+        // 1. Камера
+        state.map.jumpTo({
+          center: data.mapView.center,
+          zoom: data.mapView.zoom,
+        });
+
+        // 2. Маркери (звичайні)
+        if (data.markers) {
+          data.markers.forEach((m) => createMarker(m.lngLat, m));
+        }
+
+        // 3. Лінійка/Компас
+        if (data.tools && data.tools.points) {
+          state.rulerPoints = [];
+          data.tools.points.forEach((coords) => {
+            const lngLat = { lng: coords[0], lat: coords[1] };
+            addRulerPoint(lngLat, false);
+          });
+        }
+
+        // Зберігаємо новий стан
+        AppState.save();
+        showCopyToast('СИТУАЦІЮ ЗАВАНТАЖЕНО');
+      } catch (err) {
+        console.error(err);
+        customAlert('ПОМИЛКА ЧИТАННЯ ФАЙЛУ');
+      }
+    };
+
+    reader.readAsText(file);
+  },
+};
+
+function initButtons() {
+  const contourBtn = document.getElementById('toggle-contours-btn');
+  if (contourBtn)
+    contourBtn.onclick = () => {
+      const vis = state.map.getLayoutProperty('contour-lines', 'visibility');
+      const next = vis === 'visible' ? 'none' : 'visible';
+      state.map.setLayoutProperty('contour-lines', 'visibility', next);
+      state.map.setLayoutProperty('contour-labels', 'visibility', next);
+      contourBtn.classList.toggle('active', next === 'visible');
+    };
+
+  // 1. Кнопка ЕКСПОРТ
+  const exportBtn = document.getElementById('export-btn');
+  if (exportBtn) {
+    exportBtn.onclick = () => {
+      DataManager.exportToFile();
+    };
+  }
+
+  // 2. Кнопка ІМПОРТ (клікає по прихованому інпуту)
+  const importBtn = document.getElementById('import-btn');
+  const fileInput = document.getElementById('file-input');
+
+  if (importBtn && fileInput) {
+    importBtn.onclick = () => {
+      // Запитуємо підтвердження перед заміною даних
+      if (state.rulerPoints.length > 0 || state.markersData.length > 0) {
+        if (!confirm('Завантаження файлу замінить поточні дані. Продовжити?'))
+          return;
+      }
+      fileInput.click();
+    };
+
+    // Коли файл обрано
+    fileInput.onchange = (e) => {
+      if (e.target.files.length > 0) {
+        DataManager.importFromFile(e.target.files[0]);
+        fileInput.value = ''; // Скидаємо, щоб можна було завантажити той самий файл ще раз
+      }
+    };
+  }
+}
+
+function initHelp() {
+  // Додати це в window.onload або initButtons()
+  const helpBtn = document.getElementById('help-btn');
+  const helpModal = document.getElementById('modal-help');
+  const closeHelpBtn = document.getElementById('close-help-btn');
+
+  if (helpBtn && helpModal) {
+    // Відкриття
+    helpBtn.onclick = () => {
+      helpModal.style.display = 'flex';
+      setTimeout(() => helpModal.classList.add('active'), 10);
+    };
+
+    // Закриття кнопкою
+    closeHelpBtn.onclick = () => {
+      helpModal.classList.remove('active');
+      setTimeout(() => (helpModal.style.display = 'none'), 200);
+    };
+
+    // Закриття по кліку на фон
+    helpModal.onclick = (e) => {
+      if (e.target === helpModal) {
+        helpModal.classList.remove('active');
+        setTimeout(() => (helpModal.style.display = 'none'), 200);
+      }
+    };
+  }
+}
+
 // START
 window.onload = () => {
   if (!checkWebGL()) return showWebGLError();
   updatePlaceholder();
   state.scanMarkers = [];
+  initHelp();
 };
