@@ -1,6 +1,6 @@
 :root {
   --border-width: 1px;
-  --border-radius: 2px;
+  --border-radius: 4px;
 
   --bg-black: #000000;
   --bg-dark-grey: #0a0a0a;
@@ -27,21 +27,64 @@
   --transition-slide: .3s cubic-bezier(.4, 0, .2, 1);
 }
 
-@-webkit-keyframes success-glow {
-  0% {
-    border-color: var(--color-main);
-    box-shadow: 0 0 10px rgba(0, 255, 0, .3);
-  }
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  font: inherit;
+  font-size: 100%;
+}
 
-  50% {
-    border-color: #55ff55;
-    box-shadow: 0 0 20px rgba(0, 255, 0, .6);
-  }
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
 
-  to {
-    border-color: var(--color-main);
-    box-shadow: 0 0 10px rgba(0, 255, 0, .3);
-  }
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+body {
+  overflow: hidden;
+  background-color: var(--bg-black);
+  color: var(--color-main);
+  font-family: var(--font-main);
 }
 
 @keyframes success-glow {
@@ -58,23 +101,6 @@
   to {
     border-color: var(--color-main);
     box-shadow: 0 0 10px rgba(0, 255, 0, .3);
-  }
-}
-
-@-webkit-keyframes error-glow {
-  0% {
-    border-color: red;
-    box-shadow: 0 0 10px rgba(255, 0, 0, .5);
-  }
-
-  50% {
-    border-color: #ff4444;
-    box-shadow: 0 0 25px rgba(255, 0, 0, .8);
-  }
-
-  to {
-    border-color: red;
-    box-shadow: 0 0 10px rgba(255, 0, 0, .5);
   }
 }
 
@@ -95,51 +121,23 @@
   }
 }
 
-@-webkit-keyframes modal-shake {
-
-  0%,
-  to {
-    -webkit-transform: translateX(0);
-    transform: translateX(0);
-  }
-
-  25% {
-    -webkit-transform: translateX(-5px);
-    transform: translateX(-5px);
-  }
-
-  75% {
-    -webkit-transform: translateX(5px);
-    transform: translateX(5px);
-  }
-}
-
 @keyframes modal-shake {
-
-  0%,
-  to {
+  0%, to {
     -webkit-transform: translateX(0);
-    transform: translateX(0);
+            transform: translateX(0);
   }
 
   25% {
     -webkit-transform: translateX(-5px);
-    transform: translateX(-5px);
+            transform: translateX(-5px);
   }
 
   75% {
     -webkit-transform: translateX(5px);
-    transform: translateX(5px);
+            transform: translateX(5px);
   }
 }
 
-body {
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  background: var(--bg-black);
-  font-family: var(--font-main);
-}
 
 #map {
   position: absolute;
@@ -147,24 +145,11 @@ body {
   bottom: 0;
   overflow: hidden;
   width: 100%;
-
-  /* фоновий колір, щоб не було "спалаху" контенту */
   background: var(--bg-black);
 }
 
-
-#map-controls,
-#results-sidebar,
-#infobar,
-#search-overlay {
-  transition: var(--transition-normal);
-}
-
-#map-controls,
-#results-sidebar {
-  transition: -webkit-transform var(--transition-slide);
+#map-controls, #results-sidebar, #infobar, #search-overlay {
   transition: transform var(--transition-slide);
-  transition: transform var(--transition-slide), -webkit-transform var(--transition-slide);
 }
 
 #search-overlay {
@@ -188,18 +173,18 @@ body {
   justify-content: center;
   padding: 25px;
   border: var(--border-width) solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: #111111;
   text-align: center;
 }
 
-input[type="text"],
-select {
-  margin-bottom: var(--gap-medium);
-  padding: 12px;
+.search-box input[type="text"], .search-box select {
+  margin: 20px 0;
+  padding: 10px;
   width: 280px;
   outline: 0;
   border: var(--border-width) solid var(--color-main);
+  border-radius: var(--border-radius);
   background: var(--bg-black);
   color: var(--color-main);
   font-family: inherit;
@@ -210,10 +195,11 @@ select {
   top: 10px;
   left: 10px;
   z-index: 10;
+  display: none;
   padding: var(--panel-padding);
   min-width: 220px;
   border: var(--border-width) solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: var(--bg-panel);
   color: var(--color-main);
 }
@@ -249,7 +235,7 @@ select {
   border: 1px solid var(--bg-black);
   border-radius: var(--border-radius);
   cursor: -webkit-grab;
-  cursor: grab;
+  cursor:         grab;
 }
 
 .m-green {
@@ -286,18 +272,18 @@ select {
   font-size: 11px;
   cursor: pointer;
   -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
+          transform: translateX(-50%);
 
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .ruler-point-el {
   cursor: pointer;
   transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
+  -webkit-transform var(--transition-fast);
 }
 
 .info-container {
@@ -305,29 +291,29 @@ select {
   top: 10px;
   left: 50%;
   z-index: 10;
+  display: none;
   padding: 12px;
   min-width: 180px;
   border: var(--border-width) solid var(--color-main);
-  border-radius: 4px;
-  background: var(--bg-overlay);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-panel);
   color: var(--color-main);
   text-align: center;
   font-weight: 700;
   font-size: 14px;
   line-height: 1.5;
   -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
+          transform: translateX(-50%);
 }
 
-button.main-btn {
+button.btn-main {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: var(--gap-small);
   padding: 10px 20px;
   width: 100%;
   border: var(--border-width) solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: var(--color-main-dark);
   color: var(--color-main);
   text-transform: uppercase;
@@ -335,13 +321,12 @@ button.main-btn {
   cursor: pointer;
 }
 
-button.main-btn:hover {
+button.btn-main:hover {
   background: var(--color-main);
   color: var(--bg-black);
 }
 
-button.main-btn,
-.btn-copy-small {
+button.btn-main, .btn-copy-small {
   letter-spacing: .5px;
   font-weight: 700;
   font-family: var(--font-main);
@@ -352,6 +337,10 @@ button.main-btn,
   padding: var(--gap-small) 0;
   border-top: 1px dashed #333333;
   border-bottom: 1px dashed #333333;
+  color: #ffcc00;
+  font-weight: bold;
+  font-size: 16px;
+  ;
 }
 
 select.speed-select {
@@ -375,16 +364,17 @@ select.speed-select {
   max-height: 80vh;
   width: 320px;
   border: var(--border-width) solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: var(--bg-panel);
   color: var(--color-main);
   -webkit-transform: translateY(-50%);
-  transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 
 .points-list {
   overflow-y: auto;
   flex-grow: 1;
+  margin-bottom: 10px;
 }
 
 .point-item {
@@ -412,9 +402,7 @@ select.speed-select {
   font-size: 10px;
 }
 
-.coord-text,
-#live-coords,
-#elevation-info {
+.coord-text, #live-coords, #elevation-info {
   letter-spacing: .5px;
   font-family: var(--font-main);
 }
@@ -428,7 +416,7 @@ select.speed-select {
   display: block !important;
   overflow: visible !important;
   -webkit-filter: drop-shadow(0 0 4px #000000);
-  filter: drop-shadow(0 0 4px #000000);
+          filter: drop-shadow(0 0 4px #000000);
   cursor: pointer;
 }
 
@@ -467,7 +455,7 @@ select.speed-select {
   font-weight: 700;
   font-size: 11px;
   -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
+          transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -482,7 +470,7 @@ select.speed-select {
   background: rgba(0, 255, 0, .4);
 }
 
-.copy-toast {
+.toast-notification {
   position: fixed;
   bottom: 20px;
   left: 50%;
@@ -491,13 +479,13 @@ select.speed-select {
   padding: 12px;
   border: var(--border-width) solid var(--color-main);
   border-radius: var(--border-radius);
-  background: var(--bg-overlay);
+  background-color: var(--bg-panel);
   color: var(--color-main);
   font-weight: 700;
   font-size: 14px;
   line-height: 1.5;
   -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
+          transform: translateX(-50%);
 }
 
 .btn-copy-small {
@@ -530,7 +518,7 @@ select.speed-select {
 .radio-group {
   display: flex;
   justify-content: center;
-  margin-bottom: 25px;
+  margin-top: 25px;
 
   gap: 20px;
 }
@@ -540,9 +528,10 @@ select.speed-select {
 }
 
 .radio-label {
-  padding: 8px 20px;
+  padding: 12px 20px;
   width: 100%;
   border: var(--border-width) solid var(--color-main-muted);
+  border-radius: var(--border-radius);
   background: rgba(0, 20, 0, .5);
   color: var(--color-main-muted);
   text-transform: uppercase;
@@ -573,12 +562,12 @@ select.speed-select {
 
 .ui-left-hidden {
   -webkit-transform: translateX(-100%);
-  transform: translateX(-100%);
+          transform: translateX(-100%);
 }
 
 .ui-right-hidden {
   -webkit-transform: translateX(100%);
-  transform: translateX(100%);
+          transform: translateX(100%);
 }
 
 .modal-overlay {
@@ -592,37 +581,34 @@ select.speed-select {
   width: 100%;
   height: 100%;
   background: 0 0;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-slide);
 
   -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
 }
 
 .modal-overlay.active {
+  display: flex;
   background: rgba(0, 0, 0, .85);
+  transition: background var(--transition-slide);
 }
 
 .modal-content {
   width: 340px;
   border: 1px solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: var(--bg-panel);
   box-shadow: 0 0 30px rgba(0, 255, 0, .2);
   opacity: 0;
   transition: all var(--transition-fast);
   -webkit-transform: translateY(20px) scale(.95);
-  transform: translateY(20px) scale(.95);
+          transform: translateY(20px) scale(.95);
 }
 
 .modal-overlay.active .modal-content {
   opacity: 1;
   -webkit-transform: translateY(0) scale(1);
-  transform: translateY(0) scale(1);
-}
-
-#modal-prompt-input {
-  box-sizing: border-box;
-  width: 100%;
+          transform: translateY(0) scale(1);
 }
 
 .main-input {
@@ -653,7 +639,7 @@ select.speed-select {
 .modal-content.modal-error {
   border: 1px solid red;
   -webkit-animation: error-glow 1.5s infinite ease-in-out;
-  animation: error-glow 1.5s infinite ease-in-out;
+          animation: error-glow 1.5s infinite ease-in-out;
 }
 
 .modal-error .panel-header {
@@ -663,22 +649,22 @@ select.speed-select {
 
 .modal-overlay.active .modal-content.modal-error {
   -webkit-animation: error-glow 1.5s infinite ease-in-out,
-    modal-shake .3s ease-in-out;
-  animation: error-glow 1.5s infinite ease-in-out, modal-shake .3s ease-in-out;
+  modal-shake .3s ease-in-out;
+          animation: error-glow 1.5s infinite ease-in-out, modal-shake .3s ease-in-out;
 }
 
 .modal-success {
   -webkit-animation: success-glow 2s infinite ease-in-out;
-  animation: success-glow 2s infinite ease-in-out;
+          animation: success-glow 2s infinite ease-in-out;
 }
 
-.copy-toast {
+.toast-notification {
   border: 1px solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: var(--bg-panel);
   box-shadow: 0 0 15px rgba(0, 255, 0, .2);
   -webkit-animation: success-glow 1.5s infinite ease-in-out;
-  animation: success-glow 1.5s infinite ease-in-out;
+          animation: success-glow 1.5s infinite ease-in-out;
 }
 
 #toggle-contours-btn:hover svg path {
@@ -693,17 +679,17 @@ select.speed-select {
   width: 24px;
   height: 24px;
   -webkit-filter: drop-shadow(0 0 5px var(--color-main));
-  filter: drop-shadow(0 0 5px var(--color-main));
+          filter: drop-shadow(0 0 5px var(--color-main));
   cursor: pointer;
   transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
-  transition: transform .2s cubic-bezier(.175, .885, .32, 1.275);
-  transition: transform .2s cubic-bezier(.175, .885, .32, 1.275), -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
+  transition:         transform .2s cubic-bezier(.175, .885, .32, 1.275);
+  transition:         transform .2s cubic-bezier(.175, .885, .32, 1.275), -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
 .ruler-point-svg:hover {
   transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
   -webkit-transform: scale(1.1);
-  transform: scale(1.1);
+          transform: scale(1.1);
 }
 
 .ruler-point-svg path {
@@ -723,12 +709,11 @@ select.speed-select {
   pointer-events: none;
 }
 
-.ruler-dist-label {
+.ruler-label-dist {
   padding: 2px 5px;
   border: 1px solid rgba(var(--color-main), .3);
-  border-radius: 2px;
-  border-radius: 6px;
-  background: var(--bg-overlay);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-panel);
   color: var(--color-main);
   letter-spacing: .5px;
   font-size: 10px;
@@ -747,45 +732,6 @@ select.speed-select {
   background: rgba(0, 255, 0, .1);
 }
 
-@media print {
-
-  #map-controls,
-  .navigation-control,
-  #search-overlay,
-  .btn-copy-small {
-    display: none !important;
-  }
-
-  body,
-  html,
-  #map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  #results-sidebar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: block !important;
-    max-height: none;
-    height: auto;
-    border: 1px solid #000000 !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  .point-item {
-    border-bottom: 1px solid #cccccc !important;
-    color: #000000 !important;
-  }
-}
-
 .compass-dot {
   z-index: 10;
   box-shadow: 0 0 5px rgba(0, 0, 0, .5);
@@ -800,55 +746,31 @@ select.speed-select {
   pointer-events: none;
 }
 
-.compass-marker-dot:hover,
-.compass-marker-dot:focus,
-.compass-marker-dot:active {
+.compass-marker-dot:hover, .compass-marker-dot:focus, .compass-marker-dot:active {
   -webkit-filter: drop-shadow(0 0 5px #ffffff);
-  filter: drop-shadow(0 0 5px #ffffff);
+          filter: drop-shadow(0 0 5px #ffffff);
   transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
-.maplibregl-marker,
-.ruler-point-wrapper,
-.ruler-label {
+.maplibregl-marker, .ruler-point-wrapper, .ruler-label {
   z-index: 1 !important;
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-.ruler-dist-label {
+.ruler-label-dist {
   display: none;
 }
 
 .static-marker .custom-marker {
   /* Прибирає "руку" перетягування */
   -webkit-filter: brightness(1.2);
-  filter: brightness(1.2);
+          filter: brightness(1.2);
   cursor: default !important;
   /* Робимо пошуковий маркер трохи яскравішим */
 }
 
-/* Режим друку через клас */
-body.printing-mode #map-controls,
-body.printing-mode #search-overlay,
-body.printing-mode .btn-copy-small,
-body.printing-mode #modal-alert {
-  display: none !important;
-}
-
-/* Налаштування розміру сторінки */
-@media print {
-  @page {
-    margin: 0;
-
-    size: A4 landscape;
-  }
-
-  body {
-    background: white;
-  }
-}
 
 /* Вставте це в кінець файлу CSS */
 
@@ -898,7 +820,7 @@ body.printing-mode #modal-alert {
   justify-content: center;
   padding: 6px;
   border: var(--border-width) solid var(--color-main);
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   background: var(--color-main-dark);
   cursor: pointer;
   transition: all .2s ease;
@@ -964,18 +886,16 @@ body.printing-mode #modal-alert {
 }
 
 /* Ефект матового скла для панелей */
-.panel,
-.modal-content,
-.copy-toast {
+.panel, .modal-content, .toast-notification {
   border: 1px solid rgba(0, 255, 0, .3);
   background-color: rgba(0, 15, 0, .85) !important;
 
-  /* Розмиття фону */
+/* Розмиття фону */
 
   -webkit-backdrop-filter: blur(5px);
 
-  /* Напівпрозорий чорно-зелений */
-  backdrop-filter: blur(5px);
+/* Напівпрозорий чорно-зелений */
+          backdrop-filter: blur(5px);
 }
 
 /* Плавна поява модалок */
@@ -998,9 +918,8 @@ body.printing-mode #modal-alert {
   transform: translateY(0) scale(1);
 }
 
-/* === ОНОВЛЕНИЙ ЕФЕКТ СКАНЕРА (Laser Sweep) === */
+/* === ЕФЕКТ СКАНЕРА (Laser Sweep) === */
 
-/* Видаляємо старий keyframes scan-line */
 @keyframes scan-sweep {
   0% {
     top: -20%;
@@ -1044,6 +963,8 @@ body.printing-mode #modal-alert {
   }
 }
 
+
+
 .selection-box {
   position: absolute;
   z-index: 2000;
@@ -1052,13 +973,13 @@ body.printing-mode #modal-alert {
   align-items: center;
   justify-content: center;
 
-  /* Зелена рамка */
+/* Зелена рамка */
   border: 2px dashed var(--color-main);
 
-  /* Майже прозорий зелений фон */
+/* Майже прозорий зелений фон */
   background: rgba(0, 255, 0, .1);
 
-  /* Зелене світіння */
+/* Зелене світіння */
   box-shadow: 0 0 10px rgba(0, 255, 0, .2), inset 0 0 10px rgba(0, 255, 0, .05);
   pointer-events: none;
 }
@@ -1066,21 +987,25 @@ body.printing-mode #modal-alert {
 /* Новий стиль для тексту площі */
 .selection-area-label {
   /* Темна підкладка для читабельності */
-  padding: 4px 8px;
-  border: 1px solid var(--color-main-dark);
-  border-radius: 2px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  padding: var(--gap-small) var(--gap-medium);
+  border-radius: var(--border-radius);
 
-  /* Зелений текст */
-  background-color: rgba(0, 0, 0, .7);
-  color: var(--color-main);
+/* Зелений текст */
+  background-color: var(--bg-panel);
+  color: var(--color-yellow);
 
-  /* Щоб не заважав клікам */
+/* Щоб не заважав клікам */
   white-space: nowrap;
   font-weight: bold;
   font-size: 12px;
   font-family: var(--font-mono);
+  transform: translate(-50%, -50%);
 
-  /* Розмиття фону під текстом */
+/* Розмиття фону під текстом */
   pointer-events: none;
 
   backdrop-filter: blur(2px);
@@ -1092,21 +1017,23 @@ body.printing-mode #modal-alert {
   position: absolute;
   left: -150%;
 
-  /* Геометрія для повного покриття */
+/* Геометрія для повного покриття */
   width: 400%;
   height: 15px;
 
-  /* Зелений лазерний промінь */
+/* Зелений лазерний промінь */
   background: linear-gradient(to bottom,
-      transparent,
-      rgba(0, 255, 0, .4),
-      rgba(0, 255, 0, .9),
-      rgba(0, 255, 0, .4),
-      transparent);
+  transparent,
+  rgba(0, 255, 0, .4),
+  rgba(0, 255, 0, .9),
+  rgba(0, 255, 0, .4),
+  transparent);
   content: "";
   transform: rotate(-45deg);
   animation: scan-diagonal 2s linear infinite;
 }
+
+
 
 /* === ТАКТИЧНА МАСШТАБНА ШКАЛА === */
 
@@ -1115,25 +1042,25 @@ body.printing-mode #modal-alert {
   margin-bottom: 5px !important;
   margin-left: 5px !important;
 
-  /* Яскраво-зелений текст */
+/* Яскраво-зелений текст */
   border: 1px solid var(--color-main) !important;
 
-  /* Зелені межі */
+/* Зелені межі */
   border-top: none !important;
   background-color: rgba(0, 15, 0, .8) !important;
 
-  /* Тінь для читабельності */
+/* Тінь для читабельності */
   box-shadow: 0 0 5px rgba(0, 255, 0, .2);
 
-  /* Темний напівпрозорий фон */
+/* Темний напівпрозорий фон */
   color: var(--color-main) !important;
   text-shadow: 0 0 2px #000000 !important;
   font-weight: bold !important;
 
-  /* Моноширинний шрифт */
+/* Моноширинний шрифт */
   font-size: 11px !important;
 
-  /* Прибираємо верхню межу (класичний вигляд шкали) */
+/* Прибираємо верхню межу (класичний вигляд шкали) */
   font-family: var(--font-mono) !important;
 }
 
@@ -1144,17 +1071,17 @@ body.printing-mode #modal-alert {
   /* Темний фон */
   border: 1px solid var(--color-main) !important;
 
-  /* Зелена рамка */
+/* Зелена рамка */
   border-radius: 2px !important;
   background-color: rgba(0, 15, 0, .85) !important;
 
-  /* Гострі кути (тактичний стиль) */
+/* Гострі кути (тактичний стиль) */
   box-shadow: 0 0 10px rgba(0, 255, 0, .15) !important;
 
   -webkit-backdrop-filter: blur(5px);
 
-  /* Легке світіння */
-  backdrop-filter: blur(5px);
+/* Легке світіння */
+          backdrop-filter: blur(5px);
 }
 
 /* 2. Самі кнопки (+, -, компас) */
@@ -1199,4 +1126,63 @@ body.printing-mode #modal-alert {
 .maplibregl-ctrl-compass-arrow {
   /* Можна залишити як є, або теж застосувати фільтр, якщо треба монохром */
   filter: inherit;
+}
+
+/* Режим друку через клас */
+body.printing-mode #map-controls, body.printing-mode #search-overlay, body.printing-mode .btn-copy-small, body.printing-mode #modal-alert {
+  display: none !important;
+}
+
+@media print {
+  @page {
+    margin: 0;
+
+    size: landscape;
+  }
+
+  body {
+    visibility: hidden;
+    background: white;
+  }
+
+  /* Карта */
+  #map {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 99999;
+    visibility: visible !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
+  /* Канвас */
+  .maplibregl-canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Приховати все інше */
+  #map-controls, #infobar, #search-overlay, .toast {
+    display: none !important;
+  }
+}
+
+.modal-prompt-text {
+  color: var(--color-main);
+}
+
+#modal-prompt-input {
+  box-sizing: border-box;
+  margin: 15px 0;
+  width: 100%;
+}
+
+#modal-prompt-cancel {
+  background: var(--color-accent);
+  color: white;
+}
+
+#file {
+  display: none;
 }
