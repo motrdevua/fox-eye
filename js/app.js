@@ -236,9 +236,9 @@ function customAlert(text) {
 }
 
 function clearSidebar() {
-  const listEl = document.getElementById('points-list');
-  const sidebar = document.getElementById('results-sidebar');
-  if (listEl) listEl.innerHTML = '';
+  const sidebar = document.getElementById('sidebar');
+  const pointsList = document.getElementById('points');
+  if (pointsList) pointsList.innerHTML = '';
   if (sidebar) sidebar.style.display = 'none';
 }
 
@@ -409,9 +409,9 @@ function bindEventListeners() {
   }
 
   // 8. Очищення сканування (clearScanResults)
-  const clearScanBtn = document.getElementById('clear-scan');
-  if (clearScanBtn) {
-    clearScanBtn.addEventListener('click', clearScanResults);
+  const clearPointsBtn = document.getElementById('clear-points');
+  if (clearPointsBtn) {
+    clearPointsBtn.addEventListener('click', clearScanResults);
   }
 
   // 9. Інші кнопки (існуючі прив'язки)
@@ -446,7 +446,7 @@ function bindEventListeners() {
 
 function startMap(lon, lat) {
   document.getElementById('search-overlay').style.display = 'none';
-  document.getElementById('map-controls').style.display = 'block';
+  document.getElementById('tools').style.display = 'block';
 
   if (!state.map) {
     initMap(lon, lat);
@@ -753,28 +753,28 @@ function setupMapEvents() {
   });
 
   // 5. Авто-приховування інтерфейсу при русі карти
-  const ui = [
-    document.getElementById('map-controls'),
-    document.getElementById('results-sidebar'),
+  const panels = [
+    document.getElementById('tools'),
+    document.getElementById('sidebar'),
     document.getElementById('infobar'),
   ];
 
-  map.on('movestart', () =>
-    ui.forEach((el) => el && el.classList.add('interface-hidden')),
-  );
-  map.on('moveend', () =>
-    ui.forEach((el) => el && el.classList.remove('interface-hidden')),
-  );
+  map.on('movestart', () => {
+    panels.forEach((el) => el && el.classList.add('is-hidden'));
+  });
+  map.on('moveend', () => {
+    panels.forEach((el) => el && el.classList.remove('is-hidden'));
+  });
 
   // 6. Логіка SCAN (Виділення області) - Native DOM events
   const canvas = map.getCanvas();
   canvas.addEventListener('mousedown', handleScanStart);
   canvas.addEventListener('mousedown', function () {
-    ui.forEach((el) => el && el.classList.add('interface-hidden'));
+    panels.forEach((el) => el && el.classList.add('is-hidden'));
   });
   canvas.addEventListener('mouseup', handleScanEnd);
   canvas.addEventListener('mouseup', function () {
-    ui.forEach((el) => el && el.classList.remove('interface-hidden'));
+    panels.forEach((el) => el && el.classList.remove('is-hidden'));
   });
   canvas.addEventListener('mousemove', handleScanMove);
 }
@@ -1072,17 +1072,17 @@ function reindexRulerPoints() {
   if (state.activeTool === 'scan' || state.activeTool === 'compass') return;
   if (typeof turf === 'undefined') return;
 
-  const listEl = document.getElementById('points-list');
-  const sidebar = document.getElementById('results-sidebar');
+  const sidebar = document.getElementById('sidebar');
+  const pointsList = document.getElementById('points');
 
   if (state.rulerPoints.length < 2) {
-    if (sidebar) sidebar.classList.add('interface-hidden');
+    if (sidebar) sidebar.classList.add('is-hidden');
     return;
   }
 
-  if (sidebar) sidebar.classList.remove('interface-hidden');
+  if (sidebar) sidebar.classList.remove('is-hidden');
   if (sidebar) sidebar.style.display = 'flex';
-  if (listEl) listEl.innerHTML = '';
+  if (pointsList) pointsList.innerHTML = '';
 
   // 1. Виносимо змінну за межі циклу, щоб рахувати загальну дистанцію
   let totalDist = 0;
@@ -1153,7 +1153,7 @@ function reindexRulerPoints() {
 
     item.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items: baseline; margin-bottom: 4px;">
-          <b style="color: var(--color-main);">ТОЧКА ${index + 1}</b>
+          <b>ТОЧКА ${index + 1}</b>
           <div style="text-align:right;">
              ${
                index === 0
@@ -1164,8 +1164,8 @@ function reindexRulerPoints() {
           </div>
       </div>
       
-      <div class="mgrs-copy-zone" style="display:flex; justify-content:space-between; align-items:center;">
-          <span class="coord-text" style="font-family:var(--font-mono); font-size:12px; color:#ccc;">${formattedMgrs}</span>
+      <div class="mgrs-copy-zone">
+          <span class="coord-text">${formattedMgrs}</span>
           <button class="btn-copy-small" onclick="event.stopPropagation(); navigator.clipboard.writeText('${rawMgrs}'); showCopyToast('MGRS СКОПІЙОВАНО')">COPY</button>
       </div>
     `;
@@ -1175,7 +1175,7 @@ function reindexRulerPoints() {
       else state.map.flyTo({ center: coords, zoom: 14 });
     };
 
-    if (listEl) listEl.appendChild(item);
+    if (pointsList) pointsList.appendChild(item);
   });
 }
 
@@ -1496,13 +1496,13 @@ async function findHighestPoints(p1, p2) {
 }
 
 function renderScanResults(data) {
-  const sidebar = document.getElementById('results-sidebar');
-  const listEl = document.getElementById('points-list');
-  if (!sidebar || !listEl) return;
+  const sidebar = document.getElementById('sidebar');
+  const pointsList = document.getElementById('points');
+  if (!sidebar || !pointsList) return;
 
   state.activeTool = 'scan_results'; // "фейковий" стан, щоб система знала, що панель зараз потрібна
   sidebar.style.display = 'flex';
-  listEl.innerHTML = '';
+  pointsList.innerHTML = '';
 
   // Очистка старих маркерів
   if (!state.scanMarkers) state.scanMarkers = [];
@@ -1534,13 +1534,13 @@ function renderScanResults(data) {
     item.style.borderLeft = `5px solid ${color}`;
     item.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items: baseline; pointer-events: none;">
-          <b style="color: ${color}; font-size: 14px;">${name}</b>
-          <b style="background:${color}; color:black; padding:2px 6px; border-radius:2px; font-size: 14px;">${Math.round(
+          <b style="background: ${color}; font-size: 16px; color:black; padding:0px 6px 2px 6px; border-radius:2px;">${name}</b>
+          <b style="background: ${color}; color:black; padding:2px 6px; border-radius:2px; font-size: 14px;">${Math.round(
             p.elevation,
           )} м</b>
       </div>
       <div class="mgrs-copy-zone">
-          <span class="coord-text" style="color: ${CONFIG.colors.main}; opacity: 0.8;">${formattedMgrs}</span>
+          <span class="coord-text">${formattedMgrs}</span>
           <button class="btn-copy-small btn-copy-mgrs">COPY</button>
       </div>
     `;
@@ -1553,7 +1553,7 @@ function renderScanResults(data) {
         .then(() => showCopyToast(`${name} СКОПІЙОВАНО`));
     };
 
-    listEl.appendChild(item);
+    pointsList.appendChild(item);
   });
 }
 
@@ -1796,3 +1796,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Наприклад, якщо ви хочете відразу показати карту, розкоментуйте:
   // initMap(30.5234, 50.4501);
 });
+
+// 1. Хелпер для класів (замість style.display)
+const UI = {
+  hide: (id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('is-hidden');
+  },
+  show: (id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('is-hidden');
+  },
+  toggle: (id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('is-hidden');
+  },
+};

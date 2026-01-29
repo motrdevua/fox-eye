@@ -1,3 +1,59 @@
+/* === ПІДКЛЮЧЕННЯ ЛОКАЛЬНИХ ШРИФТІВ === */
+
+/* jura-regular - cyrillic_latin */
+@font-face {
+  font-weight: 400;
+  font-style: normal;
+
+/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: "Jura";
+  src: url("../fonts/jura-v34-cyrillic_latin-regular.woff2") format("woff2");
+
+  font-display: swap;
+  /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+/* jura-700 - cyrillic_latin */
+@font-face {
+  font-weight: 700;
+  font-style: normal;
+
+/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: "Jura";
+  src: url("../fonts/jura-v34-cyrillic_latin-700.woff2") format("woff2");
+
+  font-display: swap;
+  /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+/* exo-2-regular - cyrillic_latin */
+@font-face {
+  font-weight: 400;
+  font-style: normal;
+
+/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: "Exo 2";
+  src: url("../fonts/exo-2-v26-cyrillic_latin-regular.woff2") format("woff2");
+
+  font-display: swap;
+
+  /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+/* exo-2-700 - cyrillic_latin */
+@font-face {
+  font-weight: 700;
+  font-style: normal;
+
+/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: "Exo 2";
+  src: url("../fonts/exo-2-v26-cyrillic_latin-700.woff2") format("woff2");
+
+  font-display: swap;
+
+  /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
 :root {
   --border-width: 1px;
   --border-radius: 4px;
@@ -14,8 +70,8 @@
   --color-main-deep: #001500;
   --color-main-muted: #004400;
   --color-yellow: #ffcc00;
-  --font-main: "Roboto", sans-serif;
-  --font-mono: "Courier New", monospace;
+  --font-main: "Jura", sans-serif;
+  --font-mono: "Jura", monospace;
   --gap-medium: 10px;
   --gap-small: 5px;
   --panel-padding: 15px;
@@ -87,6 +143,8 @@ body {
   font-family: var(--font-main);
 }
 
+/* =============== АНІМАЦІЇ START ===============*/
+
 @keyframes success-glow {
   0% {
     border-color: var(--color-main);
@@ -138,19 +196,167 @@ body {
   }
 }
 
+/* ДІАГОНАЛЬНИЙ СКАНЕР */
 
-#map {
-  position: absolute;
-  top: 0;
-  bottom: 0;
+@keyframes scan-diagonal {
+  0% {
+    top: -150%;
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 250%;
+    opacity: 0;
+  }
+}
+
+/* ЕФЕКТ СКАНЕРА (Laser Sweep) */
+
+@keyframes scan-sweep {
+  0% {
+    top: -20%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 120%;
+    opacity: 0;
+  }
+}
+
+/* Анімація пульсації */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, .7);
+    opacity: .8;
+    transform: scale(.8);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+    opacity: 0;
+    transform: scale(1.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(.8);
+  }
+}
+
+/* =============== АНІМАЦІЇ END ===============*/
+
+/* =============== КНОПКИ END ===============*/
+
+.icon-btn {
+  position: relative;
+  display: flex;
   overflow: hidden;
-  width: 100%;
-  background: var(--bg-black);
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: var(--border-width) solid var(--color-main);
+  border-radius: var(--border-radius);
+  background: var(--color-main-dark);
+  cursor: pointer;
+  transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
-#map-controls, #results-sidebar, #infobar, #search-overlay {
-  transition: transform var(--transition-slide);
+.icon-btn:hover {
+  border-color: var(--color-main);
+  background: var(--color-main);
+  box-shadow: 0 0 8px var(--color-main);
+  color: var(--bg-black);
+  transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
 }
+
+.icon-btn:active {
+  /* Ефект натискання */
+  transform: scale(.92);
+}
+
+.icon-btn.active {
+  border: var(--border-width) solid var(--color-main);
+  background: var(--color-main);
+  background-color: var(--color-main);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, .5);
+  color: black;
+  transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+  transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
+
+  fill: var(--color-main);
+}
+
+.icon-btn:hover svg {
+  transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
+
+  fill: var(--bg-black);
+}
+
+.icon-btn.active svg {
+  transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
+
+  fill: var(--bg-black);
+}
+
+#contours:hover svg path {
+  stroke: var(--bg-black);
+}
+
+#contours.active svg path {
+  stroke: var(--bg-black);
+}
+
+.btn-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  width: 100%;
+  border: var(--border-width) solid var(--color-main);
+  border-radius: var(--border-radius);
+  background: var(--color-main-dark);
+  color: var(--color-main);
+  text-transform: uppercase;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-main:hover {
+  background: var(--color-main);
+  color: var(--bg-black);
+}
+
+.btn-main, .btn-copy-small {
+  letter-spacing: .5px;
+  font-weight: 700;
+  font-family: var(--font-main);
+}
+
+/* =============== КНОПКИ END ===============*/
+
+/* =============== ПОШУК START ===============*/
 
 #search-overlay {
   position: fixed;
@@ -165,6 +371,17 @@ body {
   height: 100%;
   background: var(--bg-dark-grey);
   color: var(--color-main);
+  transition: transform var(--transition-slide);
+}
+
+body.printing-mode #search-overlay {
+  display: none !important;
+}
+
+@media print {
+  #search-overlay {
+    display: none !important;
+  }
 }
 
 .search-box {
@@ -178,7 +395,7 @@ body {
   text-align: center;
 }
 
-.search-box input[type="text"], .search-box select {
+.search-box__input {
   margin: 20px 0;
   padding: 10px;
   width: 280px;
@@ -190,7 +407,50 @@ body {
   font-family: inherit;
 }
 
-.data-panel {
+.search-box__radio-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+
+  gap: 20px;
+}
+
+.search-box__radio {
+  display: none;
+}
+
+.search-box__radio-label {
+  padding: 12px 20px;
+  width: 100%;
+  border: var(--border-width) solid var(--color-main-muted);
+  border-radius: var(--border-radius);
+  background: rgba(0, 20, 0, .5);
+  color: var(--color-main-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.search-box__radio-label:hover {
+  border-color: var(--color-main);
+  color: var(--color-main);
+}
+
+.search-box__radio:checked+.search-box__radio-label {
+  border-color: var(--color-main);
+  background: var(--color-main);
+  box-shadow: 0 0 15px rgba(0, 255, 0, .4);
+  color: var(--bg-black);
+}
+
+/* =============== ПОШУК END ===============*/
+
+/* =============== ІНСТРУМЕНТИ START ===============*/
+
+.tools {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -202,9 +462,20 @@ body {
   border-radius: var(--border-radius);
   background: var(--bg-panel);
   color: var(--color-main);
+  transition: transform var(--transition-slide);
 }
 
-.label-desc {
+body.printing-mode #tools {
+  display: none !important;
+}
+
+@media print {
+  #tools {
+    display: none !important;
+  }
+}
+
+.tools__desc {
   display: block;
   margin-bottom: var(--gap-small);
   color: var(--text-grey);
@@ -212,12 +483,156 @@ body {
   font-size: 10px;
 }
 
-.tools-selector {
+.tools__hint {
+  margin: 8px 0;
+  padding: var(--gap-small) 0;
+  border-top: 1px dashed #333333;
+  border-bottom: 1px dashed #333333;
+  color: #ffcc00;
+  font-size: 16px;
+}
+
+.tools__selector {
   display: flex;
   margin-bottom: var(--gap-medium);
 
   gap: 8px;
 }
+
+.tools__file {
+  display: none;
+}
+
+/* =============== ІНСТРУМЕНТИ END ===============*/
+
+
+/* =============== МАПА START ===============*/
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  width: 100%;
+  background: var(--bg-black);
+}
+
+#results-sidebar {
+  transition: transform var(--transition-slide);
+}
+
+/* =============== МАПА END ===============*/
+
+/* =============== ІНФО START ===============*/
+
+#infobar {
+  transition: transform var(--transition-slide);
+}
+
+@media print {
+  #infobar {
+    display: none !important;
+  }
+}
+
+.infobar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 10;
+  display: none;
+  padding: 12px;
+  min-width: 180px;
+  border: var(--border-width) solid var(--color-main);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-panel);
+  color: var(--color-main);
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+}
+
+/* =============== ІНФО END ===============*/
+
+/* =============== SIDEBAR START ===============*/
+
+.sidebar {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  z-index: 100;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  padding: var(--panel-padding);
+  max-height: 80vh;
+  width: 320px;
+  border: var(--border-width) solid var(--color-main);
+  border-radius: var(--border-radius);
+  background: var(--bg-panel);
+  color: var(--color-main);
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+
+.sidebar__header, .modal__header {
+  margin-bottom: 15px;
+  padding: 12px 0;
+  width: 100%;
+  border-bottom: var(--border-width) solid var(--color-main);
+  color: var(--color-main);
+  text-align: center;
+  letter-spacing: 1px;
+  font-weight: 700;
+  font-family: var(--font-main);
+}
+
+/* Ефект матового скла для панелей */
+.panel {
+  border: 1px solid rgba(0, 255, 0, .3);
+  background-color: rgba(0, 15, 0, .85) !important;
+
+/* Розмиття фону */
+
+  -webkit-backdrop-filter: blur(5px);
+
+/* Напівпрозорий чорно-зелений */
+          backdrop-filter: blur(5px);
+}
+
+.points {
+  overflow-y: auto;
+  flex-grow: 1;
+  margin-bottom: 10px;
+}
+
+.point-item {
+  margin-bottom: var(--gap-small);
+  padding: 4px;
+  border-left: 5px solid var(--color-main);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.point-item:hover {
+  border-color: var(--color-main);
+  background: rgba(0, 255, 0, .2);
+}
+
+.point-item b {
+  color: var(--color-accent-yellow);
+  font-weight: 700;
+  font-size: 14px;
+  ;
+}
+
+/* =============== SIDEBAR END ===============*/
+
+
 
 .marker-wrapper {
   position: relative;
@@ -286,62 +701,6 @@ body {
   -webkit-transform var(--transition-fast);
 }
 
-.info-container {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  z-index: 10;
-  display: none;
-  padding: 12px;
-  min-width: 180px;
-  border: var(--border-width) solid var(--color-main);
-  border-radius: var(--border-radius);
-  background-color: var(--bg-panel);
-  color: var(--color-main);
-  text-align: center;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.5;
-  -webkit-transform: translateX(-50%);
-          transform: translateX(-50%);
-}
-
-button.btn-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  width: 100%;
-  border: var(--border-width) solid var(--color-main);
-  border-radius: var(--border-radius);
-  background: var(--color-main-dark);
-  color: var(--color-main);
-  text-transform: uppercase;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-button.btn-main:hover {
-  background: var(--color-main);
-  color: var(--bg-black);
-}
-
-button.btn-main, .btn-copy-small {
-  letter-spacing: .5px;
-  font-weight: 700;
-  font-family: var(--font-main);
-}
-
-.hint {
-  margin: 8px 0;
-  padding: var(--gap-small) 0;
-  border-top: 1px dashed #333333;
-  border-bottom: 1px dashed #333333;
-  color: #ffcc00;
-  font-weight: bold;
-  font-size: 16px;
-  ;
-}
 
 select.speed-select {
   margin-bottom: var(--gap-medium);
@@ -352,58 +711,18 @@ select.speed-select {
 }
 
 
-.results-panel {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  z-index: 100;
-  display: flex;
-  overflow: hidden;
-  flex-direction: column;
-  padding: var(--panel-padding);
-  max-height: 80vh;
-  width: 320px;
-  border: var(--border-width) solid var(--color-main);
-  border-radius: var(--border-radius);
-  background: var(--bg-panel);
-  color: var(--color-main);
-  -webkit-transform: translateY(-50%);
-          transform: translateY(-50%);
-}
-
-.points-list {
-  overflow-y: auto;
-  flex-grow: 1;
-  margin-bottom: 10px;
-}
-
-.point-item {
-  margin-bottom: var(--gap-small);
-  padding: 4px;
-  border-left: 5px solid var(--color-main);
-  font-size: 12px;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.point-item:hover {
-  border-color: var(--color-main);
-  background: rgba(0, 255, 0, .2);
-}
-
-.point-item b {
-  font-size: 14px;
-}
-
 .coord-text {
   display: block;
   margin-top: 3px;
-  color: var(--text-grey);
-  font-size: 10px;
+  color: var(--color-main);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  opacity: .8;
 }
 
 .coord-text, #live-coords, #elevation-info {
   letter-spacing: .5px;
+  font-weight: 700;
   font-family: var(--font-main);
 }
 
@@ -452,7 +771,7 @@ select.speed-select {
   background: rgba(0, 10, 0, .85);
   color: var(--color-main);
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 11px;
   -webkit-transform: translateX(-50%);
           transform: translateX(-50%);
@@ -515,60 +834,7 @@ select.speed-select {
   border-top: 1px solid rgba(0, 255, 0, .1);
 }
 
-.radio-group {
-  display: flex;
-  justify-content: center;
-  margin-top: 25px;
 
-  gap: 20px;
-}
-
-.radio-group input[type="radio"] {
-  display: none;
-}
-
-.radio-label {
-  padding: 12px 20px;
-  width: 100%;
-  border: var(--border-width) solid var(--color-main-muted);
-  border-radius: var(--border-radius);
-  background: rgba(0, 20, 0, .5);
-  color: var(--color-main-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
-  transition: var(--transition-normal);
-}
-
-.radio-label:hover {
-  border-color: var(--color-main);
-  color: var(--color-main);
-}
-
-.radio-group input[type="radio"]:checked+.radio-label {
-  border-color: var(--color-main);
-  background: var(--color-main);
-  box-shadow: 0 0 15px rgba(0, 255, 0, .4);
-  color: var(--bg-black);
-}
-
-.interface-hidden {
-  opacity: 0 !important;
-  transition: var(--transition-normal);
-  pointer-events: none;
-}
-
-.ui-left-hidden {
-  -webkit-transform: translateX(-100%);
-          transform: translateX(-100%);
-}
-
-.ui-right-hidden {
-  -webkit-transform: translateX(100%);
-          transform: translateX(100%);
-}
 
 .modal-overlay {
   position: fixed;
@@ -622,19 +888,7 @@ select.speed-select {
   font-family: var(--font-main);
 }
 
-.panel-header {
-  margin: 0;
-  margin-bottom: var(--gap-medium);
-  padding: 12px 0;
-  padding-bottom: 8px;
-  width: 100%;
-  border-bottom: var(--border-width) solid var(--color-main);
-  color: var(--color-main);
-  text-align: center;
-  letter-spacing: 1px;
-  font-weight: 700;
-  font-family: var(--font-main);
-}
+
 
 .modal-content.modal-error {
   border: 1px solid red;
@@ -642,7 +896,7 @@ select.speed-select {
           animation: error-glow 1.5s infinite ease-in-out;
 }
 
-.modal-error .panel-header {
+.modal-error .modal__header {
   border-bottom-color: red !important;
   color: red !important;
 }
@@ -667,13 +921,6 @@ select.speed-select {
           animation: success-glow 1.5s infinite ease-in-out;
 }
 
-#toggle-contours-btn:hover svg path {
-  stroke: var(--bg-black);
-}
-
-#toggle-contours-btn.active svg path {
-  stroke: var(--bg-black);
-}
 
 .ruler-point-svg {
   width: 24px;
@@ -703,7 +950,7 @@ select.speed-select {
   text-align: center;
   text-shadow: 1px 1px 2px #000000, -1px -1px 2px #000000;
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 12px;
   font-family: var(--font-mono);
   pointer-events: none;
@@ -771,29 +1018,6 @@ select.speed-select {
   /* Робимо пошуковий маркер трохи яскравішим */
 }
 
-
-/* Вставте це в кінець файлу CSS */
-
-/* Анімація пульсації */
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, .7);
-    opacity: .8;
-    transform: scale(.8);
-  }
-
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
-    opacity: 0;
-    transform: scale(1.3);
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(.8);
-  }
-}
-
 /* Застосування до центру компаса */
 .compass-marker-dot::after {
   position: absolute;
@@ -814,79 +1038,9 @@ select.speed-select {
   transform: scale(1.2);
 }
 
-.icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  border: var(--border-width) solid var(--color-main);
-  border-radius: var(--border-radius);
-  background: var(--color-main-dark);
-  cursor: pointer;
-  transition: all .2s ease;
-}
-
-.icon-btn:hover {
-  background: var(--color-main);
-  color: var(--bg-black);
-  transition: all .2s ease;
-}
-
-.icon-btn.active {
-  border: var(--border-width) solid var(--color-main);
-  background: var(--color-main);
-  transition: all .2s ease;
-}
-
-.icon-btn svg {
-  width: 22px;
-  height: 22px;
-  transition: all .2s ease;
-
-  fill: var(--color-main);
-}
-
-.icon-btn:hover svg {
-  transition: all .2s ease;
-
-  fill: var(--bg-black);
-}
-
-.icon-btn.active svg {
-  transition: all .2s ease;
-
-  fill: var(--bg-black);
-}
-
-/* Покращення кнопок */
-.icon-btn {
-  /* Пружинистий ефект */
-  position: relative;
-  overflow: hidden;
-  /* transition: all .2s cubic-bezier(.175, .885, .32, 1.275); */
-}
-
-.icon-btn:hover {
-  /* Світіння */
-  border-color: var(--color-main);
-  box-shadow: 0 0 8px var(--color-main);
-}
-
-.icon-btn:active {
-  /* Ефект натискання */
-  transform: scale(.92);
-}
-
-/* Активна кнопка (втиснута) */
-.icon-btn.active {
-  background-color: var(--color-main);
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, .5);
-  color: black;
-  /* Внутрішня тінь */
-}
 
 /* Ефект матового скла для панелей */
-.panel, .modal-content, .toast-notification {
+.modal-content, .toast-notification {
   border: 1px solid rgba(0, 255, 0, .3);
   background-color: rgba(0, 15, 0, .85) !important;
 
@@ -917,53 +1071,6 @@ select.speed-select {
 .modal-overlay.active .modal-content {
   transform: translateY(0) scale(1);
 }
-
-/* === ЕФЕКТ СКАНЕРА (Laser Sweep) === */
-
-@keyframes scan-sweep {
-  0% {
-    top: -20%;
-    opacity: 0;
-  }
-
-  10% {
-    opacity: 1;
-  }
-
-  90% {
-    opacity: 1;
-  }
-
-  100% {
-    top: 120%;
-    opacity: 0;
-  }
-}
-
-
-/* === ДІАГОНАЛЬНИЙ СКАНЕР (TACTICAL GREEN) === */
-
-@keyframes scan-diagonal {
-  0% {
-    top: -150%;
-    opacity: 0;
-  }
-
-  15% {
-    opacity: 1;
-  }
-
-  85% {
-    opacity: 1;
-  }
-
-  100% {
-    top: 250%;
-    opacity: 0;
-  }
-}
-
-
 
 .selection-box {
   position: absolute;
@@ -1129,7 +1236,7 @@ select.speed-select {
 }
 
 /* Режим друку через клас */
-body.printing-mode #map-controls, body.printing-mode #search-overlay, body.printing-mode .btn-copy-small, body.printing-mode #modal-alert {
+body.printing-mode .btn-copy-small, body.printing-mode #modal-alert {
   display: none !important;
 }
 
@@ -1163,7 +1270,7 @@ body.printing-mode #map-controls, body.printing-mode #search-overlay, body.print
   }
 
   /* Приховати все інше */
-  #map-controls, #infobar, #search-overlay, .toast {
+  #search-overlay, .toast {
     display: none !important;
   }
 }
@@ -1183,6 +1290,50 @@ body.printing-mode #map-controls, body.printing-mode #search-overlay, body.print
   color: white;
 }
 
-#file {
-  display: none;
+.help-section li {
+  margin-bottom: 5px;
+}
+
+/* Стан приховано (utility class) */
+.is-hidden {
+  /* display: none !important; */
+  opacity: 0 !important;
+  transition: var(--transition-normal);
+  pointer-events: none;
+}
+
+/* Якщо ви хочете плавне зникнення для модалок, можна використовувати: */
+.modal {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.modal.modal--active {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    /* Займати тільки 40% висоти знизу */
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 40vh;
+    border-radius: 15px 15px 0 0;
+    transform: translateY(0);
+  }
+
+  .tools {
+    top: auto;
+    bottom: 20px;
+
+/* Панель інструментів переїжджає вниз */
+    left: 50%;
+    display: flex;
+    justify-content: space-around;
+    width: 90%;
+    transform: translateX(-50%);
+  }
 }

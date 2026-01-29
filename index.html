@@ -6,9 +6,9 @@
   <title>FOX-EYE</title>
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'> <circle cx='12' cy='12' r='10'></circle> <line x1='22' y1='12' x2='18' y2='12'></line> <line x1='6' y1='12' x2='2' y2='12'></line> <line x1='12' y1='6' x2='12' y2='2'></line> <line x1='12' y1='22' x2='12' y2='18'></line></svg>" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="./css/maplibre-gl.css" />
   <link rel="stylesheet" href="./css/app.css" />
-  <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -16,61 +16,69 @@
   <header class="header"></header>
 
   <!-- MAIN LAYOUT -->
-  <div class="main-wrapper">
+  <div class="app">
 
-    <div id="search-overlay">
+    <div id="search-overlay" class="search-box__overlay">
       <div class="search-box">
-        <h2>FOX-EYE</h2>
-        <div class="radio-group">
-          <input type="radio" name="search-type" id="type-city" value="city" checked />
-          <label for="type-city" class="radio-label">НП</label>
-          <input type="radio" name="search-type" id="type-mgrs" value="mgrs" />
-          <label for="type-mgrs" class="radio-label">MGRS</label>
+        <h2 class="search-box__title">FOX-EYE</h2>
+        <div class="search-box__radio-group">
+          <input id="city" class="search-box__radio" type="radio" name="search-type" value="city" checked />
+          <label class="search-box__radio-label" for="city">НП</label>
+          <input id="mgrs" class="search-box__radio" type="radio" name="search-type" value="mgrs" />
+          <label class="search-box__radio-label" for="mgrs">MGRS</label>
         </div>
-        <input type="text" id="search-input" placeholder="ВВЕДІТЬ НАЗВУ НП..." />
-        <button class="btn-main" id="search-btn" data-icon="search">ПОШУК&nbsp;</button>
+        <input class="search-box__input" type="text" id="search-input" placeholder="ВВЕДІТЬ НАЗВУ НП..." />
+        <button class="search-box__btn btn-main" id="search-btn" data-icon="search">ПОШУК&nbsp;</button>
       </div>
     </div>
 
     <div id="map"></div>
 
-    <div class="data-panel" id="map-controls">
-      <span class="label-desc">Інструменти</span>
-      <div class="tools-selector">
-        <button class="icon-btn" id="ruler" title="Лінійка" data-tooltip="Лінійка" data-icon="ruler"></button>
-        <button class="icon-btn" id="compass" title="Циркуль" data-tooltip="Циркуль" data-icon="compass"></button>
-        <button class="icon-btn" id="scan" title="Сканер висот (Area Scan)" data-tooltip="Сканер висот (Area Scan)"
-          data-icon="scan"></button>
-        <button class="icon-btn" id="map-mode" title="Тип мапи" data-tooltip="Тип мапи" data-icon="map"></button>
-        <button class="icon-btn" id="contours" title="Ізогіпси" data-tooltip="Ізогіпси" data-icon="izogips"></button>
-        <button class="icon-btn" id="print" title="Друк / Збереження" data-tooltip="Друк / Збереження"
-          data-icon="print"></button>
+    <div class="tools" id="tools">
+      <span class="tools__desc">Інструменти</span>
+      <div class="tools__selector">
+        <button class="icon-btn tools__icon-btn" id="ruler" title="Лінійка" aria-label="Лінійка" data-tooltip="Лінійка"
+          data-icon="ruler"></button>
+        <button class="icon-btn tools__icon-btn" id="compass" title="Циркуль" aria-label="Циркуль"
+          data-tooltip="Циркуль" data-icon="compass"></button>
+        <button class="icon-btn tools__icon-btn" id="scan" title="Сканер висот (Area Scan)"
+          aria-label="Сканер висот (Area Scan)" data-tooltip="Сканер висот (Area Scan)" data-icon="scan"></button>
+        <button class="icon-btn tools__icon-btn" id="map-mode" title="Тип мапи" aria-label="Тип мапи"
+          data-tooltip="Тип мапи" data-icon="map"></button>
+        <button class="icon-btn tools__icon-btn" id="contours" title="Ізогіпси" aria-label="Ізогіпси"
+          data-tooltip="Ізогіпси" data-icon="izogips"></button>
+        <button class="icon-btn tools__icon-btn" id="print" title="Друк / Збереження" aria-label="Друк / Збереження"
+          data-tooltip="Друк / Збереження" data-icon="print"></button>
       </div>
 
       <div>
-        <span class="label-desc">MGRS</span>
-        <div class="hint">
-          <span id="live-coords">---</span>
+        <span class="tools__desc">MGRS</span>
+        <div class="tools__hint">
+          <span id="live-coords" class="tools__live-coords">---</span>
         </div>
       </div>
 
-      <div class="tools-selector">
-        <button class="icon-btn" id="export" title="ЗБЕРЕГТИ" data-tooltip="ЗБЕРЕГТИ" data-icon="download"></button>
-        <button class="icon-btn" id="import" title="ЗАВАНТАЖИТИ" data-tooltip="ЗАВАНТАЖИТИ" data-icon="upload"></button>
-        <input type="file" id="file" accept=".json" />
-        <button class="icon-btn" id="clear" title="ОЧИСТИТИ" data-tooltip="ОЧИСТИТИ" data-icon="clear"></button>
-        <button class="icon-btn" id="help" title="ІНСТРУКЦІЯ" data-tooltip="ІНСТРУКЦІЯ" data-icon="help"></button>
+      <div class="tools__selector">
+        <button class="icon-btn tools__icon-btn" id="export" title="ЗБЕРЕГТИ" aria-label="ЗБЕРЕГТИ"
+          data-tooltip="ЗБЕРЕГТИ" data-icon="download"></button>
+        <button class="icon-btn tools__icon-btn" id="import" title="ЗАВАНТАЖИТИ" aria-label="ЗАВАНТАЖИТИ"
+          data-tooltip="ЗАВАНТАЖИТИ" data-icon="upload"></button>
+        <input class="tools__file" type="file" id="file" accept=".json" />
+        <button class="icon-btn tools__icon-btn" id="clear" title="ОЧИСТИТИ" aria-label="ОЧИСТИТИ"
+          data-tooltip="ОЧИСТИТИ" data-icon="clear"></button>
+        <button class="icon-btn tools__icon-btn" id="help" title="ІНСТРУКЦІЯ" aria-label="ІНСТРУКЦІЯ"
+          data-tooltip="ІНСТРУКЦІЯ" data-icon="help"></button>
       </div>
 
-      <button class="btn-main" id="reload" data-icon="reset">НОВИЙ ПОШУК&nbsp;</button>
+      <button class="btn-main tools__btn-main" id="reload" data-icon="reset">НОВИЙ ПОШУК&nbsp;</button>
     </div>
 
-    <div id="infobar" class="info-container">ВІДСТАНЬ: 0 м</div>
+    <div id="infobar" class="infobar">ВІДСТАНЬ: 0 м</div>
 
-    <div id="results-sidebar" class="results-panel interface-hidden">
-      <div class="panel-header">РЕЗУЛЬТАТИ СКАНУВАННЯ</div>
-      <div id="points-list" class="points-list"></div>
-      <button class="btn-main" id="clear-scan" data-icon="clear">ОЧИСТИТИ&nbsp;</button>
+    <div id="sidebar" class="sidebar is-hidden">
+      <div class="sidebar__header">РЕЗУЛЬТАТИ СКАНУВАННЯ</div>
+      <div id="points" class="sidebar__list points"></div>
+      <button class="btn-main clear-points" id="clear-points" data-icon="clear">ОЧИСТИТИ&nbsp;</button>
     </div>
   </div>
 
@@ -81,7 +89,7 @@
   <div class="modals-wrapper">
     <div id="modal-prompt" class="modal-overlay">
       <div class="modal-content">
-        <div class="panel-header" id="modal-prompt-title">ЗАПИТ ДАНИХ</div>
+        <div class="modal__header" id="modal-prompt-title">ЗАПИТ ДАНИХ</div>
         <div style="padding: 12px">
           <p id="modal-prompt-text"></p>
           <input type="text" id="modal-prompt-input" class="main-input" />
@@ -95,7 +103,7 @@
 
     <div id="modal-alert" class="modal-overlay">
       <div class="modal-content">
-        <div class="panel-header" style="color: var(--color-accent); border-color: var(--color-main)">
+        <div class="modal__header" style="color: var(--color-accent); border-color: var(--color-main)">
           УВАГА!
         </div>
         <div style="padding: 20px; text-align: center">
@@ -107,7 +115,7 @@
 
     <div id="modal-help" class="modal-overlay">
       <div class="modal-content" style="max-width: 500px">
-        <div class="panel-header">КОРОТКИЙ ДОВІДНИК</div>
+        <div class="modal__header">КОРОТКИЙ ДОВІДНИК</div>
         <div class="help-content"
           style="padding: 15px; font-family: var(--font-mono); font-size: 14px; max-height: 70vh; overflow-y: auto;">
           <div class="help-section" style="margin-bottom: 20px">
@@ -115,13 +123,13 @@
               style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
               📏 ЛІНІЙКА</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">ЛКМ (Карта)</b> — Додати точку (WP)
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">ЛКМ (Точка)</b> — Затиснути й тягнути
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-accent)">ПКМ (Точка)</b> — Видалити точку
               </li>
             </ul>
@@ -132,19 +140,19 @@
               style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
               🎯 ЦИРКУЛЬ (РАДІУС)</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">1-й КЛІК</b> — Встановити ЦЕНТР
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">РУХ МИШІ</b> — Обрати дистанцію
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">2-й КЛІК</b> — Зафіксувати РАДІУС
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-accent)">ПКМ</b> — СКАСУВАТИ (під час малювання)
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <i>* 3-й клік автоматично починає нове коло</i>
               </li>
             </ul>
@@ -155,13 +163,13 @@
               style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
               📡 СКАНЕР ВИСОТ</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">ЛКМ (Затиснути)</b> — Початок зони
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">ТЯГНУТИ</b> — Виділити квадрат
               </li>
-              <li style="margin-bottom: 5px">
+              <li>
                 <b style="color: var(--color-main)">ВІДПУСТИТИ</b> — Пошук панівних висот
               </li>
             </ul>
@@ -172,9 +180,9 @@
               style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
               💾 ДАНІ</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li style="margin-bottom: 5px"><b>АВТОЗБЕРЕЖЕННЯ</b> — Працює постійно (F5 friendly)</li>
-              <li style="margin-bottom: 5px">⬇ — Зберегти файл (JSON)</li>
-              <li style="margin-bottom: 5px">⬆ — Завантажити ситуацію</li>
+              <li><b>АВТОЗБЕРЕЖЕННЯ</b> — Працює постійно (F5 friendly)</li>
+              <li>⬇ — Зберегти файл (JSON)</li>
+              <li>⬆ — Завантажити ситуацію</li>
             </ul>
           </div>
         </div>
@@ -186,9 +194,9 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mgrs@1.0.0/dist/mgrs.min.js"></script>
-  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+  <script src="./js/vendor/maplibre-gl.js"></script>
+  <script src="./js/vendor/mgrs.min.js"></script>
+  <script src="./js/vendor/turf.min.js"></script>
   <script src="./js/app.js"></script>
 </body>
 
