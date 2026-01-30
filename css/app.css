@@ -10,6 +10,7 @@
   src: url("../fonts/jura-v34-cyrillic_latin-regular.woff2") format("woff2");
 
   font-display: swap;
+
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
@@ -23,6 +24,7 @@
   src: url("../fonts/jura-v34-cyrillic_latin-700.woff2") format("woff2");
 
   font-display: swap;
+
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
@@ -395,6 +397,10 @@ body.printing-mode #search-overlay {
   text-align: center;
 }
 
+.search-box__title {
+  font-size: 24px;
+}
+
 .search-box__input {
   margin: 20px 0;
   padding: 10px;
@@ -429,7 +435,7 @@ body.printing-mode #search-overlay {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   transition: var(--transition-normal);
 }
