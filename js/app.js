@@ -189,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setActiveTool(null);
     clearMeasurements();
     clearScanResults();
+    localStorage.clear();
   };
   // Кнопка "Очистити" в сайдбарі сканера
   const clearPointsBtn = document.getElementById('clear-points');
