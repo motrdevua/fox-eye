@@ -1,0 +1,30 @@
+# === FOX-EYE Git Ignore ===
+
+# Системні файли ОС
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Файли конфігурації редакторів (VS Code, JetBrains)
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Тимчасові файли та логи
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Резервні копії (якщо робиш вручну)
+*.bak
+*.tmp
+*.old
+
+# Локальні файли налаштувань (якщо будеш використовувати .env)
+.env
+.env.local
+
+# Папка з модулями (якщо в майбутньому додаси npm)
+node_modules/

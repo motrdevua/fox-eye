@@ -221,10 +221,11 @@ function setupMapEvents() {
     document.getElementById('infobar'),
   ];
   map.on('movestart', () => {
-    panels.forEach((el) => el && el.classList.add('is-hidden'));
+    panels.forEach((el) => el && (el.style.display = 'none'));
   });
   map.on('moveend', () => {
-    panels.forEach((el) => el && el.classList.remove('is-hidden'));
+    panels.forEach((el) => el && (el.style.display = 'block'));
+
     AppState.save(); // Зберігаємо позицію після руху
   });
 }

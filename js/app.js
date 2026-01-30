@@ -1,3 +1,13 @@
+// Реєстрація Service Worker для Offline-режиму
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then((reg) => console.log('SW Registered', reg))
+      .catch((err) => console.log('SW Registration Failed', err));
+  });
+}
+
 import { injectIcons } from './ui/icons.js';
 import { startMap, toggleMapStyle, toggleContours } from './map/map-core.js';
 import { createMarker } from './map/markers.js';
