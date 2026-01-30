@@ -265,12 +265,4 @@ document.addEventListener('DOMContentLoaded', () => {
   mapContainer.addEventListener('mousedown', handleScanStart);
   mapContainer.addEventListener('mousemove', handleScanMove);
   document.addEventListener('mouseup', handleScanEnd);
-
-  // --- АВТО-ПРИХОВУВАННЯ ПАНЕЛЕЙ ПРИ РУСІ МАПИ ---
-  // Це додається як callback, оскільки state.map ще може не існувати при старті
-  // Ми використовуємо інтервал або перевірку в startMap, але найкраще це зробити
-  // через MutationObserver або просто додати ці події, коли карта буде створена.
-  // Оскільки initMap в нас в іншому модулі, ми просто додамо це в setupMapEvents того модуля.
-  // (Я переконався, що це додано в код map-core.js у попередній відповіді про map-core.js.
-  // Якщо ні - перевірте, чи є там panels.forEach у initMap/setupMapEvents).
 });

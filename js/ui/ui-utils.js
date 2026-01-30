@@ -1,5 +1,3 @@
-// js/ui/ui-utils.js
-
 // 1. Показ повідомлень (Toast)
 export function showCopyToast(text) {
   let toast = document.getElementById('toast-notification');
@@ -13,6 +11,7 @@ export function showCopyToast(text) {
   toast.className = 'toast-notification modal-success';
   toast.style.display = 'block';
 
+  // Плавне зникнення через 2 секунди
   setTimeout(() => {
     toast.style.opacity = '0';
     setTimeout(() => {

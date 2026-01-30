@@ -1,4 +1,3 @@
-// js/map/markers.js
 import { state } from '../core/state.js';
 import { CONFIG } from '../core/config.js';
 

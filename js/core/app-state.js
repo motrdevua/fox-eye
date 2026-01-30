@@ -39,9 +39,11 @@ export const AppState = {
         state.rulerPoints = [];
         state.rulerMarkers = []; // Очистити перед відновленням
 
+        // Проходимо по збережених координатах і ставимо точки
+        // Важливо: передаємо false, щоб не викликати збереження під час завантаження
         data.points.forEach((coords) => {
           const lngLat = { lng: coords[0], lat: coords[1] };
-          // false - не зберігати під час завантаження, щоб уникнути циклу
+          // false - щоб уникнути циклу
           addRulerPoint(lngLat, false);
         });
 

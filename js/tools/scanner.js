@@ -232,8 +232,10 @@ function renderScanResults(data) {
     item.style.borderLeft = `5px solid ${color}`;
     item.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items: baseline; pointer-events: none;">
-          <b style="color: ${color}; font-size: 14px;">${name}</b>
-          <b style="background:${color}; color:black; padding:2px 6px; border-radius:2px; font-size: 14px;">${Math.round(p.elevation)} м</b>
+          <b style="background: ${color}; font-size: 14px; color:black; padding:0px 6px 2px 6px; border-radius:2px;">${name}</b>
+          <b style="background: ${color}; color:black; padding:2px 6px; border-radius:2px; font-size: 12px;">${Math.round(
+            p.elevation,
+          )} м</b>
       </div>
       <div class="mgrs-copy-zone">
           <span class="coord-text">${formattedMgrs}</span>
