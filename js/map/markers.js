@@ -20,6 +20,26 @@ export function createMarker(lngLat, savedData = null) {
   const label = document.createElement('div');
   label.className = 'marker-label';
   label.innerText = name;
+
+  // === НОВЕ: ПЕРЕЙМЕНУВАННЯ ===
+  // Подвійний клік по тексту для зміни назви
+  label.ondblclick = (e) => {
+    e.stopPropagation(); // Щоб не ставити нові точки
+    // Використовуємо звичайний prompt або ваш customPrompt
+    const newName = prompt('Нова назва точки:', name);
+    if (newName && newName.trim() !== '') {
+      label.innerText = newName;
+
+      // Оновлюємо в state
+      const mData = state.markersData.find((m) => m.id === id);
+      if (mData) {
+        mData.name = newName;
+        saveMarkers();
+      }
+    }
+  };
+  // ============================
+
   wrapper.appendChild(label);
 
   // 2. Створення маркера на мапі

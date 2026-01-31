@@ -110,7 +110,7 @@ export function updatePlaceholder() {
 
   const isCity = typeEl.value === 'city';
   input.value = '';
-  input.placeholder = isCity ? 'ВВЕДІТЬ НАЗВУ НП...' : '36U VV 12345 67890';
+  input.placeholder = isCity ? 'ВВЕДІТЬ НАЗВУ' : '36U VV 12345 67890';
 
   // Якщо вибрано MGRS, вішаємо маску, якщо ні - знімаємо
   input.oninput = isCity ? null : handleMgrsMask;

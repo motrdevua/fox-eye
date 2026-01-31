@@ -111,15 +111,8 @@ export function handleScanEnd(e) {
 // --- ГОЛОВНА ЛОГІКА (МАПА + API) ---
 
 async function findHighestPoints(p1, p2) {
-  const pointsCountInput = await customPrompt(
-    'Скільки найвищих точок знайти?',
-    '5',
-  );
-  if (pointsCountInput === null) {
-    return;
-  }
+  if (typeof turf === 'undefined') return;
 
-  const pointsCount = parseInt(pointsCountInput) || 5;
   const bbox = [
     Math.min(p1.lng, p2.lng),
     Math.min(p1.lat, p2.lat),
@@ -127,63 +120,118 @@ async function findHighestPoints(p1, p2) {
     Math.max(p1.lat, p2.lat),
   ];
 
-  // 1. ГЕНЕРАЦІЯ ЩІЛЬНОЇ СІТКИ (0.02 КМ)
-  const grid = turf.pointGrid(bbox, 0.02, { units: 'kilometers' });
-  const results = [];
+  // 1. РОЗРАХУНОК ДИНАМІЧНОГО КРОКУ (ГРУБИЙ ПОШУК)
+  const poly = turf.bboxPolygon(bbox);
+  const areaKm2 = turf.area(poly) / 1000000;
 
-  // 2. ПРЯМЕ ОПИТУВАННЯ КАРТИ (ШВИДКЕ)
-  grid.features.forEach((f) => {
+  // Для грубого пошуку беремо менше точок (наприклад, 1600), щоб було швидко
+  let coarseStep = Math.sqrt(areaKm2 / 1600);
+  coarseStep = Math.max(0.02, Math.min(coarseStep, 0.5));
+
+  // Розрахунок рекомендованої відстані
+  const diagonal = turf.distance([bbox[0], bbox[1]], [bbox[2], bbox[3]], {
+    units: 'kilometers',
+  });
+  let recMinDist = (diagonal * 0.1).toFixed(2);
+  if (recMinDist < 0.1) recMinDist = 0.1;
+
+  // Питання користувачу
+  const pointsCountInput = await customPrompt('Кількість точок:', '5');
+  if (pointsCountInput === null) return;
+  const minDistInput = await customPrompt('Мін. відстань (км):', recMinDist);
+  if (minDistInput === null) return;
+
+  const pointsCount = parseInt(pointsCountInput) || 5;
+  const minDistance = parseFloat(minDistInput.replace(',', '.')) || 0.1;
+
+  showCopyToast(`Грубе сканування (${areaKm2.toFixed(1)} км²)...`);
+
+  // --- ЕТАП 1: ГРУБИЙ ПРОХІД ---
+  const coarseGrid = turf.pointGrid(bbox, coarseStep, { units: 'kilometers' });
+  let candidates = [];
+
+  coarseGrid.features.forEach((f) => {
     const coords = f.geometry.coordinates;
     const elev = state.map.queryTerrainElevation(coords) || 0;
-    results.push({
-      lng: coords[0],
-      lat: coords[1],
-      elevation: Math.round(elev),
-    });
+    candidates.push({ lng: coords[0], lat: coords[1], elevation: elev });
   });
 
-  results.sort((a, b) => b.elevation - a.elevation);
+  // Сортуємо і беремо топ-20 кандидатів для детальної перевірки
+  candidates.sort((a, b) => b.elevation - a.elevation);
+  let topCandidates = candidates.slice(0, 30);
 
-  // 3. ФІЛЬТРАЦІЯ (ЩОБ НЕ ЗЛИПАЛИСЯ)
-  let filtered = [];
-  for (let p of results) {
-    if (filtered.length >= 50) break; // Ліміт
-    const isTooClose = filtered.some(
+  showCopyToast(`Уточнення вершин...`);
+
+  // --- ЕТАП 2: ТОЧНИЙ ПРОХІД (LOCAL REFINEMENT) ---
+  // Навколо кожного кандидата скануємо квадрат 100x100м з кроком 10м
+  let refinedResults = [];
+
+  for (let cand of topCandidates) {
+    // Створюємо мікро-bbox навколо кандидата (приблизно +/- 100 метрів)
+    // 0.001 градуса ~ 111 метрів
+    const buffer = 0.0015;
+    const miniBbox = [
+      cand.lng - buffer,
+      cand.lat - buffer,
+      cand.lng + buffer,
+      cand.lat + buffer,
+    ];
+
+    // Супер-щільна сітка (крок 0.01 км = 10 метрів)
+    const fineGrid = turf.pointGrid(miniBbox, 0.01, { units: 'kilometers' });
+
+    let localMax = { lng: cand.lng, lat: cand.lat, elevation: cand.elevation };
+
+    fineGrid.features.forEach((f) => {
+      const coords = f.geometry.coordinates;
+      const elev = state.map.queryTerrainElevation(coords) || 0;
+      if (elev > localMax.elevation) {
+        localMax = { lng: coords[0], lat: coords[1], elevation: elev };
+      }
+    });
+    refinedResults.push(localMax);
+  }
+
+  // --- ЕТАП 3: ФІЛЬТРАЦІЯ ТА API ---
+  // Сортуємо уточнені результати
+  refinedResults.sort((a, b) => b.elevation - a.elevation);
+
+  // Фільтруємо за дистанцією (тепер ми фільтруємо вже ТОЧНІ вершини)
+  let finalPoints = [];
+  for (let p of refinedResults) {
+    if (finalPoints.length >= 50) break;
+    const isTooClose = finalPoints.some(
       (f) =>
         turf.distance([p.lng, p.lat], [f.lng, f.lat], { units: 'kilometers' }) <
-        0.3,
+        minDistance,
     );
-    if (!isTooClose) filtered.push(p);
+    if (!isTooClose) finalPoints.push(p);
   }
 
-  showCopyToast(`ЗАПИТ ДО Open-Meteo Elevation API...`);
-
-  // 4. УТОЧНЕННЯ ЧЕРЕЗ API
+  // Запит до Open-Meteo для фінальної перевірки висот
   try {
-    const lats = filtered.map((p) => p.lat).join(',');
-    const lngs = filtered.map((p) => p.lng).join(',');
+    const requestPoints = finalPoints.slice(0, pointsCount * 2); // Беремо з запасом
+    if (requestPoints.length > 0) {
+      const lats = requestPoints.map((p) => p.lat).join(',');
+      const lngs = requestPoints.map((p) => p.lng).join(',');
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lngs}`,
+      );
 
-    const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lngs}`;
-    const response = await fetch(url);
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.elevation) {
-        filtered.forEach(
-          (p, i) => (p.elevation = Math.round(data.elevation[i])),
-        );
+      if (response.ok) {
+        const data = await response.json();
+        requestPoints.forEach((p, i) => {
+          if (data.elevation && data.elevation[i])
+            p.elevation = Math.round(data.elevation[i]);
+        });
       }
-    } else {
-      throw new Error('API Response Error');
     }
   } catch (e) {
-    console.error('Ошибка API, використовуємо дані мапи:', e);
-    showCopyToast(`ПОМИЛКА МЕРЕЖІ (Дані з кешу)`);
+    console.warn('API Error');
   }
 
-  // Фінальне сортування та рендер
-  filtered.sort((a, b) => b.elevation - a.elevation);
-  renderScanResults(filtered.slice(0, pointsCount));
+  finalPoints.sort((a, b) => b.elevation - a.elevation);
+  renderScanResults(finalPoints.slice(0, pointsCount));
 
   state.activeTool = null;
   document

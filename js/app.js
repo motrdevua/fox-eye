@@ -1,13 +1,3 @@
-// Реєстрація Service Worker для Offline-режиму
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('./sw.js')
-      .then((reg) => console.log('SW Registered', reg))
-      .catch((err) => console.log('SW Registration Failed', err));
-  });
-}
-
 import { injectIcons } from './ui/icons.js';
 import { startMap, toggleMapStyle, toggleContours } from './map/map-core.js';
 import { createMarker } from './map/markers.js';
@@ -158,6 +148,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   injectIcons();
   updatePlaceholder();
+
+  // Кнопка "Просто відкрити мапу"
+  const openSimpleBtn = document.getElementById('open-map-simple');
+  if (openSimpleBtn) {
+    openSimpleBtn.onclick = () => {
+      // Відкриваємо Київ або центр України за замовчуванням
+      startMap(30.5234, 50.4501);
+    };
+  }
 
   // --- ПОШУК ---
   const searchInput = document.getElementById('search-input');

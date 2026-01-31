@@ -514,7 +514,7 @@ body.printing-mode #search-overlay {
 .search-box__radio-group {
   display: flex;
   justify-content: center;
-  margin-top: 25px;
+  margin-top: 20px;
 
   gap: 20px;
 }

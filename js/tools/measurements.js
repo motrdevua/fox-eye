@@ -17,6 +17,13 @@ import {
   renderRulerSidebar,
 } from './ruler.js';
 
+export function clearSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const pointsList = document.getElementById('points');
+
+  if (sidebar) sidebar.classList.add('is-hidden');
+  if (pointsList) pointsList.innerHTML = '';
+}
 // === ГОЛОВНИЙ ОБРОБНИК КЛІКІВ ===
 export function handleToolClick(lngLat) {
   if (state.activeTool === 'compass') {
@@ -101,6 +108,8 @@ export function clearMeasurements() {
   state.rulerPoints = [];
   state.rulerMarkers = [];
 
+  clearSidebar();
+
   const clearGeoJSON = { type: 'FeatureCollection', features: [] };
   const rSrc = state.map.getSource('ruler-source');
   const cSrc = state.map.getSource('compass-arc');
@@ -112,24 +121,12 @@ export function clearMeasurements() {
   state.compass.center = null;
 
   // Очищення UI
-  clearSidebar();
-  clearInfobar();
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.add('is-hidden');
+  const infoEl = document.getElementById('infobar');
+  if (infoEl) infoEl.style.display = 'none';
 
   localStorage.removeItem('fox-eye-tools');
-}
-
-export function clearSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const pointsList = document.getElementById('points');
-
-  if (sidebar) sidebar.style.display = 'none';
-  if (pointsList) pointsList.innerHTML = '';
-}
-
-export function clearInfobar() {
-  const infobar = document.getElementById('infobar');
-  if (infobar) infobar.innerHTML = '';
-  if (infobar) infobar.style.display = 'none';
 }
 
 // === ФУНКЦІЯ ДЛЯ AppState.load (Сумісність) ===
@@ -151,7 +148,7 @@ export function updateMeasurements() {
 
   const rSrc = state.map.getSource('ruler-source');
   const cSrc = state.map.getSource('compass-arc');
-  const infobar = document.getElementById('infobar');
+  const infoEl = document.getElementById('infobar');
 
   if (state.activeTool === 'compass') {
     // Логіка Компаса
@@ -165,9 +162,9 @@ export function updateMeasurements() {
       const dist = turf.distance(start, end, { units: 'kilometers' });
       const bearing = turf.bearing(start, end);
       const azimuth = Math.round(bearing < 0 ? bearing + 360 : bearing);
-      if (infobar) {
-        infobar.style.display = 'block';
-        infobar.innerHTML = `РАДІУС: <span style="color:${CONFIG.colors.yellow}">${formatDistance(dist)}</span> | АЗИМУТ: <span style="color:${CONFIG.colors.yellow}">${azimuth}°</span>`;
+      if (infoEl) {
+        infoEl.style.display = 'block';
+        infoEl.innerHTML = `РАДІУС: <span style="color:${CONFIG.colors.yellow}">${formatDistance(dist)}</span> | АЗИМУТ: <span style="color:${CONFIG.colors.yellow}">${azimuth}°</span>`;
       }
     }
   } else {
@@ -178,7 +175,7 @@ export function updateMeasurements() {
     if (rSrc) rSrc.setData(geoJSON);
 
     // Інфобар Лінійки
-    if (infobar) {
+    if (infoEl) {
       // Рахуємо загальну дистанцію для інфобару
       let total = 0;
       geoJSON.features.forEach(
@@ -186,10 +183,10 @@ export function updateMeasurements() {
       );
 
       if (state.rulerPoints.length > 1) {
-        infobar.style.display = 'block';
-        infobar.innerHTML = `ЗАГАЛЬНА ДИСТАНЦІЯ: <span style="color:${CONFIG.colors.yellow}">${formatDistance(total)}</span>`;
+        infoEl.style.display = 'block';
+        infoEl.innerHTML = `ЗАГАЛЬНА ДИСТАНЦІЯ: <span style="color:${CONFIG.colors.yellow}">${formatDistance(total)}</span>`;
       } else {
-        infobar.style.display = 'none';
+        infoEl.style.display = 'none';
       }
     }
     renderRulerSidebar();

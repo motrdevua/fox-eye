@@ -7,7 +7,6 @@
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'> <circle cx='12' cy='12' r='10'></circle> <line x1='22' y1='12' x2='18' y2='12'></line> <line x1='6' y1='12' x2='2' y2='12'></line> <line x1='12' y1='6' x2='12' y2='2'></line> <line x1='12' y1='22' x2='12' y2='18'></line></svg>" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./css/maplibre-gl.css" />
   <link rel="stylesheet" href="./css/app.css" />
 </head>
@@ -22,6 +21,9 @@
     <div id="search-overlay" class="search-box__overlay">
       <div class="search-box">
         <h2 class="search-box__title">FOX-EYE</h2>
+        <button id="open-map-simple" class="search-box__btn btn-main"
+          style="margin-top: 25px; padding: 10px 15px; cursor: pointer;">ВІДКРИТИ
+          МАПУ</button>
         <div class="search-box__radio-group">
           <input id="city" class="search-box__radio" type="radio" name="search-type" value="city" checked />
           <label class="search-box__radio-label" for="city">НП</label>
@@ -29,7 +31,8 @@
           <label class="search-box__radio-label" for="mgrs">MGRS</label>
         </div>
         <input class="search-box__input" type="text" id="search-input" placeholder="ВВЕДІТЬ НАЗВУ НП..." />
-        <button class="search-box__btn btn-main" id="search-btn" data-icon="search">ПОШУК&nbsp;</button>
+        <button id="search-btn" class="search-box__btn btn-main" data-icon="search">ПОШУК&nbsp;</button>
+
       </div>
     </div>
 

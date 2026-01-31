@@ -25,9 +25,9 @@ export const AppState = {
       const data = JSON.parse(raw);
 
       // 1. Відновлюємо позицію мапи
-      if (data.mapCenter && data.mapZoom) {
-        state.map.jumpTo({ center: data.mapCenter, zoom: data.mapZoom });
-      }
+      // if (data.mapCenter && data.mapZoom) {
+      //   state.map.jumpTo({ center: data.mapCenter, zoom: data.mapZoom });
+      // }
 
       // 2. Відновлюємо інструмент (це робиться в app.js через setActiveTool,
       // але тут ми просто відновлюємо точки, а користувач сам обере інструмент)
