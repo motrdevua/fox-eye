@@ -5,6 +5,11 @@ export const state = {
   markersData: [],
   activeTool: null, // 'ruler', 'compass', 'scan', 'scan_results'
 
+  los: {
+    points: [], // Масив з 2 точок [{lng, lat}, {lng, lat}]
+    markers: [], // Масив маркерів на мапі
+  },
+
   // Інструменти вимірювання
   rulerPoints: [], // Масив координат {id, coords}
   rulerMarkers: [], // Масив об'єктів маркерів на карті

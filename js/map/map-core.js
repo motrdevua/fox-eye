@@ -5,10 +5,13 @@ import {
   handleToolClick,
   updateMeasurements,
   clearMeasurements,
+  updateCompassVisual,
 } from '../tools/measurements.js';
+// === НОВЕ: Імпорт обробника Line of Sight ===
+import { handleLosClick } from '../tools/los.js';
+// ===========================================
 import { createMarker, loadSavedMarkers } from './markers.js';
 import { AppState } from '../core/app-state.js';
-import { updateCompassVisual } from '../tools/measurements.js';
 
 function focusPoint(lng, lat) {
   state.map.flyTo({
@@ -20,10 +23,7 @@ function focusPoint(lng, lat) {
 }
 
 function selectZone(e) {
-  // 1. Використовуємо e.point (точність MapLibre), а не clientX
   const currentPoint = e.point;
-
-  // Перераховуємо стартову точку в пікселі (гарантує точність навіть при зміщенні)
   const startPoint = state.map.project(state.selectionStart.lngLat);
 
   const minX = Math.min(startPoint.x, currentPoint.x);
@@ -31,38 +31,29 @@ function selectZone(e) {
   const minY = Math.min(startPoint.y, currentPoint.y);
   const maxY = Math.max(startPoint.y, currentPoint.y);
 
-  // Оновлюємо візуал рамки
   state.selectionBoxEl.style.left = minX + 'px';
   state.selectionBoxEl.style.top = minY + 'px';
   state.selectionBoxEl.style.width = maxX - minX + 'px';
   state.selectionBoxEl.style.height = maxY - minY + 'px';
 
-  // === 2. ТОЧНИЙ РОЗРАХУНОК (ГЕКТАРИ) ===
   const label = state.selectionBoxEl.querySelector('.selection-area-label');
   if (label) {
-    // Беремо координати середини сторін (це компенсує кривизну Землі)
     const leftMid = state.map.unproject([minX, (minY + maxY) / 2]);
     const rightMid = state.map.unproject([maxX, (minY + maxY) / 2]);
     const topMid = state.map.unproject([(minX + maxX) / 2, minY]);
     const bottomMid = state.map.unproject([(minX + maxX) / 2, maxY]);
 
-    // Рахуємо дистанцію в метрах
     const widthM = leftMid.distanceTo(rightMid);
     const heightM = topMid.distanceTo(bottomMid);
 
     const area = widthM * heightM;
 
-    // === 3. ФОРМАТУВАННЯ (M² -> HA -> KM²) ===
     let text = '';
     if (area >= 1000000) {
-      // Більше 1 км² (1 000 000 м²) -> показуємо км²
       text = (area / 1000000).toFixed(2) + ' km²';
     } else if (area >= 10000) {
-      // Більше 1 Гектара (10 000 м²) -> показуємо Гектари (ha)
-      // Це прибере "дві тризначні цифри". 500 000 м² стане 50.00 ha
       text = (area / 10000).toFixed(2) + ' ha';
     } else {
-      // Менше 1 га -> показуємо метри
       text =
         Math.round(area)
           .toString()
@@ -73,7 +64,6 @@ function selectZone(e) {
   }
 }
 
-// Експортуємо функції для зовнішнього використання
 export function startMap(lon, lat) {
   document.getElementById('search-overlay').style.display = 'none';
   document.getElementById('tools').style.display = 'block';
@@ -137,7 +127,6 @@ function initMap(lon, lat) {
       preserveDrawingBuffer: true,
     });
 
-    // Scale & Nav Controls
     const scale = new maplibregl.ScaleControl({
       maxWidth: 150,
       unit: 'metric',
@@ -158,35 +147,38 @@ function setupMapEvents() {
 
   map.doubleClickZoom.disable();
 
-  // Події завантаження
   map.on('load', () => {
-    addMapLayers(); // Додаємо шари
-    loadSavedMarkers(); // Завантажуємо маркери з пам'яті
-    AppState.load(); // ВІДНОВЛЕННЯ СТАНУ
+    addMapLayers();
+    loadSavedMarkers();
+    AppState.load();
   });
 
-  // 1. Кліки (Інструменти)
+  // === 1. ВИПРАВЛЕНО: Кліки (Розподіл інструментів) ===
   map.on('click', (e) => {
-    if (state.activeTool) handleToolClick(e.lngLat);
+    if (!state.activeTool) return;
+
+    if (state.activeTool === 'los') {
+      // Якщо обрано інструмент "Line of Sight", викликаємо його логіку
+      handleLosClick(e.lngLat);
+    } else {
+      // Для "ruler" та "compass" викликаємо стару функцію
+      handleToolClick(e.lngLat);
+    }
   });
+  // ====================================================
 
   // 2. Правий клік (Context Menu)
   map.on('contextmenu', (e) => {
-    // Якщо ми зараз малюємо компасом (поставили центр, але ще не поставили радіус)
     if (state.activeTool === 'compass' && state.compass.isDrawing) {
-      // 1. Зупиняємо малювання
       state.compass.isDrawing = false;
       state.compass.center = null;
-      // 2. Очищаємо все (видаляємо точку центру і  коло)
       clearMeasurements();
-      // 3. Даємо знати користувачу
       showCopyToast('МАЛЮВАННЯ СКАСОВАНО');
-      // 4. Запобігаємо появі стандартного контекстного меню браузера
       e.preventDefault();
     }
   });
 
-  // 3. Подвійний клік (Double Click) - Створення маркерів
+  // 3. Подвійний клік
   map.on('dblclick', (e) => {
     if (
       !state.activeTool &&
@@ -196,9 +188,9 @@ function setupMapEvents() {
     }
   });
 
-  // 4. Mouse Move (Координати + Візуал циркуля + UI)
+  // 4. Mouse Move
   map.on('mousemove', (e) => {
-    updateLiveCoords(e.lngLat); // Оновлення координат в інфобарі
+    updateLiveCoords(e.lngLat);
 
     if (state.activeTool === 'compass' && state.compass.isDrawing) {
       updateCompassVisual(e.lngLat);
@@ -206,27 +198,34 @@ function setupMapEvents() {
 
     if (state.isSelecting && state.selectionBoxEl) {
       selectZone(e);
-      // Виклик імпортується зі сканера?
-      // В модульному коді ми це винесли в document/map listener в app.js,
-      // але для вірності можна і тут, хоча app.js вже обробляє це.
-      // В app.js ми додали mapContainer.addEventListener('mousemove', handleScanMove);
-      // Тому тут дублювати не треба.
     }
   });
 
-  // 5. Авто-приховування інтерфейсу (ВІДНОВЛЕНО)
-  const panels = [
-    document.getElementById('tools'),
-    document.getElementById('sidebar'),
-    document.getElementById('infobar'),
-  ];
+  // 5. Авто-приховування інтерфейсу
   map.on('movestart', () => {
-    panels.forEach((el) => el && (el.style.display = 'none'));
-  });
-  map.on('moveend', () => {
-    panels.forEach((el) => el && (el.style.display = 'block'));
+    const tools = document.getElementById('tools');
+    const sidebar = document.getElementById('sidebar');
+    const infobar = document.getElementById('infobar');
 
-    AppState.save(); // Зберігаємо позицію після руху
+    if (tools) tools.style.display = 'none';
+    if (sidebar) sidebar.style.display = 'none';
+    if (infobar) infobar.style.display = 'none';
+  });
+
+  map.on('moveend', () => {
+    const tools = document.getElementById('tools');
+    if (tools) tools.style.display = 'block';
+
+    if (state.activeTool === 'ruler' || state.activeTool === 'compass') {
+      updateMeasurements();
+    } else {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && !sidebar.classList.contains('is-hidden')) {
+        sidebar.style.display = 'flex';
+      }
+    }
+
+    AppState.save();
   });
 }
 
@@ -234,13 +233,11 @@ function updateLiveCoords(lngLat) {
   const coordsDisplay = document.getElementById('live-coords');
   if (!coordsDisplay) return;
   try {
-    // Перевірка наявності бібліотеки mgrs
     if (typeof mgrs === 'undefined') {
       coordsDisplay.innerText = `${lngLat.lat.toFixed(5)}, ${lngLat.lng.toFixed(5)}`;
       return;
     }
     const mgrsString = mgrs.forward([lngLat.lng, lngLat.lat]);
-    // Форматування: 36U VV 12345 67890
     const formatted = mgrsString.replace(
       /(.{3})(.{2})(.{5})(.{5})/,
       '$1 $2 $3 $4',
@@ -299,7 +296,6 @@ function addMapLayers() {
       },
     });
 
-  // 2. Tools Sources (Ruler & Compass)
   if (!map.getSource('ruler-source'))
     map.addSource('ruler-source', {
       type: 'geojson',
@@ -354,7 +350,6 @@ function addMapLayers() {
         'line-dasharray': [4, 2],
       },
     });
-    // Заливка
     map.addLayer({
       id: 'compass-fill',
       type: 'fill',
@@ -365,7 +360,6 @@ function addMapLayers() {
         'fill-opacity': 0.1,
       },
     });
-    // Радіус
     map.addLayer({
       id: 'compass-line',
       type: 'line',
@@ -376,7 +370,6 @@ function addMapLayers() {
         'line-dasharray': [4, 2],
       },
     });
-    // Підпис
     map.addLayer({
       id: 'compass-labels',
       type: 'symbol',
@@ -395,13 +388,52 @@ function addMapLayers() {
     });
   }
 
-  // Додатковий шар тіней рельєфу (Hillshade)
+  // === LINE OF SIGHT LAYERS (Це ви вже додали, залишаємо) ===
+  if (!map.getSource('los-source')) {
+    map.addSource('los-source', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+    });
+  }
+
+  if (!map.getLayer('los-line')) {
+    map.addLayer({
+      id: 'los-line',
+      type: 'line',
+      source: 'los-source',
+      layout: {
+        'line-join': 'round',
+        'line-cap': 'round',
+      },
+      paint: {
+        'line-color': ['get', 'color'],
+        'line-width': 4,
+        'line-opacity': 0.8,
+      },
+    });
+  }
+
+  if (!map.getLayer('los-obstacle')) {
+    map.addLayer({
+      id: 'los-obstacle',
+      type: 'circle',
+      source: 'los-source',
+      filter: ['==', 'isObstacle', true],
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#FF0000',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#FFFFFF',
+      },
+    });
+  }
+
   if (!map.getLayer('terrain-helper')) {
     map.addLayer({
       id: 'terrain-helper',
       type: 'hillshade',
       source: 'terrain-data',
-      paint: { 'hillshade-exaggeration': 0 }, // Не візуалізуємо тіні, але шар потрібен для роботи 3D
+      paint: { 'hillshade-exaggeration': 0 },
     });
   }
 }

@@ -18,6 +18,8 @@ import {
 } from './tools/scanner.js';
 import { DataManager } from './core/data-manager.js';
 
+import { handleLosClick, clearLos } from './tools/los.js';
+
 // --- 1. ПЕРЕВІРКА WEBGL (З оригінального коду) ---
 function checkWebGL() {
   try {
@@ -50,6 +52,7 @@ function setActiveTool(toolName) {
   // Чистимо попередній інструмент
   if (prevTool !== toolName) {
     clearMeasurements();
+    clearLos();
     // Не чистимо результати сканування, якщо ми просто клікнули "Scan" знову або перейшли в інший режим
     if (toolName !== 'scan_results') clearScanResults();
   }
@@ -69,12 +72,14 @@ function setActiveTool(toolName) {
 
     if (toolName === 'ruler') {
       document.body.classList.add('compass-active-cursor');
-      infoBox.innerText = '...';
+      infoBox.innerText = 'START';
     } else if (toolName === 'compass') {
       document.body.classList.add('compass-active-cursor');
       infoBox.innerText = 'ОБЕРІТЬ ЦЕНТР';
     } else if (toolName === 'scan') {
       infoBox.innerText = 'ЗАТИСНІТЬ ТА ТЯГНІТЬ';
+    } else if (toolName === 'los') {
+      infoBox.innerText = 'ВСТАНОВІТЬ СПОСТЕРІГАЧА (Точка А)';
     }
   }
 }
@@ -143,8 +148,29 @@ function printMap() {
 }
 
 // === ТОЧКА ВХОДУ (DOM READY) ===
+document.addEventListener('onload', () => {
+  const searchBoxTitle = document.querySelector('.search-box__title');
+  if (searchBoxTitle) {
+    searchBoxTitle.innerHTML = `<span id="fox" data-icon="fox"></span>&nbsp;FOX-EYE&nbsp;<span>>${CONFIG.VERSION}</span>`;
+  }
+});
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkWebGL()) return showWebGLError();
+
+  // === ВІДОБРАЖЕННЯ ВЕРСІЇ (НОВЕ) ===
+  console.log(
+    `%c FOX-EYE %c ${CONFIG.VERSION} `,
+    `background: #333; color: ${CONFIG.colors.main}; font-weight: bold; padding: 4px; border-radius: 3px 0 0 3px;`,
+    `background: ${CONFIG.colors.main}; color: #000; font-weight: bold; padding: 4px; border-radius: 0 3px 3px 0;`,
+  );
+
+  // Бонус: додаємо версію в модальне вікно "Довідка", якщо воно існує
+  const helpTitle = document.querySelector('#modal-help .modal__header');
+  if (helpTitle) {
+    helpTitle.innerHTML = `КОРОТКИЙ ДОВІДНИК <span style="font-size: 0.7em; opacity: 0.7; margin-top: 4px;">${CONFIG.VERSION}</span>`;
+  }
+
+  // ===================================
 
   injectIcons();
   updatePlaceholder();
@@ -182,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('ruler').onclick = () => setActiveTool('ruler');
   document.getElementById('compass').onclick = () => setActiveTool('compass');
   document.getElementById('scan').onclick = () => setActiveTool('scan');
+  document.getElementById('los').onclick = () => setActiveTool('los');
 
   // Очищення
   document.getElementById('clear').onclick = () => {

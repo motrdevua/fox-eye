@@ -496,7 +496,14 @@ body.printing-mode #search-overlay {
 }
 
 .search-box__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 24px;
+}
+
+.search-box__title span {
+  font-size: 14px;
 }
 
 .search-box__input {

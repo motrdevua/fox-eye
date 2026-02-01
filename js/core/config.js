@@ -1,5 +1,6 @@
 // КОНФІГУРАЦІЯ (Кольори, Ключі, Налаштування)
 export const CONFIG = {
+  VERSION: 'v0.5.1',
   apiKey: '39vWsRU1aZVglDrRNJUv',
   colors: {
     main: '#00ff00',
