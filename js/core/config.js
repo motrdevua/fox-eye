@@ -3,7 +3,9 @@ export const CONFIG = {
   VERSION: 'v0.5.1',
   apiKey: '39vWsRU1aZVglDrRNJUv',
   colors: {
-    main: '#00ff00',
+    main: '#00ff00', // Це змінюватиметься динамічно
+    green: '#00ff00', // Константа для зеленої теми
+    orange: '#ff6b00', // Константа для помаранчевої теми
     accent: '#ff0000',
     yellow: '#ffcc00',
     black: '#000000',

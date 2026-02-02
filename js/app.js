@@ -1,3 +1,4 @@
+import { toggleTheme } from './ui/theme-switcher.js';
 import { injectIcons } from './ui/icons.js';
 import { startMap, toggleMapStyle, toggleContours } from './map/map-core.js';
 import { createMarker } from './map/markers.js';
@@ -154,6 +155,7 @@ document.addEventListener('onload', () => {
     searchBoxTitle.innerHTML = `<span id="fox" data-icon="fox"></span>&nbsp;FOX-EYE&nbsp;<span>>${CONFIG.VERSION}</span>`;
   }
 });
+
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkWebGL()) return showWebGLError();
 
@@ -209,6 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('compass').onclick = () => setActiveTool('compass');
   document.getElementById('scan').onclick = () => setActiveTool('scan');
   document.getElementById('los').onclick = () => setActiveTool('los');
+  // document.getElementById('theme-toggle').addEventListener('click', () => {
+  //   toggleTheme();
+
+  //   // (Опціонально) Знімаємо активний клас з кнопки, щоб вона блимнула і все,
+  //   // або залишаємо активною, якщо хочеш показати стан
+  //   // document.getElementById('theme-toggle').classList.toggle('active');
+  // });
 
   // Очищення
   document.getElementById('clear').onclick = () => {

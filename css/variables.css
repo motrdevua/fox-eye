@@ -1,0 +1,28 @@
+:root {
+  --main-color: #00ff00;
+  --main-color-dark: #003300;
+  --main-color-deep: #001500;
+  --main-color-muted: #004400;
+  --bg-black: #000000;
+  --bg-dark-grey: #0a0a0a;
+  --bg-overlay: rgba(0, 0, 0, .85);
+  --bg-panel: rgba(0, 15, 0, .9);
+  --color-accent: #ff0000;
+  --color-accent-blue: #008cff;
+  --color-accent-yellow: #ffff00;
+  --color-orange: #ff6b00;
+  --color-yellow: #ffcc00;
+  --font-main: "Jura", sans-serif;
+  --font-mono: "Jura", monospace;
+  --border-width: 1px;
+  --border-radius: 4px;
+  --gap-medium: 10px;
+  --gap-small: 5px;
+  --panel-padding: 15px;
+  --text-dark-grey: #666666;
+  --text-dim: #555555;
+  --text-grey: #888888;
+  --transition-fast: .05s;
+  --transition-normal: .15s ease-in-out;
+  --transition-slide: .3s cubic-bezier(.4, 0, .2, 1);
+}
