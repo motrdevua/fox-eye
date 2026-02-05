@@ -12,6 +12,7 @@ import { handleLosClick } from '../tools/los.js';
 // ===========================================
 import { createMarker, loadSavedMarkers } from './markers.js';
 import { AppState } from '../core/app-state.js';
+import { Hexagon } from '../ui/hexagon.js';
 
 function focusPoint(lng, lat) {
   state.map.flyTo({
@@ -67,6 +68,8 @@ function selectZone(e) {
 export function startMap(lon, lat) {
   document.getElementById('search-overlay').style.display = 'none';
   document.getElementById('tools').style.display = 'block';
+
+  Hexagon.stop();
 
   if (!state.map) {
     initMap(lon, lat);
@@ -407,7 +410,7 @@ function addMapLayers() {
       },
       paint: {
         'line-color': ['get', 'color'],
-        'line-width': 4,
+        'line-width': 2,
         'line-opacity': 0.8,
       },
     });
@@ -421,9 +424,9 @@ function addMapLayers() {
       filter: ['==', 'isObstacle', true],
       paint: {
         'circle-radius': 6,
-        'circle-color': '#FF0000',
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#FFFFFF',
+        'circle-color': CONFIG.colors.red,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': CONFIG.colors.black,
       },
     });
   }

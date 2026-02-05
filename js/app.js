@@ -1,5 +1,5 @@
-import { toggleTheme } from './ui/theme-switcher.js';
 import { injectIcons } from './ui/icons.js';
+import { Hexagon } from './ui/hexagon.js';
 import { startMap, toggleMapStyle, toggleContours } from './map/map-core.js';
 import { createMarker } from './map/markers.js';
 import {
@@ -159,6 +159,8 @@ document.addEventListener('onload', () => {
 document.addEventListener('DOMContentLoaded', () => {
   if (!checkWebGL()) return showWebGLError();
 
+  Hexagon.start();
+
   // === ВІДОБРАЖЕННЯ ВЕРСІЇ (НОВЕ) ===
   console.log(
     `%c FOX-EYE %c ${CONFIG.VERSION} `,
@@ -211,13 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('compass').onclick = () => setActiveTool('compass');
   document.getElementById('scan').onclick = () => setActiveTool('scan');
   document.getElementById('los').onclick = () => setActiveTool('los');
-  // document.getElementById('theme-toggle').addEventListener('click', () => {
-  //   toggleTheme();
-
-  //   // (Опціонально) Знімаємо активний клас з кнопки, щоб вона блимнула і все,
-  //   // або залишаємо активною, якщо хочеш показати стан
-  //   // document.getElementById('theme-toggle').classList.toggle('active');
-  // });
 
   // Очищення
   document.getElementById('clear').onclick = () => {

@@ -7,7 +7,7 @@ export const ICONS = {
   scan: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M14,6L10.25,11L13.1,14.8L11.5,16C9.81,13.75 7,10 7,10L1,18H23L14,6Z"/></svg>`,
   visible: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12,4C7,4,2.73,7.11,1,11.5C2.73,15.89,7,19,12,19s9.27-3.11,11-7.5C21.27,7.11,17,4,12,4z M12,16.5 c-2.76,0-5-2.24-5-5s2.24-5,5-5s5,2.24,5,5S14.76,16.5,12,16.5z M12,8.5c-1.66,0-3,1.34-3,3s1.34,3,3,3s3-1.34-3-3S13.66,8.5,12,8.5 z"/></svg>`,
   map: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>`,
-  izogips: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M3.5 18.5L9.5 12.5L13.5 16.5L20.5 9.5" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/><path d="M3.5 12.5L9.5 6.5L13.5 10.5L20.5 3.5" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"/></svg>`,
+  izogips: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M3.5 18.5L9.5 12.5L13.5 16.5L20.5 9.5" fill="none" stroke-width="2" stroke-linecap="round"/><path d="M3.5 12.5L9.5 6.5L13.5 10.5L20.5 3.5" fill="none" stroke-width="2" stroke-linecap="round"/></svg>`,
   print: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>`,
   download: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/></svg>`,
   upload: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"/></svg>`,

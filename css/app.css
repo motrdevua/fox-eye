@@ -1,18 +1,18 @@
-@import './fonts.css';
-@import './variables.css';
 @import './reset.css';
+@import './variables.css';
+
 
 body {
   overflow: hidden;
-  background-color: var(--bg-black);
-  color: var(--main-color);
+  background-color: var(--color-black);
   font-family: var(--font-main);
+  color: var(--main-color);
 }
 
-body.theme-fox {
-  --main-color: #ff6b00;
-  /* Наш тактичний помаранчевий */
-  --text-color: #ff6b00;
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* =============== АНІМАЦІЇ START ===============*/
@@ -55,22 +55,17 @@ body.theme-fox {
 
   0%,
   to {
-    -webkit-transform: translateX(0);
     transform: translateX(0);
   }
 
   25% {
-    -webkit-transform: translateX(-5px);
     transform: translateX(-5px);
   }
 
   75% {
-    -webkit-transform: translateX(5px);
     transform: translateX(5px);
   }
 }
-
-/* ДІАГОНАЛЬНИЙ СКАНЕР */
 
 @keyframes scan-diagonal {
   0% {
@@ -92,29 +87,6 @@ body.theme-fox {
   }
 }
 
-/* ЕФЕКТ СКАНЕРА (Laser Sweep) */
-
-@keyframes scan-sweep {
-  0% {
-    top: -20%;
-    opacity: 0;
-  }
-
-  10% {
-    opacity: 1;
-  }
-
-  90% {
-    opacity: 1;
-  }
-
-  100% {
-    top: 120%;
-    opacity: 0;
-  }
-}
-
-/* Анімація пульсації */
 @keyframes pulse-ring {
   0% {
     box-shadow: 0 0 0 0 rgba(0, 255, 0, .7);
@@ -136,7 +108,7 @@ body.theme-fox {
 
 /* =============== АНІМАЦІЇ END ===============*/
 
-/* =============== КНОПКИ END ===============*/
+/* =============== КНОПКИ START ===============*/
 
 .icon-btn {
   position: relative;
@@ -157,7 +129,7 @@ body.theme-fox {
   border-color: var(--main-color);
   background: var(--main-color);
   box-shadow: 0 0 8px var(--main-color);
-  color: var(--bg-black);
+  color: var(--color-black);
   transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
@@ -171,7 +143,7 @@ body.theme-fox {
   background: var(--main-color);
   background-color: var(--main-color);
   box-shadow: inset 0 0 5px rgba(0, 0, 0, .5);
-  color: black;
+  color: var(--color-black);
   transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
@@ -183,24 +155,28 @@ body.theme-fox {
   fill: var(--main-color);
 }
 
+#contours.icon-btn svg path {
+  stroke: var(--main-color);
+}
+
 .icon-btn:hover svg {
   transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
 
-  fill: var(--bg-black);
+  fill: var(--color-black);
 }
 
 .icon-btn.active svg {
   transition: all .2s cubic-bezier(.175, .885, .32, 1.275);
 
-  fill: var(--bg-black);
+  fill: var(--color-black);
 }
 
 #contours:hover svg path {
-  stroke: var(--bg-black);
+  stroke: var(--color-black);
 }
 
 #contours.active svg path {
-  stroke: var(--bg-black);
+  stroke: var(--color-black);
 }
 
 .btn-main {
@@ -214,20 +190,18 @@ body.theme-fox {
   background: var(--main-color-dark);
   color: var(--main-color);
   text-transform: uppercase;
-  font-family: inherit;
   cursor: pointer;
 }
 
 .btn-main:hover {
   background: var(--main-color);
-  color: var(--bg-black);
+  color: var(--color-black);
 }
 
 .btn-main,
 .btn-copy-small {
   letter-spacing: .5px;
-  font-weight: 700;
-  font-family: var(--font-main);
+  /* font-weight: 700; */
 }
 
 /* =============== КНОПКИ END ===============*/
@@ -261,14 +235,16 @@ body.printing-mode #search-overlay {
 }
 
 .search-box {
+  position: fixed;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 25px;
   border: var(--border-width) solid var(--main-color);
   border-radius: var(--border-radius);
-  background: #111111;
+  background: var(--bg-overlay);
   text-align: center;
+  backdrop-filter: blur(1px);
 }
 
 .search-box__title {
@@ -301,9 +277,8 @@ body.printing-mode #search-overlay {
   outline: 0;
   border: var(--border-width) solid var(--main-color);
   border-radius: var(--border-radius);
-  background: var(--bg-black);
+  background: var(--bg-panel);
   color: var(--main-color);
-  font-family: inherit;
 }
 
 .search-box__radio-group {
@@ -323,10 +298,10 @@ body.printing-mode #search-overlay {
   width: 100%;
   border: var(--border-width) solid var(--main-color-muted);
   border-radius: var(--border-radius);
-  background: rgba(0, 20, 0, .5);
+  background: var(--main-color-deep);
   color: var(--main-color-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: .5px;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -342,7 +317,7 @@ body.printing-mode #search-overlay {
   border-color: var(--main-color);
   background: var(--main-color);
   box-shadow: 0 0 15px rgba(0, 255, 0, .4);
-  color: var(--bg-black);
+  color: var(--color-black);
 }
 
 /* =============== ПОШУК END ===============*/
@@ -404,7 +379,6 @@ body.printing-mode #tools {
 
 /* =============== ІНСТРУМЕНТИ END ===============*/
 
-
 /* =============== МАПА START ===============*/
 
 #map {
@@ -413,7 +387,7 @@ body.printing-mode #tools {
   bottom: 0;
   overflow: hidden;
   width: 100%;
-  background: var(--bg-black);
+  background: var(--color-black);
 }
 
 #results-sidebar {
@@ -450,7 +424,6 @@ body.printing-mode #tools {
   font-weight: 700;
   font-size: 14px;
   line-height: 1.5;
-  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
 
@@ -473,7 +446,6 @@ body.printing-mode #tools {
   border-radius: var(--border-radius);
   background: var(--bg-panel);
   color: var(--main-color);
-  -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
 }
 
@@ -490,19 +462,12 @@ body.printing-mode #tools {
   text-align: center;
   letter-spacing: 1px;
   font-weight: 700;
-  font-family: var(--font-main);
 }
 
 /* Ефект матового скла для панелей */
 .panel {
   border: 1px solid rgba(0, 255, 0, .3);
   background-color: rgba(0, 15, 0, .85) !important;
-
-  /* Розмиття фону */
-
-  -webkit-backdrop-filter: blur(5px);
-
-  /* Напівпрозорий чорно-зелений */
   backdrop-filter: blur(5px);
 }
 
@@ -527,7 +492,7 @@ body.printing-mode #tools {
 }
 
 .point-item b {
-  color: var(--color-accent-yellow);
+  color: var(--color-yellow-light);
   font-weight: 700;
   font-size: 14px;
   ;
@@ -535,7 +500,109 @@ body.printing-mode #tools {
 
 /* =============== SIDEBAR END ===============*/
 
+/* =============== MODAL START ===============*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: 0 0;
+  transition: background var(--transition-slide);
+  backdrop-filter: blur(2px);
+}
 
+.modal-overlay.active {
+  display: flex;
+  background: var(--bg-overlay);
+  transition: background var(--transition-slide);
+}
+
+.modal-content {
+  width: 340px;
+  border: 1px solid var(--main-color);
+  border-radius: var(--border-radius);
+  background: var(--bg-panel);
+  box-shadow: 0 0 30px rgba(0, 255, 0, .2);
+  opacity: 0;
+  transition: all var(--transition-fast);
+  transform: translateY(20px) scale(.95);
+}
+
+.modal-overlay.active .modal-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.modal-content.modal-error {
+  border: 1px solid red;
+  animation: error-glow 1.5s infinite ease-in-out;
+}
+
+.modal-error .modal__header {
+  border-bottom-color: red !important;
+  color: red !important;
+}
+
+.modal-overlay.active .modal-content.modal-error {
+  animation: error-glow 1.5s infinite ease-in-out, modal-shake .3s ease-in-out;
+}
+
+.modal-success {
+  animation: success-glow 2s infinite ease-in-out;
+}
+
+/* Плавна поява модалок */
+.modal-overlay {
+  opacity: 0;
+  transition: opacity .3s ease;
+  /* background: rgba(0, 0, 0, 0.5); — можна зробити темнішим */
+}
+
+.modal-overlay.active {
+  opacity: 1;
+}
+
+.modal-content {
+  transition: transform .3s cubic-bezier(.175, .885, .32, 1.275);
+  transform: translateY(-20px) scale(.95);
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0) scale(1);
+}
+
+#modal-prompt-text {
+  color: var(--main-color);
+}
+
+#modal-prompt-input {
+  box-sizing: border-box;
+  margin: 15px 0;
+  width: 100%;
+}
+
+#modal-prompt-cancel {
+  background: var(--color-red);
+  color: white;
+}
+
+.modal {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.modal.modal--active {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* =============== MODAL END ===============*/
 
 .marker-wrapper {
   position: relative;
@@ -550,9 +617,8 @@ body.printing-mode #tools {
   z-index: 2;
   width: 14px;
   height: 14px;
-  border: 1px solid var(--bg-black);
+  border: 1px solid var(--color-black);
   border-radius: var(--border-radius);
-  cursor: -webkit-grab;
   cursor: grab;
 }
 
@@ -562,18 +628,18 @@ body.printing-mode #tools {
 }
 
 .m-red {
-  background: var(--color-accent);
-  box-shadow: 0 0 10px var(--color-accent);
+  background: var(--color-red);
+  box-shadow: 0 0 10px var(--color-red);
 }
 
 .m-blue {
-  background: var(--color-accent-blue);
-  box-shadow: 0 0 10px var(--color-accent-blue);
+  background: var(--color-blue);
+  box-shadow: 0 0 10px var(--color-blue);
 }
 
 .m-yellow {
-  background: var(--color-accent-yellow);
-  box-shadow: 0 0 10px var(--color-accent-yellow);
+  background: var(--color-yellow-light);
+  box-shadow: 0 0 10px var(--color-yellow-light);
 }
 
 .marker-label {
@@ -589,19 +655,13 @@ body.printing-mode #tools {
   font-weight: 700;
   font-size: 11px;
   cursor: pointer;
-  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
-
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
 .ruler-point-el {
   cursor: pointer;
-  transition: transform var(--transition-fast),
-    -webkit-transform var(--transition-fast);
+  transition: transform var(--transition-fast);
 }
 
 
@@ -617,9 +677,8 @@ select.speed-select {
 .coord-text {
   display: block;
   margin-top: 3px;
-  color: var(--main-color);
+  color: var(--color-yellow);
   font-size: 10px;
-  font-family: var(--font-mono);
   opacity: .8;
 }
 
@@ -628,7 +687,6 @@ select.speed-select {
 #elevation-info {
   letter-spacing: .5px;
   font-weight: 700;
-  font-family: var(--font-main);
 }
 
 .maplibregl-marker {
@@ -639,7 +697,6 @@ select.speed-select {
   z-index: 99999 !important;
   display: block !important;
   overflow: visible !important;
-  -webkit-filter: drop-shadow(0 0 4px #000000);
   filter: drop-shadow(0 0 4px #000000);
   cursor: pointer;
 }
@@ -647,11 +704,9 @@ select.speed-select {
 .scan-marker-label-text {
   font-weight: 700;
   font-size: 12px;
-  font-family: var(--font-mono);
-
   fill: var(--main-color);
   paint-order: stroke;
-  stroke: var(--bg-black);
+  stroke: var(--color-black);
   stroke-width: .5px;
 }
 
@@ -660,7 +715,7 @@ select.speed-select {
   box-sizing: border-box !important;
   width: 16px !important;
   height: 16px !important;
-  border: 2px solid rgba(0, 0, 0, .45) !important;
+  border: 2px solid rgba(var(--color-black), .45) !important;
   border-radius: 50% !important;
   cursor: pointer !important;
 }
@@ -673,12 +728,11 @@ select.speed-select {
   padding: 0 5px;
   border: var(--border-width) solid var(--main-color);
   border-radius: 5px;
-  background: rgba(0, 10, 0, .85);
+  background: var(--bg-overlay);
   color: var(--main-color);
   white-space: nowrap;
   font-weight: 400;
   font-size: 11px;
-  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -708,7 +762,6 @@ select.speed-select {
   font-weight: 700;
   font-size: 14px;
   line-height: 1.5;
-  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
 
@@ -720,14 +773,13 @@ select.speed-select {
   color: var(--main-color);
   text-transform: uppercase;
   font-size: 10px;
-  font-family: inherit;
   cursor: pointer;
   transition: var(--transition-fast);
 }
 
 .btn-copy-small:hover {
   background: var(--main-color);
-  color: var(--bg-black);
+  color: var(--color-black);
 }
 
 .mgrs-copy-zone {
@@ -740,48 +792,6 @@ select.speed-select {
 }
 
 
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background: 0 0;
-  transition: background var(--transition-slide);
-
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-}
-
-.modal-overlay.active {
-  display: flex;
-  background: rgba(0, 0, 0, .85);
-  transition: background var(--transition-slide);
-}
-
-.modal-content {
-  width: 340px;
-  border: 1px solid var(--main-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-panel);
-  box-shadow: 0 0 30px rgba(0, 255, 0, .2);
-  opacity: 0;
-  transition: all var(--transition-fast);
-  -webkit-transform: translateY(20px) scale(.95);
-  transform: translateY(20px) scale(.95);
-}
-
-.modal-overlay.active .modal-content {
-  opacity: 1;
-  -webkit-transform: translateY(0) scale(1);
-  transform: translateY(0) scale(1);
-}
-
 .main-input {
   margin: 0;
   padding: 10px;
@@ -790,31 +800,6 @@ select.speed-select {
   border: 1px solid var(--main-color);
   background: #000000;
   color: var(--main-color);
-  font-family: var(--font-main);
-}
-
-
-
-.modal-content.modal-error {
-  border: 1px solid red;
-  -webkit-animation: error-glow 1.5s infinite ease-in-out;
-  animation: error-glow 1.5s infinite ease-in-out;
-}
-
-.modal-error .modal__header {
-  border-bottom-color: red !important;
-  color: red !important;
-}
-
-.modal-overlay.active .modal-content.modal-error {
-  -webkit-animation: error-glow 1.5s infinite ease-in-out,
-    modal-shake .3s ease-in-out;
-  animation: error-glow 1.5s infinite ease-in-out, modal-shake .3s ease-in-out;
-}
-
-.modal-success {
-  -webkit-animation: success-glow 2s infinite ease-in-out;
-  animation: success-glow 2s infinite ease-in-out;
 }
 
 .toast-notification {
@@ -822,7 +807,6 @@ select.speed-select {
   border-radius: var(--border-radius);
   background: var(--bg-panel);
   box-shadow: 0 0 15px rgba(0, 255, 0, .2);
-  -webkit-animation: success-glow 1.5s infinite ease-in-out;
   animation: success-glow 1.5s infinite ease-in-out;
 }
 
@@ -830,22 +814,18 @@ select.speed-select {
 .ruler-point-svg {
   width: 24px;
   height: 24px;
-  -webkit-filter: drop-shadow(0 0 5px var(--main-color));
   filter: drop-shadow(0 0 5px var(--main-color));
   cursor: pointer;
-  transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
   transition: transform .2s cubic-bezier(.175, .885, .32, 1.275);
-  transition: transform .2s cubic-bezier(.175, .885, .32, 1.275), -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
 .ruler-point-svg:hover {
-  transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
-  -webkit-transform: scale(1.1);
+  transition: transform .2s cubic-bezier(.175, .885, .32, 1.275);
   transform: scale(1.1);
 }
 
 .ruler-point-svg path {
-  fill: var(--color-accent-yellow);
+  fill: var(--color-yellow-light);
   stroke: #000000;
   stroke-width: 1px;
 }
@@ -857,7 +837,6 @@ select.speed-select {
   white-space: nowrap;
   font-weight: 400;
   font-size: 12px;
-  font-family: var(--font-mono);
   pointer-events: none;
 }
 
@@ -869,7 +848,6 @@ select.speed-select {
   color: var(--main-color);
   letter-spacing: .5px;
   font-size: 10px;
-  font-family: var(--font-mono);
 }
 
 .point-item {
@@ -894,16 +872,15 @@ select.speed-select {
 }
 
 .compass-marker-dot {
-  transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
+  transition: transform .2s cubic-bezier(.175, .885, .32, 1.275);
   pointer-events: none;
 }
 
 .compass-marker-dot:hover,
 .compass-marker-dot:focus,
 .compass-marker-dot:active {
-  -webkit-filter: drop-shadow(0 0 5px #ffffff);
   filter: drop-shadow(0 0 5px #ffffff);
-  transition: -webkit-transform .2s cubic-bezier(.175, .885, .32, 1.275);
+  transition: transform .2s cubic-bezier(.175, .885, .32, 1.275);
 }
 
 .maplibregl-marker,
@@ -921,7 +898,6 @@ select.speed-select {
 
 .static-marker .custom-marker {
   /* Прибирає "руку" перетягування */
-  -webkit-filter: brightness(1.2);
   filter: brightness(1.2);
   cursor: default !important;
   /* Робимо пошуковий маркер трохи яскравішим */
@@ -951,35 +927,8 @@ select.speed-select {
 /* Ефект матового скла для панелей */
 .modal-content,
 .toast-notification {
-  border: 1px solid rgba(0, 255, 0, .3);
-  background-color: rgba(0, 15, 0, .85) !important;
-
-  /* Розмиття фону */
-
-  -webkit-backdrop-filter: blur(5px);
-
-  /* Напівпрозорий чорно-зелений */
+  background-color: var(--bg-panel);
   backdrop-filter: blur(5px);
-}
-
-/* Плавна поява модалок */
-.modal-overlay {
-  opacity: 0;
-  transition: opacity .3s ease;
-  /* background: rgba(0, 0, 0, 0.5); — можна зробити темнішим */
-}
-
-.modal-overlay.active {
-  opacity: 1;
-}
-
-.modal-content {
-  transition: transform .3s cubic-bezier(.175, .885, .32, 1.275);
-  transform: translateY(-20px) scale(.95);
-}
-
-.modal-overlay.active .modal-content {
-  transform: translateY(0) scale(1);
 }
 
 .selection-box {
@@ -1019,7 +968,6 @@ select.speed-select {
   white-space: nowrap;
   font-weight: bold;
   font-size: 12px;
-  font-family: var(--font-mono);
   transform: translate(-50%, -50%);
 
   /* Розмиття фону під текстом */
@@ -1050,8 +998,6 @@ select.speed-select {
   animation: scan-diagonal 2s linear infinite;
 }
 
-
-
 /* === ТАКТИЧНА МАСШТАБНА ШКАЛА === */
 
 .maplibregl-ctrl-scale {
@@ -1076,28 +1022,16 @@ select.speed-select {
 
   /* Моноширинний шрифт */
   font-size: 11px !important;
-
-  /* Прибираємо верхню межу (класичний вигляд шкали) */
-  font-family: var(--font-mono) !important;
 }
 
 /* === КАСТОМІЗАЦІЯ КНОПОК MAPLIBRE (Zoom & Compass) === */
 
 /* 1. Контейнер кнопок (сама "коробка") */
 .maplibregl-ctrl-group {
-  /* Темний фон */
   border: 1px solid var(--main-color) !important;
-
-  /* Зелена рамка */
   border-radius: 2px !important;
   background-color: rgba(0, 15, 0, .85) !important;
-
-  /* Гострі кути (тактичний стиль) */
   box-shadow: 0 0 10px rgba(0, 255, 0, .15) !important;
-
-  -webkit-backdrop-filter: blur(5px);
-
-  /* Легке світіння */
   backdrop-filter: blur(5px);
 }
 
@@ -1187,23 +1121,13 @@ body.printing-mode #modal-alert {
   }
 }
 
-.modal-prompt-text {
-  color: var(--main-color);
-}
-
-#modal-prompt-input {
-  box-sizing: border-box;
-  margin: 15px 0;
-  width: 100%;
-}
-
-#modal-prompt-cancel {
-  background: var(--color-accent);
-  color: white;
-}
 
 .help-section li {
   margin-bottom: 5px;
+}
+
+.help-section h3 {
+  font-weight: 700;
 }
 
 /* Стан приховано (utility class) */
@@ -1214,17 +1138,6 @@ body.printing-mode #modal-alert {
   pointer-events: none;
 }
 
-/* Якщо ви хочете плавне зникнення для модалок, можна використовувати: */
-.modal {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity var(--transition-normal);
-}
-
-.modal.modal--active {
-  visibility: visible;
-  opacity: 1;
-}
 
 @media (max-width: 600px) {
   .sidebar {

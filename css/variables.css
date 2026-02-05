@@ -1,19 +1,21 @@
+@import 'fonts.css';
+
 :root {
-  --main-color: #00ff00;
-  --main-color-dark: #003300;
-  --main-color-deep: #001500;
-  --main-color-muted: #004400;
-  --bg-black: #000000;
-  --bg-dark-grey: #0a0a0a;
-  --bg-overlay: rgba(0, 0, 0, .85);
-  --bg-panel: rgba(0, 15, 0, .9);
-  --color-accent: #ff0000;
-  --color-accent-blue: #008cff;
-  --color-accent-yellow: #ffff00;
+  --main-color: hsl(120, 100%, 50%);
+  --main-color-muted: hsl(120, 100%, 15%);
+  --main-color-dark: hsl(120, 100%, 10%);
+  --main-color-deep: hsl(120, 100%, 5%);
+  --color-red: #ff0000;
+  --color-blue: #008cff;
+  --color-black: #000000;
+  --color-white: #ffffff;
   --color-orange: #ff6b00;
   --color-yellow: #ffcc00;
-  --font-main: "Jura", sans-serif;
-  --font-mono: "Jura", monospace;
+  --color-yellow-light: #ffff00;
+  --bg-panel: hsl(120, 100%, 5%, .9);
+  --bg-dark-grey: #0a0a0a;
+  --bg-overlay: rgba(0, 0, 0, .85);
+  --font-main: "Jura";
   --border-width: 1px;
   --border-radius: 4px;
   --gap-medium: 10px;

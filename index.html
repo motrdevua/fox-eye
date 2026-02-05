@@ -11,15 +11,16 @@
 </head>
 
 <body>
+
+
   <!-- HEADER -->
   <header class="header"></header>
 
   <!-- MAIN LAYOUT -->
   <div class="app">
 
-
-
     <div id="search-overlay" class="search-box__overlay">
+      <canvas id="c"></canvas>
       <div class="search-box">
         <h2 class="search-box__title">
           <div id="fox" data-icon="fox"></div>
@@ -58,10 +59,6 @@
           data-tooltip="Тип мапи" data-icon="map"></button>
         <button class="icon-btn tools__icon-btn" id="contours" title="Ізогіпси" aria-label="Ізогіпси"
           data-tooltip="Ізогіпси" data-icon="izogips"></button>
-        <!-- <button id="theme-toggle" class="icon-btn tools__icon-btn" title="Змінити тему"
-          aria-label="Змінити тему" data-tooltip="Змінити тему" data-icon="fox"></button> -->
-
-
       </div>
 
       <div>
@@ -118,12 +115,12 @@
 
     <div id="modal-alert" class="modal-overlay">
       <div class="modal-content">
-        <div class="modal__header" style="color: var(--color-accent); border-color: var(--color-main)">
+        <div class="modal__header" style="color: var(--color-red); border-color: var(--main-color)">
           УВАГА!
         </div>
         <div style="padding: 20px; text-align: center">
-          <p id="modal-alert-text" style="margin-bottom: 20px; color: #fff"></p>
-          <button class="btn-main" id="modal-alert-ok">ЗРОЗУМІЛО</button>
+          <p id="modal-alert-text" style="margin-bottom: 20px; color: var(--color-white)"></p>
+          <button class=" btn-main" id="modal-alert-ok">ЗРОЗУМІЛО</button>
         </div>
       </div>
     </div>
@@ -139,13 +136,13 @@
               📏 ЛІНІЙКА</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
               <li>
-                <b style="color: var(--color-main)">ЛКМ (Карта)</b> — Додати точку (WP)
+                <b style="color: var(--main-color)">ЛКМ (Карта)</b> — Додати точку (WP)
               </li>
               <li>
-                <b style="color: var(--color-main)">ЛКМ (Точка)</b> — Затиснути й тягнути
+                <b style="color: var(--main-color)">ЛКМ (Точка)</b> — Затиснути й тягнути
               </li>
               <li>
-                <b style="color: var(--color-accent)">ПКМ (Точка)</b> — Видалити точку
+                <b style="color: var(--color-red)">ПКМ (Точка)</b> — Видалити точку
               </li>
             </ul>
           </div>
@@ -156,16 +153,16 @@
               🎯 ЦИРКУЛЬ (РАДІУС)</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
               <li>
-                <b style="color: var(--color-main)">1-й КЛІК</b> — Встановити ЦЕНТР
+                <b style="color: var(--main-color)">1-й КЛІК</b> — Встановити ЦЕНТР
               </li>
               <li>
-                <b style="color: var(--color-main)">РУХ МИШІ</b> — Обрати дистанцію
+                <b style="color: var(--main-color)">РУХ МИШІ</b> — Обрати дистанцію
               </li>
               <li>
-                <b style="color: var(--color-main)">2-й КЛІК</b> — Зафіксувати РАДІУС
+                <b style="color: var(--main-color)">2-й КЛІК</b> — Зафіксувати РАДІУС
               </li>
               <li>
-                <b style="color: var(--color-accent)">ПКМ</b> — СКАСУВАТИ (під час малювання)
+                <b style="color: var(--color-red)">ПКМ</b> — СКАСУВАТИ (під час малювання)
               </li>
               <li>
                 <i>* 3-й клік автоматично починає нове коло</i>
@@ -179,13 +176,13 @@
               📡 СКАНЕР ВИСОТ</h3>
             <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
               <li>
-                <b style="color: var(--color-main)">ЛКМ (Затиснути)</b> — Початок зони
+                <b style="color: var(--main-color)">ЛКМ (Затиснути)</b> — Початок зони
               </li>
               <li>
-                <b style="color: var(--color-main)">ТЯГНУТИ</b> — Виділити квадрат
+                <b style="color: var(--main-color)">ТЯГНУТИ</b> — Виділити квадрат
               </li>
               <li>
-                <b style="color: var(--color-main)">ВІДПУСТИТИ</b> — Пошук панівних висот
+                <b style="color: var(--main-color)">ВІДПУСТИТИ</b> — Пошук панівних висот
               </li>
             </ul>
           </div>

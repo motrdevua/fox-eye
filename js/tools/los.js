@@ -20,7 +20,7 @@ export function handleLosClick(lngLat) {
 
   // Створюємо маркер
   const isObserver = state.los.points.length === 1;
-  const color = isObserver ? '#00FFFF' : '#FF00FF'; // Cyan для Спостерігача, Magenta для Цілі
+  const color = isObserver ? CONFIG.colors.green : CONFIG.colors.yellow; // Cyan для Спостерігача, Magenta для Цілі
   const label = isObserver ? 'ОКО' : 'ЦІЛЬ';
 
   const el = document.createElement('div');
@@ -32,7 +32,7 @@ export function handleLosClick(lngLat) {
   el.style.width = '12px';
   el.style.height = '12px';
   el.style.borderRadius = '50%';
-  el.style.border = '2px solid white';
+  el.style.border = '1px solid black';
   el.style.boxShadow = '0 0 5px black';
 
   const marker = new maplibregl.Marker({ element: el })
