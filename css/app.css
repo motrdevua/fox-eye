@@ -299,7 +299,6 @@ body.printing-mode #search-overlay {
   border: var(--border-width) solid var(--main-color-muted);
   border-radius: var(--border-radius);
   background: var(--main-color-deep);
-  color: var(--main-color-muted);
   text-transform: uppercase;
   letter-spacing: .5px;
   font-weight: 700;
@@ -360,8 +359,8 @@ body.printing-mode #tools {
 .tools__hint {
   margin: 8px 0;
   padding: var(--gap-small) 0;
-  border-top: 1px dashed #333333;
-  border-bottom: 1px dashed #333333;
+  border-top: 1px dashed var(--color-grey)333;
+  border-bottom: 1px dashed var(--color-grey)333;
   color: #ffcc00;
   font-size: 16px;
 }
@@ -1121,14 +1120,49 @@ body.printing-mode #modal-alert {
   }
 }
 
+#modal-help .modal-content {
+  max-width: 500px;
+}
 
-.help-section li {
+.help__content {
+  padding: 15px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.help__section:not(:last-child) {
+  margin-bottom: 20px
+}
+
+.help__title {
+  color: var(--color-yellow);
+  border-bottom: 1px dashed var(--color-grey);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.help__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #ccc
+}
+
+.help__list-item {
   margin-bottom: 5px;
 }
 
-.help-section h3 {
-  font-weight: 700;
+.help__item--green {
+  color: var(--main-color);
 }
+
+.help__item--red {
+  color: var(--color-red);
+}
+
 
 /* Стан приховано (utility class) */
 .is-hidden {

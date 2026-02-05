@@ -126,80 +126,75 @@
     </div>
 
     <div id="modal-help" class="modal-overlay">
-      <div class="modal-content" style="max-width: 500px">
+      <div class="modal-content">
         <div class="modal__header">КОРОТКИЙ ДОВІДНИК</div>
-        <div class="help-content"
-          style="padding: 15px; font-family: var(--font-mono); font-size: 14px; max-height: 70vh; overflow-y: auto;">
-          <div class="help-section" style="margin-bottom: 20px">
-            <h3
-              style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
+        <div class="help__content">
+          <div class="help__section">
+            <h3 class="help__title">
               📏 ЛІНІЙКА</h3>
-            <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li>
-                <b style="color: var(--main-color)">ЛКМ (Карта)</b> — Додати точку (WP)
+            <ul class="help__list">
+              <li class="help__item">
+                <b class="help__item--green">ЛКМ (Карта)</b> — Додати точку (WP)
               </li>
-              <li>
-                <b style="color: var(--main-color)">ЛКМ (Точка)</b> — Затиснути й тягнути
+              <li class="help__item">
+                <b class="help__item--green">ЛКМ (Точка)</b> — Затиснути й тягнути
               </li>
-              <li>
-                <b style="color: var(--color-red)">ПКМ (Точка)</b> — Видалити точку
+              <li class="help__item">
+                <b class="help__item--red">ПКМ (Точка)</b> — Видалити точку
               </li>
             </ul>
           </div>
 
-          <div class="help-section" style="margin-bottom: 20px">
-            <h3
-              style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
+          <div class="help__section">
+            <h3 class="help__title">
               🎯 ЦИРКУЛЬ (РАДІУС)</h3>
-            <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li>
-                <b style="color: var(--main-color)">1-й КЛІК</b> — Встановити ЦЕНТР
+            <ul class="help__list">
+              <li class="help__item">
+                <b class="help__item--green">1-й КЛІК</b> — Встановити ЦЕНТР
               </li>
-              <li>
-                <b style="color: var(--main-color)">РУХ МИШІ</b> — Обрати дистанцію
+              <li class="help__item">
+                <b class="help__item--green">РУХ МИШІ</b> — Обрати дистанцію
               </li>
-              <li>
-                <b style="color: var(--main-color)">2-й КЛІК</b> — Зафіксувати РАДІУС
+              <li class="help__item">
+                <b class="help__item--green">2-й КЛІК</b> — Зафіксувати РАДІУС
               </li>
-              <li>
-                <b style="color: var(--color-red)">ПКМ</b> — СКАСУВАТИ (під час малювання)
+              <li class="help__item">
+                <b class="help__item--green">3-й КЛІК</b> — автоматично починає нове коло
               </li>
-              <li>
-                <i>* 3-й клік автоматично починає нове коло</i>
+              <li class="help__item">
+                <b class="help__item--red">ПКМ</b> — СКАСУВАТИ (під час малювання)
               </li>
             </ul>
           </div>
 
-          <div class="help-section" style="margin-bottom: 20px">
-            <h3
-              style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
+          <div class="help__section">
+            <h3 class="help__title">
               📡 СКАНЕР ВИСОТ</h3>
-            <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li>
-                <b style="color: var(--main-color)">ЛКМ (Затиснути)</b> — Початок зони
+            <ul class="help__list">
+              <li class="help__item">
+                <b class="help__item--green">ЛКМ (Затиснути)</b> — Початок зони
               </li>
-              <li>
-                <b style="color: var(--main-color)">ТЯГНУТИ</b> — Виділити квадрат
+              <li class="help__item">
+                <b class="help__item--green">ТЯГНУТИ</b> — Виділити квадрат
               </li>
-              <li>
-                <b style="color: var(--main-color)">ВІДПУСТИТИ</b> — Пошук панівних висот
+              <li class="help__item">
+                <b class="help__item--green">ВІДПУСТИТИ</b> — Пошук панівних висот
               </li>
             </ul>
           </div>
 
-          <div class="help-section">
-            <h3
-              style="color: var(--color-yellow); border-bottom: 1px dashed #333; padding-bottom: 5px; margin-bottom: 10px;">
+          <div class="help__section">
+            <h3 class="help__title">
               💾 ДАНІ</h3>
-            <ul style="list-style: none; padding: 0; margin: 0; color: #ccc">
-              <li><b>АВТОЗБЕРЕЖЕННЯ</b> — Працює постійно (F5 friendly)</li>
-              <li>⬇ — Зберегти файл (JSON)</li>
-              <li>⬆ — Завантажити ситуацію</li>
+            <ul class="help__list">
+              <li class="help__item"><b>АВТОЗБЕРЕЖЕННЯ</b> — Працює постійно (F5 friendly)</li>
+              <li class="help__item">⬇ — Зберегти файл (JSON)</li>
+              <li class="help__item">⬆ — Завантажити ситуацію</li>
             </ul>
           </div>
         </div>
 
-        <div style="padding: 10px; text-align: right; border-top: 1px solid #333">
+        <div style="padding: 15px;">
           <button id="close-help-btn" class="btn-main" style="width: 100%">ЗРОЗУМІЛО</button>
         </div>
       </div>
@@ -209,6 +204,7 @@
   <script src="./js/vendor/maplibre-gl.js"></script>
   <script src="./js/vendor/mgrs.min.js"></script>
   <script src="./js/vendor/turf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module" src="./js/app.js"></script>
 </body>
 

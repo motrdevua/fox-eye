@@ -1,30 +1,44 @@
 @import 'fonts.css';
 
 :root {
-  --main-color: hsl(120, 100%, 50%);
-  --main-color-muted: hsl(120, 100%, 15%);
-  --main-color-dark: hsl(120, 100%, 10%);
-  --main-color-deep: hsl(120, 100%, 5%);
-  --color-red: #ff0000;
-  --color-blue: #008cff;
+  --main-color: #00ff00;
+  --main-color-muted: #004d00;
+  /* Приглушений */
+  --main-color-dark: #003300;
+  /* Темно-зелений фон кнопок */
+  --main-color-deep: #001a00;
+
+  --bg-color: #000000;
+  --bg-panel: rgba(0, 15, 0, 0.85);
+  --bg-overlay: rgba(0, 0, 0, 0.85);
+  --bg-dark-grey: #1a1a1a;
+
+  --text-color: #00ff00;
+  --text-grey: #888888;
+  --text-dim: #aaaaaa;
+
   --color-black: #000000;
-  --color-white: #ffffff;
-  --color-orange: #ff6b00;
+  --color-red: #ff0000;
+  --color-blue: #0088ff;
   --color-yellow: #ffcc00;
   --color-yellow-light: #ffff00;
-  --bg-panel: hsl(120, 100%, 5%, .9);
-  --bg-dark-grey: #0a0a0a;
-  --bg-overlay: rgba(0, 0, 0, .85);
-  --font-main: "Jura";
+  --color-grey: #888888;
+  --color-white: #ffffff;
+  --color-orange: #ff6b00;
+  --color-grey: #333333;
+
+  --font-main: 'Jura', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
+
   --border-width: 1px;
   --border-radius: 4px;
-  --gap-medium: 10px;
-  --gap-small: 5px;
   --panel-padding: 15px;
-  --text-dark-grey: #666666;
-  --text-dim: #555555;
-  --text-grey: #888888;
-  --transition-fast: .05s;
-  --transition-normal: .15s ease-in-out;
-  --transition-slide: .3s cubic-bezier(.4, 0, .2, 1);
+
+  --gap-small: 5px;
+  --gap-medium: 10px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slide: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }

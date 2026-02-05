@@ -1,5 +1,3 @@
-import { CONFIG } from '../core/config.js';
-
 // --- ЗМІННІ МОДУЛЯ (Зберігають стан) ---
 let animationId = null;
 let resizeHandler = null;
@@ -32,7 +30,7 @@ export const Hexagon = {
       sparkChance: 0.1,
       sparkDist: 10,
       sparkSize: 2,
-      color: CONFIG.colors.main,
+      color: 'hsl(120,100%,light%)',
       baseLight: 50,
       addedLight: 10,
       shadowToTimePropMult: 6,
@@ -52,7 +50,6 @@ export const Hexagon = {
     ctx.fillRect(0, 0, w, h);
 
     // --- ЛОГІКА LINE (Конструктор і прототипи) ---
-    // (Можна залишити всередині start, щоб бачити opts)
     function Line() {
       this.reset();
     }

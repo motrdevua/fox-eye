@@ -21,6 +21,8 @@ import { DataManager } from './core/data-manager.js';
 
 import { handleLosClick, clearLos } from './tools/los.js';
 
+import { initShareTool, shareCurrentView } from './tools/share.js';
+
 // --- 1. ПЕРЕВІРКА WEBGL (З оригінального коду) ---
 function checkWebGL() {
   try {
