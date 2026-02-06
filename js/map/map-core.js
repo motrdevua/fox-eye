@@ -14,6 +14,8 @@ import { createMarker, loadSavedMarkers } from './markers.js';
 import { AppState } from '../core/app-state.js';
 import { Hexagon } from '../ui/hexagon.js';
 
+import { initAstroWidget } from '../tools/astro.js';
+
 function focusPoint(lng, lat) {
   state.map.flyTo({
     center: [lng, lat],
@@ -70,6 +72,8 @@ export function startMap(lon, lat) {
   document.getElementById('tools').style.display = 'block';
 
   Hexagon.stop();
+
+  initAstroWidget();
 
   if (!state.map) {
     initMap(lon, lat);

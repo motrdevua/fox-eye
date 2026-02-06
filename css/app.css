@@ -1,6 +1,6 @@
 @import './reset.css';
 @import './variables.css';
-
+@import './astro.css';
 
 body {
   overflow: hidden;
@@ -359,8 +359,8 @@ body.printing-mode #tools {
 .tools__hint {
   margin: 8px 0;
   padding: var(--gap-small) 0;
-  border-top: 1px dashed var(--color-grey)333;
-  border-bottom: 1px dashed var(--color-grey)333;
+  border-top: 1px dashed var(--color-grey);
+  border-bottom: 1px dashed var(--color-grey);
   color: #ffcc00;
   font-size: 16px;
 }

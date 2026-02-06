@@ -1,0 +1,55 @@
+/* ASTRO WIDGET */
+.astro-panel {
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  /* Відступ, щоб не перекривати інші кнопки */
+  z-index: 10;
+
+  background: var(--bg-panel);
+  /* Твій напівпрозорий фон */
+  border: 1px solid var(--main-color);
+  border-radius: 4px;
+  padding: 5px 10px;
+
+  color: var(--main-color);
+  font-family: var(--font-mono);
+  /* Моноширинний для цифр */
+  font-size: 11px;
+  backdrop-filter: blur(4px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  /* Щоб крізь нього можна було клікати карту, якщо треба */
+}
+
+.astro-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.astro-icon {
+  font-size: 14px;
+}
+
+/* При друку ховаємо */
+@media print {
+  .astro-panel {
+    display: none;
+  }
+}
+
+/* Адаптив для мобільних: переміщуємо вниз або ховаємо деталі */
+@media (max-width: 600px) {
+  .astro-panel {
+    top: auto;
+    bottom: 80px;
+    /* Над нижньою панеллю */
+    right: 10px;
+    font-size: 10px;
+  }
+}
